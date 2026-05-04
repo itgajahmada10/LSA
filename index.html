@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waruna Group | Verifikasi Dokumen</title>
-    <!-- Menggunakan Tailwind CSS via CDN sesuai dengan environment Anda -->
+    <!-- Menggunakan Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #fdfbf3; }
@@ -114,20 +114,20 @@
             resultContainer.innerHTML = '';
             errorContainer.classList.add('hidden');
 
-            // Siapkan FormData (Nama key WAJIB sama dengan di n8n: 'sertifikat' dan 'penawaran')
+            // Siapkan FormData
             const formData = new FormData();
             formData.append('sertifikat', fileSertifikat);
             formData.append('penawaran', filePenawaran);
 
             try {
-                // Tembak Webhook n8n
+                // Tembak Webhook n8n Produksi
                 const response = await fetch('https://n8.waruna-group.co.id/webhook/audit-dokumen', {
                     method: 'POST',
                     body: formData
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Server merespons dengan status: ${response.status}. Pastikan CORS Webhook sudah dibuka.`);
+                    throw new Error(`Server merespons dengan status: ${response.status}. Pastikan Workflow Aktif (ON) dan CORS Webhook terbuka.`);
                 }
 
                 const data = await response.json();
