@@ -132,12 +132,21 @@
 
                 const data = await response.json();
                 
-                // Cek jika array kosong atau format salah
-                if (!data || data.length === 0) {
-                    throw new Error('Data JSON kosong atau format respons dari n8n tidak valid.');
+                // 1. Tangani perbedaan format: Jika Array ambil index 0, jika Object pakai langsung
+                const result = Array.isArray(data) ? data[0] : data;
+                
+                // 2. Cek jika AI mengalami halusinasi dan n8n mengirimkan status "ERROR"
+                if (result && result.status === "ERROR") {
+                    throw new Error("AI gagal membaca dokumen atau format tidak sesuai. Output mentah: " + (result.raw || "Kosong"));
                 }
 
-                renderHasil(data[0]);
+                // 3. Cek apakah properti utama (status_keseluruhan) benar-benar ada
+                if (!result || !result.status_keseluruhan) {
+                    throw new Error('Data JSON kosong atau AI gagal menyusun format hierarki kategori. Eksekusi ditolak.');
+                }
+
+                // 4. Render ke layar
+                renderHasil(result);
 
             } catch (error) {
                 errorContainer.innerText = `Gagal memproses dokumen: ${error.message}`;
