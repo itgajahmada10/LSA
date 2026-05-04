@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Audit LSA & APAR - Waruna Group</title>
+    <title>Portal Audit LSA & APAR</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans">
     <div class="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="bg-white shadow-lg rounded-lg px-8 py-6">
             <h1 class="text-2xl font-bold text-gray-800 mb-2">Sistem Audit Dokumen Kapal</h1>
-            <p class="text-gray-600 mb-6 text-sm">Unggah file Sertifikat Inspeksi dan Penawaran Vendor untuk melakukan rekonsiliasi data (Cross-Match Audit).</p>
+            <p class="text-gray-600 mb-6 text-sm">Unggah file Sertifikat Inspeksi dan Penawaran Vendor untuk melakukan rekonsiliasi data.</p>
 
             <form id="auditForm" class="space-y-6">
                 <!-- Input Sertifikat -->
@@ -54,8 +54,7 @@
                 <!-- Input URL Webhook n8n -->
                 <div>
                     <label for="webhook_url" class="block text-sm font-medium text-gray-700">Webhook URL (n8n)</label>
-                    <input type="url" id="webhook_url" name="webhook_url" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="https://[URL-N8N-ANDA]/webhook/audit-dokumen" required>
-                    <p class="mt-1 text-xs text-gray-500">Pastikan workflow n8n Anda sudah aktif (Active).</p>
+                    <input type="url" id="webhook_url" name="webhook_url" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value="https://n8.waruna-group.co.id/webhook/audit-dokumen" required>
                 </div>
 
                 <div class="pt-4">
@@ -76,7 +75,6 @@
     </div>
 
     <script>
-        // Update label nama file saat dipilih
         document.getElementById('file_sertifikat').addEventListener('change', function(e) {
             document.getElementById('name_sertifikat').textContent = e.target.files[0] ? e.target.files[0].name : "Belum ada file dipilih";
         });
@@ -84,7 +82,6 @@
             document.getElementById('name_penawaran').textContent = e.target.files[0] ? e.target.files[0].name : "Belum ada file dipilih";
         });
 
-        // Handle Submit Form
         document.getElementById('auditForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -93,7 +90,6 @@
             const outputResult = document.getElementById('outputResult');
             const webhookUrl = document.getElementById('webhook_url').value;
             
-            // Siapkan file untuk dikirim via form-data
             const formData = new FormData();
             formData.append('sertifikat', document.getElementById('file_sertifikat').files[0]);
             formData.append('penawaran', document.getElementById('file_penawaran').files[0]);
@@ -103,7 +99,6 @@
             resultContainer.classList.add('hidden');
 
             try {
-                // Tembak data ke Webhook n8n
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     body: formData
@@ -113,8 +108,9 @@
                 
                 const data = await response.json();
                 
-                // Tampilkan hasil format JSON
                 outputResult.textContent = JSON.stringify(data, null, 2);
+                outputResult.classList.remove('text-red-400');
+                outputResult.classList.add('text-green-400');
                 resultContainer.classList.remove('hidden');
                 
             } catch (error) {
