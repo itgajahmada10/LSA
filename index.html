@@ -3,84 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Dokumen Kapal - Waruna Group</title>
+    <title>BeeSuite - Vessel Document Audit</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #fffbeb; }
-        .header-gradient { background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%); }
-        .btn-waruna { background-color: #4c1d95; transition: all 0.3s ease; }
-        .btn-waruna:hover { background-color: #5b21b6; transform: translateY(-1px); }
-        .card-container { border-top: 4px solid #f59e0b; }
-        .item-card { border-left: 4px solid #4c1d95; }
-        .doc-badge { background-color: #4c1d95; color: white; }
+        body { 
+            background-color: #FFFBEB; /* Soft Cream BG sesuai Gambar 2 */
+            font-family: 'Inter', sans-serif;
+        }
+        .beesuite-header {
+            background-color: #FEF9C3; /* Yellow Header sesuai Gambar 2 */
+            border-bottom: 1px solid #FEF08A;
+        }
+        .btn-purple {
+            background-color: #4C1D95; /* Deep Purple sesuai Gambar 2 */
+            transition: all 0.2s ease;
+        }
+        .btn-purple:hover {
+            background-color: #5B21B6;
+            transform: translateY(-1px);
+        }
+        .audit-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #FDE68A;
+        }
+        .section-tag {
+            background-color: #4C1D95;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .doc-chip {
+            background-color: #FFF7ED;
+            border: 1px solid #FFEDD5;
+            color: #9A3412;
+        }
     </style>
 </head>
-<body class="min-h-screen font-sans text-slate-800">
-    <div class="max-w-5xl mx-auto py-10 px-4">
-        <div class="bg-white shadow-xl rounded-xl overflow-hidden card-container">
-            <!-- Header -->
-            <div class="header-gradient px-8 py-6 border-b border-amber-200">
-                <h1 class="text-2xl font-bold text-amber-900 tracking-tight">Audit Dokumen Kapal</h1>
-                <p class="text-amber-700 text-sm mt-1 font-medium italic">Fokus Audit: Kelengkapan Dokumen & Temuan Anomali</p>
+<body class="text-slate-900">
+    <!-- Top Navigation Bar -->
+    <nav class="beesuite-header px-6 py-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-purple-900 rounded-lg flex items-center justify-center">
+                <span class="text-white font-black text-xs">B</span>
             </div>
+            <h1 class="text-lg font-bold text-amber-900 tracking-tight">BeeSuite <span class="font-normal text-slate-500">| Audit Dokumen</span></h1>
+        </div>
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Waruna Group Terminal
+        </div>
+    </nav>
 
-            <div class="p-8">
-                <form id="auditForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Input Sertifikat -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-bold text-slate-700 uppercase tracking-wide">Laporan Sertifikat</label>
-                            <div class="relative border-2 border-dashed border-amber-200 rounded-lg p-6 hover:bg-amber-50 transition-all text-center">
-                                <input id="file_sertifikat" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
-                                <div class="text-amber-600">
-                                    <svg class="mx-auto h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                    <span class="text-xs font-bold" id="name_sertifikat">UNGGAH SERTIFIKAT</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Input Penawaran -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-bold text-slate-700 uppercase tracking-wide">Penawaran Vendor</label>
-                            <div class="relative border-2 border-dashed border-amber-200 rounded-lg p-6 hover:bg-amber-50 transition-all text-center">
-                                <input id="file_penawaran" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
-                                <div class="text-amber-600">
-                                    <svg class="mx-auto h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                    <span class="text-xs font-bold" id="name_penawaran">UNGGAH PENAWARAN</span>
-                                </div>
-                            </div>
+    <main class="max-w-5xl mx-auto py-10 px-4">
+        <div class="audit-card shadow-lg p-8">
+            <!-- Form Section -->
+            <form id="auditForm" class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Upload 1 -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Laporan Sertifikat (Master)</label>
+                        <div class="relative border-2 border-dashed border-amber-200 rounded-xl p-8 hover:bg-amber-50/50 transition-all text-center cursor-pointer group">
+                            <input id="file_sertifikat" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                            <svg class="mx-auto h-8 w-8 text-amber-500 mb-2 opacity-60 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <span class="text-xs font-bold text-amber-800" id="name_sertifikat">UNGGAH SERTIFIKAT PDF</span>
                         </div>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full btn-waruna text-white font-bold py-4 rounded-lg shadow-md uppercase tracking-widest text-xs">
-                        Jalankan Proses Audit Ekstraksi
-                    </button>
-                </form>
+                    <!-- Upload 2 -->
+                    <div class="space-y-3">
+                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Penawaran Vendor (Compare)</label>
+                        <div class="relative border-2 border-dashed border-amber-200 rounded-xl p-8 hover:bg-amber-50/50 transition-all text-center cursor-pointer group">
+                            <input id="file_penawaran" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                            <svg class="mx-auto h-8 w-8 text-amber-500 mb-2 opacity-60 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <span class="text-xs font-bold text-amber-800" id="name_penawaran">UNGGAH PENAWARAN PDF</span>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Hasil Audit -->
-                <div id="resultContainer" class="mt-12 hidden">
-                    <!-- Bagian 1: Inventarisasi Dokumen -->
-                    <section class="mb-10">
-                        <h2 class="text-sm font-black text-purple-900 mb-4 uppercase tracking-widest flex items-center">
-                            <span class="bg-purple-900 text-white p-1 rounded mr-2">01</span> 
-                            Inventarisasi Kelengkapan Dokumen
-                        </h2>
-                        <div id="docInventory" class="flex flex-wrap gap-2"></div>
-                    </section>
+                <button type="submit" id="submitBtn" class="w-full btn-purple text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-[11px]">
+                    Jalankan Analisis Audit Ekstraksi
+                </button>
+            </form>
 
-                    <!-- Bagian 2: Temuan Khusus -->
-                    <section>
-                        <h2 class="text-sm font-black text-red-700 mb-4 uppercase tracking-widest flex items-center">
-                            <span class="bg-red-700 text-white p-1 rounded mr-2">02</span> 
-                            Anomali & Temuan Audit (Hanya Masalah)
-                        </h2>
-                        <div id="outputResult" class="space-y-4"></div>
-                    </section>
+            <!-- Results Section -->
+            <div id="resultContainer" class="mt-12 hidden space-y-10">
+                <!-- 01 Inventarisasi -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="section-tag">01</span>
+                        <h2 class="text-[11px] font-black uppercase tracking-widest text-purple-900">Inventarisasi Kelengkapan Dokumen</h2>
+                    </div>
+                    <div id="docInventory" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- 02 Temuan -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="section-tag" style="background-color: #B91C1C;">02</span>
+                        <h2 class="text-[11px] font-black uppercase tracking-widest text-red-700">Anomali & Temuan Audit (Hanya Masalah)</h2>
+                    </div>
+                    <div id="outputResult" class="space-y-4"></div>
                 </div>
             </div>
         </div>
-        <p class="text-center text-slate-400 text-[10px] mt-6 font-bold uppercase tracking-widest">© 2026 Waruna Group Audit Terminal</p>
-    </div>
+    </main>
 
     <script>
         const WEBHOOK_URL = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
@@ -104,62 +133,68 @@
             formData.append('penawaran', document.getElementById('file_penawaran').files[0]);
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="animate-pulse">MENGANALISIS DATA...</span>`;
+            btn.innerHTML = `<span class="flex items-center justify-center gap-2 italic uppercase"><svg class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" viewBox="0 0 24 24"></svg> Sedang Menganalisis...</span>`;
             resultContainer.classList.add('hidden');
 
             try {
                 const response = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
+                if (!response.ok) throw new Error('Koneksi ke server n8n gagal.');
+                
                 const data = await response.json();
                 
-                // Render Inventarisasi Dokumen
-                docInventory.innerHTML = data.daftar_dokumen.map(doc => `
-                    <span class="text-[10px] font-bold border border-purple-200 px-3 py-1.5 rounded-full bg-purple-50 text-purple-900 uppercase">
-                        ✓ ${doc}
-                    </span>
-                `).join('');
+                // --- FIX: Safety Check untuk .map() ---
+                const daftarDokumen = data.daftar_dokumen || [];
+                const temuanAudit = data.temuan || [];
 
-                // Render Temuan (Hanya yang tidak match/aneh)
-                if (data.temuan && data.temuan.length > 0) {
-                    outputResult.innerHTML = data.temuan.map(t => `
-                        <div class="bg-white p-5 rounded-xl border border-red-100 shadow-sm item-card transition-all hover:shadow-md">
-                            <div class="flex justify-between items-start mb-3">
-                                <h4 class="font-black text-slate-900 text-sm uppercase tracking-tight">${t.item}</h4>
+                // Render Inventarisasi
+                docInventory.innerHTML = daftarDokumen.length > 0 
+                    ? daftarDokumen.map(doc => `<span class="doc-chip text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">✓ ${doc}</span>`).join('')
+                    : `<span class="text-xs italic text-slate-400">Tidak ada sertifikat terdeteksi.</span>`;
+
+                // Render Temuan
+                if (temuanAudit.length > 0) {
+                    outputResult.innerHTML = temuanAudit.map(t => `
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-900 transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-4">
+                                <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">${t.item || 'Item Tanpa Nama'}</h4>
                                 <div class="text-right">
-                                    <span class="block text-[9px] font-black text-red-600 uppercase mb-1">Ditemukan di:</span>
-                                    <span class="text-[10px] bg-red-100 px-2 py-1 rounded font-bold text-red-700">${t.referensi_dokumen}</span>
+                                    <span class="block text-[8px] font-black text-slate-400 uppercase">Referensi Lokasi</span>
+                                    <span class="text-[10px] bg-purple-50 px-2 py-1 rounded font-bold text-purple-700 italic">${t.referensi_dokumen || 'Penyimpangan Umum'}</span>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[12px] mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[12px] mb-4">
                                 <div class="p-3 bg-slate-50 rounded border border-slate-100">
                                     <span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Data Penawaran</span>
-                                    <p class="font-medium text-slate-700">${t.di_penawaran}</p>
+                                    <p class="font-medium text-slate-700">${t.di_penawaran || '-'}</p>
                                 </div>
                                 <div class="p-3 bg-slate-50 rounded border border-slate-100">
                                     <span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Data Sertifikat</span>
-                                    <p class="font-medium text-slate-700">${t.di_sertifikat}</p>
+                                    <p class="font-medium text-slate-700">${t.di_sertifikat || '-'}</p>
                                 </div>
                             </div>
-                            <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                <p class="text-xs font-bold text-amber-900 leading-relaxed">
-                                    <span class="text-amber-600 mr-1 underline">ANALISIS AUDITOR:</span> ${t.analisis}
+                            <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
+                                <p class="text-xs font-bold text-amber-900 leading-relaxed italic">
+                                    <span class="text-purple-900 not-italic mr-1 underline decoration-amber-500">ANALISIS:</span> ${t.analisis || 'Butuh tinjauan manual.'}
                                 </p>
                             </div>
                         </div>
                     `).join('');
                 } else {
-                    outputResult.innerHTML = `<div class="p-8 text-center bg-green-50 border-2 border-dashed border-green-200 rounded-xl">
-                        <p class="text-green-700 font-bold uppercase tracking-widest text-xs">Semua Data Sesuai (No Discrepancies)</p>
+                    outputResult.innerHTML = `<div class="p-10 text-center bg-emerald-50 border-2 border-dashed border-emerald-200 rounded-xl">
+                        <p class="text-emerald-700 font-bold uppercase tracking-widest text-[10px]">Laporan Bersih: Semua data sesuai (Match)</p>
                     </div>`;
                 }
 
                 resultContainer.classList.remove('hidden');
                 
             } catch (error) {
-                outputResult.innerHTML = `<div class="p-4 bg-red-600 text-white font-bold rounded-lg text-xs uppercase tracking-widest">Gagal Memproses: ${error.message}</div>`;
+                outputResult.innerHTML = `<div class="p-6 bg-red-600 text-white font-bold rounded-xl text-[10px] uppercase tracking-widest shadow-xl">
+                    ⚠️ CRITICAL ERROR: ${error.message}
+                </div>`;
                 resultContainer.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'JALANKAN PROSES AUDIT EKSTRAKSI';
+                btn.textContent = 'JALANKAN ANALISIS AUDIT EKSTRAKSI';
             }
         });
     </script>
