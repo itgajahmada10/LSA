@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Verifikasi Dokumen Kapal - Waruna Group</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { 
-            background-color: #FFFBEB; 
+            background-color: #FFFBEB; /* Soft Cream BG */
             font-family: 'Inter', sans-serif;
         }
         .app-header {
@@ -31,9 +31,9 @@
         .section-tag {
             background-color: #4C1D95;
             color: white;
-            padding: 2px 8px;
+            padding: 2px 10px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
         }
         .doc-chip {
@@ -41,10 +41,15 @@
             border: 1px solid #FFEDD5;
             color: #9A3412;
         }
+        .verbatim-box {
+            background-color: #F8FAFC;
+            border-top: 1px solid #E2E8F0;
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
 <body class="text-slate-900">
-    <!-- Top Navigation Bar -->
+    <!-- Navigation Bar -->
     <nav class="app-header px-6 py-4 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-purple-900 rounded-lg flex items-center justify-center">
@@ -52,61 +57,78 @@
             </div>
             <h1 class="text-lg font-bold text-amber-900 tracking-tight">Waruna Group <span class="font-normal text-slate-500">| Verifikasi Dokumen</span></h1>
         </div>
-        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">
-            Vessel Verification System
+        <div class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
+            Vessel Verification Terminal v1.2
         </div>
     </nav>
 
     <main class="max-w-5xl mx-auto py-10 px-4">
         <div class="verification-card shadow-lg p-8">
-            <!-- Form Section -->
+            <!-- Form Upload -->
             <form id="verificationForm" class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Upload 1 -->
+                    <!-- Dokumen Master (Sertifikat) -->
                     <div class="space-y-3">
-                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Laporan Sertifikat (Master)</label>
+                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Laporan Sertifikat (Master Data)</label>
                         <div class="relative border-2 border-dashed border-amber-200 rounded-xl p-8 hover:bg-amber-50/50 transition-all text-center cursor-pointer group">
                             <input id="file_sertifikat" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
                             <svg class="mx-auto h-8 w-8 text-amber-500 mb-2 opacity-60 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <span class="text-xs font-bold text-amber-800" id="name_sertifikat">UNGGAH SERTIFIKAT PDF</span>
+                            <span class="text-xs font-bold text-amber-800 uppercase" id="name_sertifikat">Pilih File Sertifikat</span>
                         </div>
                     </div>
 
-                    <!-- Upload 2 -->
+                    <!-- Dokumen Penawaran -->
                     <div class="space-y-3">
-                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Penawaran Vendor (Compare)</label>
+                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Penawaran Vendor (Target Compare)</label>
                         <div class="relative border-2 border-dashed border-amber-200 rounded-xl p-8 hover:bg-amber-50/50 transition-all text-center cursor-pointer group">
                             <input id="file_penawaran" type="file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
                             <svg class="mx-auto h-8 w-8 text-amber-500 mb-2 opacity-60 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <span class="text-xs font-bold text-amber-800" id="name_penawaran">UNGGAH PENAWARAN PDF</span>
+                            <span class="text-xs font-bold text-amber-800 uppercase" id="name_penawaran">Pilih File Penawaran</span>
                         </div>
                     </div>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full btn-purple text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-[11px]">
-                    Jalankan Verifikasi Ekstraksi
+                    Jalankan Verifikasi Ekstraksi Berbasis Teks
                 </button>
             </form>
 
-            <!-- Results Section -->
-            <div id="resultContainer" class="mt-12 hidden space-y-10">
-                <!-- 01 Inventarisasi -->
+            <!-- Hasil Analisis -->
+            <div id="resultContainer" class="mt-12 hidden space-y-12">
+                
+                <!-- 01 Inventarisasi Dokumen -->
                 <div>
-                    <div class="flex items-center gap-3 mb-4">
+                    <div class="flex items-center gap-3 mb-5">
                         <span class="section-tag">01</span>
-                        <h2 class="text-[11px] font-black uppercase tracking-widest text-purple-900">Inventarisasi Kelengkapan Dokumen</h2>
+                        <h2 class="text-[11px] font-black uppercase tracking-widest text-purple-900">Inventarisasi Dokumen Terdeteksi</h2>
                     </div>
-                    <div id="docInventory" class="flex flex-wrap gap-2"></div>
+                    <div id="docInventory" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                 </div>
 
-                <!-- 02 Temuan -->
+                <!-- 02 Anomali Verifikasi -->
                 <div>
-                    <div class="flex items-center gap-3 mb-4">
+                    <div class="flex items-center gap-3 mb-5">
                         <span class="section-tag" style="background-color: #B91C1C;">02</span>
-                        <h2 class="text-[11px] font-black uppercase tracking-widest text-red-700">Anomali & Temuan Verifikasi (Hanya Masalah)</h2>
+                        <h2 class="text-[11px] font-black uppercase tracking-widest text-red-700">Anomali & Temuan Verifikasi (Berdasarkan Teks)</h2>
                     </div>
-                    <div id="outputResult" class="space-y-4"></div>
+                    <div id="outputResult" class="space-y-6"></div>
                 </div>
+
+                <!-- 03 Item Tidak Terverifikasi -->
+                <div id="unverifiedSection" class="hidden">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="section-tag" style="background-color: #64748b;">03</span>
+                        <h2 class="text-[11px] font-black uppercase tracking-widest text-slate-600">Item Tanpa Padanan Sertifikat</h2>
+                    </div>
+                    <div id="unverifiedList" class="bg-slate-50 p-4 rounded-lg border border-slate-200"></div>
+                </div>
+
+                <!-- Rekomendasi Tindakan -->
+                <div id="recommendationBox" class="p-6 bg-blue-50 border-l-4 border-blue-600 rounded-r-xl">
+                    <h3 class="text-[11px] font-black text-blue-800 uppercase tracking-widest mb-2">Rekomendasi Verifikator</h3>
+                    <p id="recommendationText" class="text-sm text-blue-900 font-medium italic"></p>
+                </div>
+
             </div>
         </div>
     </main>
@@ -114,6 +136,7 @@
     <script>
         const WEBHOOK_URL = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
 
+        // Update display nama file
         document.getElementById('file_sertifikat').addEventListener('change', e => {
             document.getElementById('name_sertifikat').textContent = e.target.files[0].name.toUpperCase();
         });
@@ -127,74 +150,101 @@
             const resultContainer = document.getElementById('resultContainer');
             const outputResult = document.getElementById('outputResult');
             const docInventory = document.getElementById('docInventory');
+            const unverifiedList = document.getElementById('unverifiedList');
+            const unverifiedSection = document.getElementById('unverifiedSection');
+            const recommendationText = document.getElementById('recommendationText');
 
             const formData = new FormData();
             formData.append('sertifikat', document.getElementById('file_sertifikat').files[0]);
             formData.append('penawaran', document.getElementById('file_penawaran').files[0]);
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="flex items-center justify-center gap-2 italic uppercase"><svg class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" viewBox="0 0 24 24"></svg> Sedang Verifikasi...</span>`;
+            btn.innerHTML = `<span class="flex items-center justify-center gap-2 italic uppercase"><svg class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" viewBox="0 0 24 24"></svg> Memindai Verbatim Teks...</span>`;
             resultContainer.classList.add('hidden');
 
             try {
                 const response = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
-                if (!response.ok) throw new Error('Koneksi ke server n8n gagal.');
+                if (!response.ok) throw new Error('Koneksi ke server Verifikasi gagal.');
                 
                 const data = await response.json();
                 
-                // --- Safety Check untuk mencegah error "map of undefined" ---
-                const daftarDokumen = data.daftar_dokumen || [];
-                const temuanVerifikasi = data.temuan || [];
+                // 1. Render Inventarisasi
+                const docs = data.daftar_dokumen || [];
+                docInventory.innerHTML = docs.map(d => `
+                    <div class="p-3 bg-amber-50/50 border border-amber-100 rounded-lg">
+                        <span class="block text-[8px] font-black text-amber-600 uppercase mb-1">${d.tipe}</span>
+                        <p class="text-xs font-bold text-amber-900">${d.nama_dokumen}</p>
+                        <p class="text-[9px] text-slate-400 mt-1 italic">ID: "${d.kutipan_identifikasi}"</p>
+                    </div>
+                `).join('');
 
-                // Render Inventarisasi Dokumen
-                docInventory.innerHTML = daftarDokumen.length > 0 
-                    ? daftarDokumen.map(doc => `<span class="doc-chip text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">✓ ${doc}</span>`).join('')
-                    : `<span class="text-xs italic text-slate-400">Tidak ada dokumen terdeteksi.</span>`;
+                // 2. Render Temuan Anomali (Fix Object Object)
+                const temuan = data.temuan || [];
+                if (temuan.length > 0) {
+                    outputResult.innerHTML = temuan.map(t => `
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-900 overflow-hidden transition-all hover:shadow-md">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">${t.item || 'Item'}</h4>
+                                    <div class="text-right">
+                                        <span class="block text-[8px] font-black text-slate-400 uppercase">Lokasi Data</span>
+                                        <span class="text-[10px] bg-purple-50 px-2 py-1 rounded font-bold text-purple-700 italic">${t.referensi_dokumen}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[12px]">
+                                    <!-- Penawaran -->
+                                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="block text-[9px] font-black text-purple-800 uppercase mb-2">Penawaran Harga</span>
+                                        <p class="font-bold text-slate-800 mb-1">${t.di_penawaran?.nilai || '-'}</p>
+                                        <div class="mt-2 text-[10px] text-slate-500 italic border-t border-slate-200 pt-2 leading-relaxed">
+                                            "${t.di_penawaran?.kutipan_verbatim || 'N/A'}"
+                                        </div>
+                                    </div>
+                                    <!-- Sertifikat -->
+                                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
+                                        <span class="block text-[9px] font-black text-purple-800 uppercase mb-2">Sertifikat Inspeksi</span>
+                                        <p class="font-bold text-slate-800 mb-1">${t.di_sertifikat?.nilai || '-'}</p>
+                                        <div class="mt-2 text-[10px] text-slate-500 italic border-t border-slate-200 pt-2 leading-relaxed">
+                                            "${t.di_sertifikat?.kutipan_verbatim || 'N/A'}"
+                                        </div>
+                                    </div>
+                                </div>
 
-                // Render Temuan (Hanya yang anomali/bermasalah)
-                if (temuanVerifikasi.length > 0) {
-                    outputResult.innerHTML = temuanVerifikasi.map(t => `
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-900 transition-all hover:shadow-md">
-                            <div class="flex justify-between items-start mb-4">
-                                <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">${t.item || 'Item Teridentifikasi'}</h4>
-                                <div class="text-right">
-                                    <span class="block text-[8px] font-black text-slate-400 uppercase">Referensi Lokasi</span>
-                                    <span class="text-[10px] bg-purple-50 px-2 py-1 rounded font-bold text-purple-700 italic">${t.referensi_dokumen || 'Data Pendukung'}</span>
+                                <div class="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                    <p class="text-[11px] font-bold text-amber-900 uppercase mb-1">Analisis Verifikator [${t.tipe_anomali}]:</p>
+                                    <p class="text-xs text-amber-800 leading-relaxed font-medium">${t.analisis}</p>
                                 </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[12px] mb-4">
-                                <div class="p-3 bg-slate-50 rounded border border-slate-100">
-                                    <span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Data Penawaran</span>
-                                    <p class="font-medium text-slate-700">${t.di_penawaran || '-'}</p>
-                                </div>
-                                <div class="p-3 bg-slate-50 rounded border border-slate-100">
-                                    <span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Data Sertifikat</span>
-                                    <p class="font-medium text-slate-700">${t.di_sertifikat || '-'}</p>
-                                </div>
-                            </div>
-                            <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
-                                <p class="text-xs font-bold text-amber-900 leading-relaxed italic">
-                                    <span class="text-purple-900 not-italic mr-1 underline decoration-amber-500 uppercase">Analisis Verifikator:</span> ${t.analisis || 'Butuh tinjauan manual.'}
-                                </p>
                             </div>
                         </div>
                     `).join('');
                 } else {
                     outputResult.innerHTML = `<div class="p-10 text-center bg-emerald-50 border-2 border-dashed border-emerald-200 rounded-xl">
-                        <p class="text-emerald-700 font-bold uppercase tracking-widest text-[10px]">Data Sesuai: Tidak ditemukan anomali pada kedua dokumen.</p>
+                        <p class="text-emerald-700 font-bold uppercase tracking-widest text-[10px]">Verifikasi Bersih: Tidak ditemukan anomali teks.</p>
                     </div>`;
                 }
+
+                // 3. Render Item Tidak Terverifikasi
+                const unverified = data.item_tidak_terverifikasi || [];
+                if (unverified.length > 0) {
+                    unverifiedSection.classList.remove('hidden');
+                    unverifiedList.innerHTML = `<ul class="list-disc list-inside text-xs text-slate-600 font-medium space-y-1">
+                        ${unverified.map(item => `<li>${item}</li>`).join('')}
+                    </ul>`;
+                } else {
+                    unverifiedSection.classList.add('hidden');
+                }
+
+                // 4. Rekomendasi
+                recommendationText.textContent = data.rekomendasi_tindakan || "Data cukup. Silakan tinjau kembali hasil verifikasi di atas.";
 
                 resultContainer.classList.remove('hidden');
                 
             } catch (error) {
-                outputResult.innerHTML = `<div class="p-6 bg-red-600 text-white font-bold rounded-xl text-[10px] uppercase tracking-widest shadow-xl">
-                    ⚠️ KEGAGALAN SISTEM: ${error.message}
-                </div>`;
-                resultContainer.classList.remove('hidden');
+                alert("Kesalahan Sistem: " + error.message);
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'JALANKAN VERIFIKASI EKSTRAKSI';
+                btn.textContent = 'JALANKAN VERIFIKASI EKSTRAKSI BERBASIS TEKS';
             }
         });
     </script>
