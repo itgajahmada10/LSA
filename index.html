@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeeSuite - Vessel Document Audit</title>
+    <title>Sistem Verifikasi Dokumen Kapal - Waruna Group</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { 
-            background-color: #FFFBEB; /* Soft Cream BG sesuai Gambar 2 */
+            background-color: #FFFBEB; 
             font-family: 'Inter', sans-serif;
         }
-        .beesuite-header {
-            background-color: #FEF9C3; /* Yellow Header sesuai Gambar 2 */
+        .app-header {
+            background-color: #FEF9C3; 
             border-bottom: 1px solid #FEF08A;
         }
         .btn-purple {
-            background-color: #4C1D95; /* Deep Purple sesuai Gambar 2 */
+            background-color: #4C1D95; 
             transition: all 0.2s ease;
         }
         .btn-purple:hover {
             background-color: #5B21B6;
             transform: translateY(-1px);
         }
-        .audit-card {
+        .verification-card {
             background: #FFFFFF;
             border-radius: 12px;
             border: 1px solid #FDE68A;
@@ -45,22 +45,22 @@
 </head>
 <body class="text-slate-900">
     <!-- Top Navigation Bar -->
-    <nav class="beesuite-header px-6 py-4 flex items-center justify-between shadow-sm">
+    <nav class="app-header px-6 py-4 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-purple-900 rounded-lg flex items-center justify-center">
-                <span class="text-white font-black text-xs">B</span>
+                <span class="text-white font-black text-xs">W</span>
             </div>
-            <h1 class="text-lg font-bold text-amber-900 tracking-tight">BeeSuite <span class="font-normal text-slate-500">| Audit Dokumen</span></h1>
+            <h1 class="text-lg font-bold text-amber-900 tracking-tight">Waruna Group <span class="font-normal text-slate-500">| Verifikasi Dokumen</span></h1>
         </div>
         <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">
-            Waruna Group Terminal
+            Vessel Verification System
         </div>
     </nav>
 
     <main class="max-w-5xl mx-auto py-10 px-4">
-        <div class="audit-card shadow-lg p-8">
+        <div class="verification-card shadow-lg p-8">
             <!-- Form Section -->
-            <form id="auditForm" class="space-y-8">
+            <form id="verificationForm" class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Upload 1 -->
                     <div class="space-y-3">
@@ -84,7 +84,7 @@
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full btn-purple text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-[11px]">
-                    Jalankan Analisis Audit Ekstraksi
+                    Jalankan Verifikasi Ekstraksi
                 </button>
             </form>
 
@@ -103,7 +103,7 @@
                 <div>
                     <div class="flex items-center gap-3 mb-4">
                         <span class="section-tag" style="background-color: #B91C1C;">02</span>
-                        <h2 class="text-[11px] font-black uppercase tracking-widest text-red-700">Anomali & Temuan Audit (Hanya Masalah)</h2>
+                        <h2 class="text-[11px] font-black uppercase tracking-widest text-red-700">Anomali & Temuan Verifikasi (Hanya Masalah)</h2>
                     </div>
                     <div id="outputResult" class="space-y-4"></div>
                 </div>
@@ -121,7 +121,7 @@
             document.getElementById('name_penawaran').textContent = e.target.files[0].name.toUpperCase();
         });
 
-        document.getElementById('auditForm').addEventListener('submit', async function(e) {
+        document.getElementById('verificationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const resultContainer = document.getElementById('resultContainer');
@@ -133,7 +133,7 @@
             formData.append('penawaran', document.getElementById('file_penawaran').files[0]);
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="flex items-center justify-center gap-2 italic uppercase"><svg class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" viewBox="0 0 24 24"></svg> Sedang Menganalisis...</span>`;
+            btn.innerHTML = `<span class="flex items-center justify-center gap-2 italic uppercase"><svg class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" viewBox="0 0 24 24"></svg> Sedang Verifikasi...</span>`;
             resultContainer.classList.add('hidden');
 
             try {
@@ -142,24 +142,24 @@
                 
                 const data = await response.json();
                 
-                // --- FIX: Safety Check untuk .map() ---
+                // --- Safety Check untuk mencegah error "map of undefined" ---
                 const daftarDokumen = data.daftar_dokumen || [];
-                const temuanAudit = data.temuan || [];
+                const temuanVerifikasi = data.temuan || [];
 
-                // Render Inventarisasi
+                // Render Inventarisasi Dokumen
                 docInventory.innerHTML = daftarDokumen.length > 0 
                     ? daftarDokumen.map(doc => `<span class="doc-chip text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">✓ ${doc}</span>`).join('')
-                    : `<span class="text-xs italic text-slate-400">Tidak ada sertifikat terdeteksi.</span>`;
+                    : `<span class="text-xs italic text-slate-400">Tidak ada dokumen terdeteksi.</span>`;
 
-                // Render Temuan
-                if (temuanAudit.length > 0) {
-                    outputResult.innerHTML = temuanAudit.map(t => `
+                // Render Temuan (Hanya yang anomali/bermasalah)
+                if (temuanVerifikasi.length > 0) {
+                    outputResult.innerHTML = temuanVerifikasi.map(t => `
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-900 transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-4">
-                                <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">${t.item || 'Item Tanpa Nama'}</h4>
+                                <h4 class="font-bold text-slate-900 text-sm uppercase tracking-tight">${t.item || 'Item Teridentifikasi'}</h4>
                                 <div class="text-right">
                                     <span class="block text-[8px] font-black text-slate-400 uppercase">Referensi Lokasi</span>
-                                    <span class="text-[10px] bg-purple-50 px-2 py-1 rounded font-bold text-purple-700 italic">${t.referensi_dokumen || 'Penyimpangan Umum'}</span>
+                                    <span class="text-[10px] bg-purple-50 px-2 py-1 rounded font-bold text-purple-700 italic">${t.referensi_dokumen || 'Data Pendukung'}</span>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[12px] mb-4">
@@ -174,14 +174,14 @@
                             </div>
                             <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
                                 <p class="text-xs font-bold text-amber-900 leading-relaxed italic">
-                                    <span class="text-purple-900 not-italic mr-1 underline decoration-amber-500">ANALISIS:</span> ${t.analisis || 'Butuh tinjauan manual.'}
+                                    <span class="text-purple-900 not-italic mr-1 underline decoration-amber-500 uppercase">Analisis Verifikator:</span> ${t.analisis || 'Butuh tinjauan manual.'}
                                 </p>
                             </div>
                         </div>
                     `).join('');
                 } else {
                     outputResult.innerHTML = `<div class="p-10 text-center bg-emerald-50 border-2 border-dashed border-emerald-200 rounded-xl">
-                        <p class="text-emerald-700 font-bold uppercase tracking-widest text-[10px]">Laporan Bersih: Semua data sesuai (Match)</p>
+                        <p class="text-emerald-700 font-bold uppercase tracking-widest text-[10px]">Data Sesuai: Tidak ditemukan anomali pada kedua dokumen.</p>
                     </div>`;
                 }
 
@@ -189,12 +189,12 @@
                 
             } catch (error) {
                 outputResult.innerHTML = `<div class="p-6 bg-red-600 text-white font-bold rounded-xl text-[10px] uppercase tracking-widest shadow-xl">
-                    ⚠️ CRITICAL ERROR: ${error.message}
+                    ⚠️ KEGAGALAN SISTEM: ${error.message}
                 </div>`;
                 resultContainer.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'JALANKAN ANALISIS AUDIT EKSTRAKSI';
+                btn.textContent = 'JALANKAN VERIFIKASI EKSTRAKSI';
             }
         });
     </script>
