@@ -553,13 +553,11 @@
     });
 
     async function mulaiProses() {
-        // Bersihkan interval lama
         stopTimers();
 
         const sertifikatInput = document.getElementById('file-sertifikat');
         const penawaranInput  = document.getElementById('file-penawaran');
 
-        // Validasi keberadaan file
         if (!sertifikatInput.files || sertifikatInput.files.length === 0) {
             tampilkanError('File Laporan Sertifikat belum dipilih. Silakan pilih file PDF terlebih dahulu.');
             return;
@@ -572,7 +570,6 @@
         const fileSertifikat = sertifikatInput.files[0];
         const filePenawaran  = penawaranInput.files[0];
 
-        // Validasi tipe file
         if (fileSertifikat.type !== 'application/pdf') {
             tampilkanError('File Laporan Sertifikat harus berformat PDF.');
             return;
@@ -582,7 +579,6 @@
             return;
         }
 
-        // Validasi ukuran file
         if (fileSertifikat.size > MAX_FILE_SIZE) {
             tampilkanError('Ukuran file Laporan Sertifikat melebihi batas 15 MB.');
             return;
@@ -592,16 +588,13 @@
             return;
         }
 
-        // Reset state
         failCount     = 0;
         waktuBerjalan = 0;
         const jobId = 'JOB-' + Date.now();
 
-        // Lock UI & Tampilkan loading
         lockUI();
-        setStep(0); // step 0: kirim
+        setStep(0); 
 
-        // Mulai timer visual
         document.getElementById('timer-text').textContent = 'Waktu berjalan: 0 detik';
         timerInterval = setInterval(function () {
             waktuBerjalan++;
@@ -612,14 +605,12 @@
             }
         }, 1000);
 
-        // Susun FormData
         const formData = new FormData();
         formData.append('sertifikat', fileSertifikat);
         formData.append('penawaran',  filePenawaran);
         formData.append('job_id',     jobId);
 
         try {
-            // TAHAP 1: Kirim ke webhook
             const response = await fetch(WEBHOOK_SUBMIT, {
                 method: 'POST',
                 body: formData
@@ -629,10 +620,8 @@
                 throw new Error('Server menolak dokumen (HTTP ' + response.status + '). Pastikan N8N aktif dan URL webhook benar.');
             }
 
-            // Pindah ke step analisis
             setStep(1);
 
-            // TAHAP 2: Mulai polling setiap 10 detik
             pollingInterval = setInterval(function () {
                 cekStatusAI(jobId);
             }, 10000);
@@ -655,9 +644,8 @@
                 throw new Error('Server polling mengembalikan HTTP ' + response.status);
             }
 
-            // Reset fail counter kalau berhasil connect
             failCount = 0;
-            setStep(2); // step 2: mengambil hasil
+            setStep(2);
 
             const responseData = await response.json();
 
@@ -688,16 +676,16 @@
                 const rowData  = rows[0];
                 let finalJson  = null;
 
-                // Cari key yang mengandung JSON hasil AI
                 for (const key in rowData) {
                     const val = rowData[key];
                     if (typeof val === 'string' && val.includes('status_keseluruhan')) {
                         try {
-                            let clean = val
-                                .replace(/```json\s*/gi, '')
-                                .replace(/
-```\s*/gi, '')
-                                .trim();
+                            // PENGAMANAN BARU: Tidak menggunakan metode Regex Literal untuk string backticks
+                            let clean = val;
+                            clean = clean.replace(new RegExp('```json', 'gi'), '');
+                            clean = clean.replace(new RegExp('```', 'g'), '');
+                            clean = clean.trim();
+                            
                             finalJson = JSON.parse(clean);
                             break;
                         } catch (e) {
@@ -716,7 +704,6 @@
                     tampilkanError('Data ditemukan di server, tetapi struktur JSON tidak dapat dibaca. Periksa output AI di N8N.');
                 }
             }
-            // Jika status bukan 'completed', biarkan interval polling terus berjalan
 
         } catch (err) {
             failCount++;
@@ -740,7 +727,6 @@
         const statusCls = isOk ? 'match' : 'mismatch';
         const statusTxt = isOk ? '✅ Semua Item Sesuai' : '⚠️ Ditemukan Selisih / Anomali';
 
-        // --- Status Header ---
         const statusDiv = document.createElement('div');
         statusDiv.className = 'status-header ' + statusCls;
         statusDiv.setAttribute('role', 'status');
@@ -759,7 +745,6 @@
         `;
         container.appendChild(statusDiv);
 
-        // --- Jika semua sesuai ---
         if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
             const successCard = document.createElement('div');
             successCard.className = 'success-card';
@@ -772,7 +757,6 @@
             return;
         }
 
-        // --- Tabel Anomali ---
         const anomaliCount = result.temuan_anomali.length;
         const panel = document.createElement('div');
         panel.className = 'anomali-panel';
