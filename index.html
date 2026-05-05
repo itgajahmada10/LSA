@@ -7,925 +7,706 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --color-primary: #3730a3;
-            --color-primary-dark: #312e81;
-            --color-primary-highlight: #c7d2fe;
-            --color-primary-surface: #e0e7ff;
-            --color-surface-offset: #f3f4f6;
-            --color-surface-2: #ffffff;
-            --color-success: #166534;
-            --color-success-surface: #dcfce7;
-            --color-success-highlight: #86efac;
-            --color-error: #991b1b;
-            --color-error-surface: #fee2e2;
-            --color-error-highlight: #fca5a5;
-            --color-text: #1f2937;
-            --color-text-muted: #4b5563;
-            --color-text-faint: #9ca3af;
-            --color-text-inverse: #ffffff;
-            --color-border: #e5e7eb;
-            --color-divider: #f3f4f6;
-            --radius-sm: 0.25rem;
-            --radius-md: 0.375rem;
-            --radius-lg: 0.5rem;
-            --radius-xl: 0.75rem;
-            --radius-full: 9999px;
-            --space-1: 0.25rem;
-            --space-2: 0.5rem;
-            --space-3: 0.75rem;
-            --space-4: 1rem;
-            --space-5: 1.25rem;
-            --space-6: 1.5rem;
-            --space-8: 2rem;
-            --space-10: 2.5rem;
-            --space-12: 3rem;
-            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            --transition: 0.2s ease;
-            --content-default: 80rem;
-            --font-display: system-ui, -apple-system, sans-serif;
-            --text-xs: 0.75rem;
-            --text-sm: 0.875rem;
-            --text-base: 1rem;
-            --text-lg: 1.125rem;
+            --primary:          #3730a3;
+            --primary-dark:     #312e81;
+            --primary-hl:       #c7d2fe;
+            --primary-surf:     #e0e7ff;
+            --surface:          #f3f4f6;
+            --surface-2:        #ffffff;
+            --success:          #166534;
+            --success-surf:     #dcfce7;
+            --success-hl:       #86efac;
+            --error:            #991b1b;
+            --error-surf:       #fee2e2;
+            --error-hl:         #fca5a5;
+            --warn:             #92400e;
+            --warn-surf:        #fef3c7;
+            --warn-hl:          #fde68a;
+            --text:             #1f2937;
+            --text-muted:       #4b5563;
+            --text-faint:       #9ca3af;
+            --text-inv:         #ffffff;
+            --border:           #e5e7eb;
+            --radius-sm:        0.25rem;
+            --radius-md:        0.5rem;
+            --radius-lg:        0.75rem;
+            --radius-xl:        1rem;
+            --radius-full:      9999px;
+            --shadow-sm:        0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md:        0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg:        0 10px 15px -3px rgba(0,0,0,0.1);
+            --t:                0.2s ease;
+            --max-w:            72rem;
         }
         [data-theme="dark"] {
-            --color-surface-offset: #111827;
-            --color-surface-2: #1f2937;
-            --color-text: #f9fafb;
-            --color-text-muted: #d1d5db;
-            --color-text-faint: #6b7280;
-            --color-border: #374151;
-            --color-divider: #374151;
+            --surface:   #111827;
+            --surface-2: #1f2937;
+            --text:      #f9fafb;
+            --text-muted:#d1d5db;
+            --text-faint:#6b7280;
+            --border:    #374151;
         }
-        body {
-            background-color: var(--color-surface-offset);
-            color: var(--color-text);
-            font-family: var(--font-display);
-            margin: 0; min-height: 100vh;
-            display: flex; flex-direction: column;
-        }
-        .app-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--color-surface-2); padding: var(--space-4) var(--space-6);
-            box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--color-border);
-        }
-        .header-brand { display: flex; align-items: center; gap: var(--space-3); }
-        .brand-logo {
-            background: var(--color-primary); color: white;
-            border-radius: var(--radius-md); padding: var(--space-1);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .brand-name { font-weight: 700; font-size: var(--text-lg); color: #ca8a04; }
-        .brand-name span { color: var(--color-text-faint); font-weight: 400; }
-        .theme-toggle {
-            background: none; border: none; color: var(--color-text-muted);
-            cursor: pointer; padding: var(--space-2); border-radius: var(--radius-full);
-            transition: background var(--transition);
-        }
-        .theme-toggle:hover { background: var(--color-surface-offset); }
-        main {
-            padding: var(--space-10) var(--space-4);
-            display: flex; flex-direction: column; align-items: center; flex-grow: 1;
-        }
-        .page-title-section { text-align: center; margin-bottom: var(--space-8); }
-        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--color-text); margin-bottom: var(--space-2); }
-        .page-subtitle { color: var(--color-text-muted); font-size: var(--text-sm); max-width: 600px; margin: 0 auto; }
 
-        /* UPLOAD */
-        .upload-card {
-            background: var(--color-surface-2); border-radius: var(--radius-xl);
-            padding: var(--space-8); box-shadow: var(--shadow-md);
-            width: 100%; max-width: var(--content-default);
-            border: 1px solid var(--color-border); margin: 0 auto;
-        }
-        .upload-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-6); margin-bottom: var(--space-8);
-        }
-        .upload-zone {
-            border: 2px dashed var(--color-primary-highlight); border-radius: var(--radius-lg);
-            padding: var(--space-6); text-align: center; transition: all var(--transition);
-            background: var(--color-surface-2);
-        }
-        .upload-zone:hover { border-color: var(--color-primary); background: var(--color-primary-surface); }
-        .upload-zone.has-file {
-            border-color: var(--color-success-highlight);
-            background: var(--color-success-surface); border-style: solid;
-        }
-        .upload-zone-icon {
-            color: var(--color-primary-highlight); margin-bottom: var(--space-3);
-            display: flex; justify-content: center;
-        }
-        .upload-zone.has-file .upload-zone-icon { color: var(--color-success); }
-        .upload-zone-label {
-            display: block; font-weight: 700; color: #a16207;
-            font-size: var(--text-sm); text-transform: uppercase; margin-bottom: var(--space-4);
-        }
-        .upload-file-input { display: block; width: 100%; font-size: var(--text-sm); color: var(--color-text-muted); cursor: pointer; }
-        .upload-file-input::file-selector-button {
-            margin-right: var(--space-4); padding: var(--space-2) var(--space-4);
-            border-radius: var(--radius-md); border: none; font-weight: 700;
-            font-size: var(--text-xs); background: var(--color-primary-surface);
-            color: var(--color-primary); cursor: pointer; transition: background var(--transition);
-            display: block; margin-bottom: var(--space-2); width: 100%; text-align: center;
-        }
-        .upload-file-input::file-selector-button:hover { background: var(--color-primary-highlight); }
-        .file-info {
-            display: none; margin-top: var(--space-4); font-size: var(--text-sm);
-            background: var(--color-surface-2); border: 1px solid var(--color-success-highlight);
-            border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3);
-            word-break: break-all;
-        }
-        .file-info.visible { display: block; }
-        .file-info strong { color: var(--color-success); font-weight: 600; }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { background: var(--surface); color: var(--text); font-family: system-ui,-apple-system,sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* BUTTON */
-        .btn-submit {
-            width: 100%; background: var(--color-primary); color: var(--color-text-inverse);
-            font-weight: 700; font-size: var(--text-sm); padding: var(--space-4) var(--space-6);
-            border-radius: var(--radius-lg); letter-spacing: 0.05em; text-transform: uppercase;
-            box-shadow: var(--shadow-sm); cursor: pointer; border: none;
-            transition: background var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: var(--space-2);
-        }
-        .btn-submit:hover:not(:disabled) { background: var(--color-primary-dark); box-shadow: var(--shadow-md); transform: translateY(-1px); }
-        .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+        /* ── HEADER ── */
+        .app-header { display:flex; justify-content:space-between; align-items:center; background:var(--surface-2); padding:1rem 1.5rem; box-shadow:var(--shadow-sm); border-bottom:1px solid var(--border); }
+        .brand { display:flex; align-items:center; gap:.75rem; }
+        .brand-logo { background:var(--primary); color:#fff; border-radius:var(--radius-md); padding:.25rem; display:flex; align-items:center; justify-content:center; }
+        .brand-name { font-weight:700; font-size:1.1rem; color:#ca8a04; }
+        .brand-name span { color:var(--text-faint); font-weight:400; }
+        .theme-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; padding:.5rem; border-radius:var(--radius-full); transition:background var(--t); }
+        .theme-btn:hover { background:var(--surface); }
 
-        /* LOADING */
-        .loading-panel {
-            display: none; width: 100%; max-width: var(--content-default);
-            background: var(--color-surface-2); border: 1px solid var(--color-primary-highlight);
-            border-radius: var(--radius-xl); padding: var(--space-10) var(--space-8);
-            text-align: center; box-shadow: var(--shadow-sm); margin-top: var(--space-8);
-        }
-        .loading-panel.visible { display: block; }
-        .spinner {
-            width: 48px; height: 48px; margin: 0 auto var(--space-5);
-            border: 3px solid var(--color-primary-highlight);
-            border-top-color: var(--color-primary); border-radius: var(--radius-full);
-            animation: spin 0.9s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-title { font-weight: 700; font-size: var(--text-base); color: var(--color-primary-dark); margin-bottom: var(--space-2); }
-        .loading-timer { font-size: var(--text-xs); font-family: 'Courier New', monospace; color: var(--color-text-muted); margin-top: var(--space-2); }
-        .loading-hint { font-size: var(--text-xs); color: var(--color-text-faint); margin-top: var(--space-1); }
-        .progress-steps { display: flex; justify-content: center; gap: var(--space-2); margin: var(--space-6) 0 var(--space-4); flex-wrap: wrap; }
-        .step-badge {
-            display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); font-weight: 600;
-            padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
-            border: 1px solid var(--color-border); color: var(--color-text-faint);
-            background: var(--color-surface-offset); transition: all 0.4s ease;
-        }
-        .step-badge.active { color: var(--color-primary); background: var(--color-primary-surface); border-color: var(--color-primary-highlight); }
-        .step-badge.done { color: var(--color-success); background: var(--color-success-surface); border-color: var(--color-success-highlight); }
-        .step-dot { width: 6px; height: 6px; border-radius: var(--radius-full); background: currentColor; }
-        .step-badge.active .step-dot { animation: pulse-dot 1.2s ease-in-out infinite; }
-        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        /* ── MAIN ── */
+        main { padding:2.5rem 1rem; display:flex; flex-direction:column; align-items:center; flex-grow:1; gap:1.5rem; }
 
-        /* ERROR & RESULT */
-        .error-banner {
-            display: none; width: 100%; max-width: var(--content-default);
-            padding: var(--space-4) var(--space-5); margin-top: var(--space-6);
-            background: var(--color-error-surface); border: 1px solid var(--color-error-highlight);
-            border-left: 4px solid var(--color-error); border-radius: var(--radius-lg);
-            color: var(--color-error); font-size: var(--text-sm); font-weight: 500; box-shadow: var(--shadow-sm);
-        }
-        .error-banner.visible { display: block; }
-        #result-container { width: 100%; max-width: var(--content-default); margin-top: var(--space-8); }
+        .page-title { text-align:center; }
+        .page-title h1 { font-size:1.5rem; font-weight:700; margin:0 0 .5rem; }
+        .page-title p { color:var(--text-muted); font-size:.875rem; margin:0; }
 
-        /* STATUS HEADER */
-        .status-header {
-            border-radius: var(--radius-xl); padding: var(--space-5) var(--space-6);
-            margin-bottom: var(--space-6); text-align: center; box-shadow: var(--shadow-sm);
-        }
-        .status-header.match { background: var(--color-success-surface); border: 1px solid var(--color-success-highlight); }
-        .status-header.mismatch { background: var(--color-error-surface); border: 1px solid var(--color-error-highlight); }
-        .status-label { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-2); }
-        .status-header.match .status-label { color: var(--color-success); }
-        .status-header.mismatch .status-label { color: var(--color-error); }
-        .status-title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 400; line-height: 1.3; margin: 0; }
-        .status-header.match .status-title { color: var(--color-success); }
-        .status-header.mismatch .status-title { color: var(--color-error); }
-        .status-meta { margin: var(--space-2) 0 0; font-size: var(--text-sm); opacity: 0.85; }
+        /* ── UPLOAD CARD ── */
+        .upload-card { background:var(--surface-2); border-radius:var(--radius-xl); padding:2rem; box-shadow:var(--shadow-md); width:100%; max-width:var(--max-w); border:1px solid var(--border); }
+        .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:1.5rem; }
+        .upload-zone { border:2px dashed var(--primary-hl); border-radius:var(--radius-lg); padding:1.5rem; text-align:center; transition:all var(--t); background:var(--surface-2); }
+        .upload-zone:hover { border-color:var(--primary); background:var(--primary-surf); }
+        .upload-zone.has-file { border-color:var(--success-hl); background:var(--success-surf); border-style:solid; }
+        .uz-icon { display:flex; justify-content:center; margin-bottom:.75rem; color:var(--primary-hl); }
+        .upload-zone.has-file .uz-icon { color:var(--success); }
+        .uz-label { display:block; font-weight:700; color:#a16207; font-size:.8rem; text-transform:uppercase; margin-bottom:1rem; }
+        .file-input { display:block; width:100%; font-size:.875rem; color:var(--text-muted); cursor:pointer; }
+        .file-input::file-selector-button { display:block; width:100%; text-align:center; margin-bottom:.5rem; padding:.4rem 1rem; border-radius:var(--radius-md); border:none; font-weight:700; font-size:.75rem; background:var(--primary-surf); color:var(--primary); cursor:pointer; transition:background var(--t); }
+        .file-input::file-selector-button:hover { background:var(--primary-hl); }
+        .file-badge { display:none; margin-top:.75rem; font-size:.8rem; background:var(--surface-2); border:1px solid var(--success-hl); border-radius:.25rem; padding:.35rem .6rem; word-break:break-all; }
+        .file-badge.show { display:block; }
+        .file-badge strong { color:var(--success); }
+
+        /* ── BUTTON ── */
+        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:.875rem; padding:1rem; border-radius:var(--radius-lg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem; letter-spacing:.05em; text-transform:uppercase; transition:background var(--t),transform var(--t),box-shadow var(--t); box-shadow:var(--shadow-sm); }
+        .btn-run:hover:not(:disabled) { background:var(--primary-dark); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+        .btn-run:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+        /* ── LOADING ── */
+        .loading-box { display:none; background:var(--surface-2); border:1px solid var(--primary-hl); border-radius:var(--radius-xl); padding:2.5rem 2rem; text-align:center; width:100%; max-width:var(--max-w); box-shadow:var(--shadow-sm); }
+        .loading-box.show { display:block; }
+        .spinner { width:48px; height:48px; margin:0 auto 1.25rem; border:3px solid var(--primary-hl); border-top-color:var(--primary); border-radius:var(--radius-full); animation:spin .9s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .loading-title { font-weight:700; color:var(--primary-dark); margin-bottom:.5rem; }
+        .loading-timer { font-family:'Courier New',monospace; font-size:.75rem; color:var(--text-muted); }
+        .loading-hint { font-size:.75rem; color:var(--text-faint); margin-top:.25rem; }
+        .steps { display:flex; justify-content:center; gap:.5rem; margin:1.5rem 0 1rem; flex-wrap:wrap; }
+        .step { display:flex; align-items:center; gap:.4rem; font-size:.75rem; font-weight:600; padding:.2rem .75rem; border-radius:var(--radius-full); border:1px solid var(--border); color:var(--text-faint); background:var(--surface); transition:all .4s; }
+        .step.active { color:var(--primary); background:var(--primary-surf); border-color:var(--primary-hl); }
+        .step.done { color:var(--success); background:var(--success-surf); border-color:var(--success-hl); }
+        .step-dot { width:6px; height:6px; border-radius:var(--radius-full); background:currentColor; }
+        .step.active .step-dot { animation:blink 1.2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+        /* ── ERROR ── */
+        .error-box { display:none; background:var(--error-surf); border:1px solid var(--error-hl); border-left:4px solid var(--error); border-radius:var(--radius-lg); padding:1rem 1.25rem; color:var(--error); font-size:.875rem; font-weight:500; width:100%; max-width:var(--max-w); }
+        .error-box.show { display:block; }
+
+        /* ── RESULT ── */
+        #result { width:100%; max-width:var(--max-w); display:flex; flex-direction:column; gap:1rem; }
+
+        /* STATUS BANNER */
+        .status-banner { border-radius:var(--radius-xl); padding:1.25rem 1.5rem; text-align:center; }
+        .status-banner.ok  { background:var(--success-surf); border:1px solid var(--success-hl); }
+        .status-banner.err { background:var(--error-surf);   border:1px solid var(--error-hl); }
+        .status-banner .sb-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.4rem; }
+        .status-banner.ok  .sb-label { color:var(--success); }
+        .status-banner.err .sb-label { color:var(--error); }
+        .status-banner .sb-title { font-size:1.125rem; margin:0; font-weight:600; }
+        .status-banner.ok  .sb-title { color:var(--success); }
+        .status-banner.err .sb-title { color:var(--error); }
+        .status-banner .sb-meta { font-size:.85rem; margin:.5rem 0 0; opacity:.85; }
+
+        /* SUMMARY BAR */
+        .summary-bar { display:flex; align-items:center; gap:.75rem; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:.875rem 1.25rem; font-size:.875rem; flex-wrap:wrap; }
+        .summary-bar .sb-count { font-weight:700; font-size:1.5rem; color:var(--error); }
+        .summary-bar .sb-ok    { font-weight:700; font-size:1.5rem; color:var(--success); }
+        .summary-bar .sb-sep   { color:var(--border); font-size:1.2rem; }
+        .summary-bar .sb-text  { color:var(--text-muted); flex:1; }
+        .filter-tabs { display:flex; gap:.5rem; margin-left:auto; flex-wrap:wrap; }
+        .ftab { font-size:.75rem; font-weight:600; padding:.3rem .85rem; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all var(--t); }
+        .ftab:hover { border-color:var(--primary-hl); color:var(--primary); }
+        .ftab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
 
         /* SUCCESS CARD */
-        .success-card {
-            background: var(--color-surface-2); border: 1px solid var(--color-success-highlight);
-            border-radius: var(--radius-xl); padding: var(--space-12) var(--space-8);
-            text-align: center; box-shadow: var(--shadow-sm);
-        }
-        .success-icon { font-size: 3rem; margin-bottom: var(--space-4); }
-        .success-card h3 { font-size: var(--text-lg); color: var(--color-success); font-weight: 700; margin-bottom: var(--space-2); margin-top: 0; }
+        .success-full { background:var(--surface-2); border:1px solid var(--success-hl); border-radius:var(--radius-xl); padding:3rem 2rem; text-align:center; }
+        .success-full .si { font-size:3rem; margin-bottom:1rem; }
+        .success-full h3 { color:var(--success); font-weight:700; margin:0 0 .5rem; }
+        .success-full p { color:var(--text-muted); margin:0; font-size:.9rem; }
 
-        /* AUDIT SECTION */
-        .audit-section {
-            margin-bottom: var(--space-6);
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-        }
-        .audit-section-header {
-            display: flex; align-items: center; gap: var(--space-3);
-            padding: var(--space-4) var(--space-5);
-        }
-        .audit-section-header.primary {
-            background: var(--color-primary-surface);
-            border: 1px solid var(--color-primary-highlight);
-            border-bottom: none;
-        }
-        .audit-section-header.danger {
-            background: var(--color-error-surface);
-            border: 1px solid var(--color-error-highlight);
-            border-bottom: none;
-        }
-        .audit-section-header h3 { font-size: var(--text-base); font-weight: 700; margin: 0; }
-        .audit-section-header.primary h3 { color: var(--color-primary-dark); }
-        .audit-section-header.danger h3 { color: var(--color-error); }
-        .audit-section-subtitle { margin-left: auto; font-size: var(--text-xs); color: var(--color-text-muted); font-style: italic; }
+        /* ── SECTION HEADER (accordion trigger) ── */
+        .sec-wrap { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-xl); overflow:hidden; }
+        .sec-trigger { width:100%; display:flex; align-items:center; gap:.75rem; padding:.875rem 1.25rem; background:none; border:none; cursor:pointer; text-align:left; transition:background var(--t); }
+        .sec-trigger:hover { background:var(--surface); }
+        .sec-trigger .sec-icon { flex-shrink:0; width:32px; height:32px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; }
+        .sec-trigger .sec-icon.blue  { background:var(--primary-surf); color:var(--primary); }
+        .sec-trigger .sec-icon.red   { background:var(--error-surf);   color:var(--error); }
+        .sec-trigger .sec-icon.green { background:var(--success-surf); color:var(--success); }
+        .sec-trigger .sec-title { font-weight:700; font-size:.9rem; }
+        .sec-trigger .sec-subtitle { font-size:.75rem; color:var(--text-muted); margin-top:.1rem; }
+        .sec-trigger .sec-badge { margin-left:auto; padding:.2rem .65rem; border-radius:var(--radius-full); font-size:.7rem; font-weight:700; flex-shrink:0; }
+        .sec-badge.all-ok   { background:var(--success-surf); color:var(--success); border:1px solid var(--success-hl); }
+        .sec-badge.has-warn { background:var(--error-surf); color:var(--error); border:1px solid var(--error-hl); }
+        .sec-chevron { margin-left:.5rem; transition:transform var(--t); flex-shrink:0; color:var(--text-faint); }
+        .sec-trigger[aria-expanded="true"] .sec-chevron { transform:rotate(180deg); }
+        .sec-body { display:none; border-top:1px solid var(--border); }
+        .sec-body.open { display:block; }
 
-        /* TABEL */
-        .table-wrap { overflow-x: auto; }
-        .audit-table { min-width: 860px; width: 100%; border-collapse: collapse; }
-        .audit-table thead tr { background: #fef08a; }
-        .audit-table th {
-            padding: var(--space-3) var(--space-4); text-align: left;
-            font-size: var(--text-xs); font-weight: 700; color: #854d0e;
-            border: 1px solid var(--color-border); white-space: nowrap;
-        }
-        .audit-table th.center { text-align: center; }
-        .audit-table tbody tr { transition: background var(--transition); }
-        .audit-table tbody tr:nth-child(even) { background: var(--color-surface-offset); }
-        .audit-table tbody tr:hover { background: #fef9c3; }
-        .audit-table td {
-            padding: var(--space-3) var(--space-4); vertical-align: top;
-            font-size: var(--text-sm); border: 1px solid var(--color-border);
-        }
-        .audit-table td.center { text-align: center; vertical-align: middle; }
-        .row-subheader td {
-            background: #f1f5f9 !important;
-            font-size: var(--text-xs) !important;
-            font-weight: 700 !important;
-            color: var(--color-text-muted) !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            padding: var(--space-2) var(--space-4) !important;
-        }
-        [data-theme="dark"] .row-subheader td { background: #1e293b !important; }
+        /* ── ANOMALI CARDS ── */
+        .anomali-list { padding:1rem; display:flex; flex-direction:column; gap:.75rem; }
 
-        .col-keterangan { font-weight: 600; color: var(--color-text); min-width: 180px; }
-        .col-doc { color: var(--color-text-muted); min-width: 140px; line-height: 1.5; }
-        .col-doc.anomali { color: var(--color-error); font-weight: 600; }
-        .col-sertifikat { min-width: 200px; line-height: 1.6; }
-        .col-sertifikat .lembar-label { font-size: var(--text-xs); color: var(--color-text-faint); font-weight: 600; }
-        .col-sertifikat .lembar-val { color: var(--color-text-muted); }
-        .col-sertifikat .lembar-val.anomali { color: var(--color-error); font-weight: 600; }
-        .col-hasil-ai { font-size: var(--text-xs); color: var(--color-text-muted); font-style: italic; min-width: 180px; line-height: 1.5; }
+        .anomali-card { border-radius:var(--radius-lg); border:1px solid var(--border); overflow:hidden; }
+        .anomali-card.is-warn { border-color:var(--error-hl); }
+        .anomali-card.is-ok   { border-color:var(--success-hl); }
 
-        /* BADGE */
-        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 700; white-space: nowrap; }
-        .badge-ok { background: var(--color-success-surface); color: var(--color-success); border: 1px solid var(--color-success-highlight); }
-        .badge-warn { background: var(--color-error-surface); color: var(--color-error); border: 1px solid var(--color-error-highlight); }
+        .ac-head { display:flex; align-items:center; gap:.75rem; padding:.75rem 1rem; }
+        .anomali-card.is-warn .ac-head { background:#fff5f5; }
+        .anomali-card.is-ok   .ac-head { background:#f0fdf4; }
+        [data-theme="dark"] .anomali-card.is-warn .ac-head { background:#2d1515; }
+        [data-theme="dark"] .anomali-card.is-ok   .ac-head { background:#0f2318; }
 
-        /* BORDER WRAPPER */
-        .audit-table-wrapper {
-            border: 1px solid var(--color-primary-highlight);
-            border-top: none;
-            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-            overflow: hidden;
-        }
-        .audit-table-wrapper.danger { border-color: var(--color-error-highlight); }
+        .ac-num { width:24px; height:24px; border-radius:var(--radius-full); font-size:.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .is-warn .ac-num { background:var(--error);   color:#fff; }
+        .is-ok   .ac-num { background:var(--success); color:#fff; }
+        .ac-label { font-weight:700; font-size:.875rem; flex:1; }
+        .ac-status { font-size:.7rem; font-weight:700; padding:.15rem .6rem; border-radius:var(--radius-full); }
+        .is-warn .ac-status { background:var(--error-surf); color:var(--error); border:1px solid var(--error-hl); }
+        .is-ok   .ac-status { background:var(--success-surf); color:var(--success); border:1px solid var(--success-hl); }
 
-        @media (max-width: 860px) {
-            .upload-grid { grid-template-columns: 1fr; }
-            .app-header { padding: var(--space-3) var(--space-4); }
-            main { padding: var(--space-6) var(--space-3); }
+        .ac-body { padding:.75rem 1rem; display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; border-top:1px solid var(--border); }
+        .ac-doc { }
+        .ac-doc-label { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); margin-bottom:.35rem; display:flex; align-items:center; gap:.3rem; }
+        .ac-doc-val { font-size:.82rem; line-height:1.5; color:var(--text-muted); background:var(--surface); padding:.4rem .6rem; border-radius:var(--radius-sm); min-height:2rem; }
+        .is-warn .ac-doc-val.anomali { color:var(--error); background:var(--error-surf); font-weight:600; }
+
+        .ac-ai { grid-column:1/-1; display:flex; align-items:flex-start; gap:.5rem; font-size:.8rem; color:var(--text-muted); padding-top:.5rem; border-top:1px solid var(--border); margin-top:.25rem; }
+        .ac-ai-icon { flex-shrink:0; margin-top:.1rem; }
+
+        /* ── DETAIL SPESIFIK (inside accordion) ── */
+        .detail-grid { padding:1rem; display:grid; grid-template-columns:repeat(2,1fr); gap:.6rem; }
+        .detail-item { background:var(--surface); border-radius:var(--radius-md); padding:.6rem .85rem; }
+        .detail-item-label { font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); font-weight:600; margin-bottom:.2rem; }
+        .detail-item-val { font-size:.82rem; color:var(--text-muted); line-height:1.4; }
+
+        /* LEMBAR BTKP badge rows */
+        .lembar-rows { padding:.75rem 1rem .25rem; display:flex; flex-direction:column; gap:.5rem; }
+        .lembar-row  { display:flex; align-items:flex-start; gap:.6rem; font-size:.82rem; }
+        .lembar-badge { flex-shrink:0; font-size:.65rem; font-weight:700; padding:.1rem .5rem; border-radius:var(--radius-full); min-width:65px; text-align:center; }
+        .lb-btkp  { background:#ede9fe; color:#5b21b6; border:1px solid #c4b5fd; }
+        .lb-judul { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+        .lb-lamp  { background:#fef9c3; color:#854d0e; border:1px solid #fde68a; }
+        .lembar-val { flex:1; color:var(--text-muted); line-height:1.4; }
+        .lembar-val.anomali { color:var(--error); font-weight:600; }
+
+        .divider-label { padding:.4rem 1rem; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+
+        /* EMPTY STATE */
+        .empty-state { padding:2rem 1rem; text-align:center; color:var(--text-faint); font-size:.875rem; }
+
+        @media (max-width:640px) {
+            .upload-grid { grid-template-columns:1fr; }
+            .ac-body { grid-template-columns:1fr; }
+            .detail-grid { grid-template-columns:1fr; }
+            .filter-tabs { margin-left:0; }
         }
     </style>
 </head>
 <body>
 
-    <header class="app-header" role="banner">
-        <div class="header-brand">
-            <div class="brand-logo" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                </svg>
-            </div>
-            <span class="brand-name">Waruna Group <span>| Verifikasi Dokumen</span></span>
+<header class="app-header">
+    <div class="brand">
+        <div class="brand-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
         </div>
-        <div class="header-actions">
-            <button class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" title="Toggle dark mode">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5"/>
-                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                </svg>
-            </button>
-        </div>
-    </header>
+        <span class="brand-name">Waruna Group <span>| Verifikasi Dokumen</span></span>
+    </div>
+    <button class="theme-btn" data-theme-toggle aria-label="Toggle dark mode"></button>
+</header>
 
-    <main role="main">
-        <div class="page-title-section">
-            <h1 class="page-title">Audit & Verifikasi Dokumen Vendor</h1>
-            <p class="page-subtitle">Upload Quotation, Sertifikat, dan DO/Surat Jalan untuk diverifikasi silang oleh AI secara otomatis.</p>
-        </div>
+<main>
+    <div class="page-title">
+        <h1>Audit &amp; Verifikasi Dokumen Vendor</h1>
+        <p>Upload Quotation, Sertifikat, dan DO/Surat Jalan untuk diverifikasi silang oleh AI.</p>
+    </div>
 
-        <div class="upload-card">
-            <div class="upload-grid">
-                <div class="upload-zone" id="zone-penawaran">
-                    <div class="upload-zone-icon" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="12" y1="18" x2="12" y2="12"/>
-                            <line x1="9" y1="15" x2="15" y2="15"/>
-                        </svg>
-                    </div>
-                    <span class="upload-zone-label">📄 Quotation / Invoice</span>
-                    <input type="file" id="file-penawaran" class="upload-file-input" accept="application/pdf">
-                    <div class="file-info" id="info-penawaran">
-                        <strong id="info-penawaran-name">—</strong>
-                        <span id="info-penawaran-size"></span>
-                    </div>
+    <div class="upload-card">
+        <div class="upload-grid">
+            <div class="upload-zone" id="zone-p">
+                <div class="uz-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
                 </div>
-
-                <div class="upload-zone" id="zone-sertifikat">
-                    <div class="upload-zone-icon" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
-                    </div>
-                    <span class="upload-zone-label">📄 Laporan Sertifikat</span>
-                    <input type="file" id="file-sertifikat" class="upload-file-input" accept="application/pdf">
-                    <div class="file-info" id="info-sertifikat">
-                        <strong id="info-sertifikat-name">—</strong>
-                        <span id="info-sertifikat-size"></span>
-                    </div>
-                </div>
-
-                <div class="upload-zone" id="zone-do">
-                    <div class="upload-zone-icon" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>
-                        </svg>
-                    </div>
-                    <span class="upload-zone-label">📄 Surat Jalan / DO</span>
-                    <input type="file" id="file-do" class="upload-file-input" accept="application/pdf">
-                    <div class="file-info" id="info-do">
-                        <strong id="info-do-name">—</strong>
-                        <span id="info-do-size"></span>
-                    </div>
-                </div>
+                <span class="uz-label">&#128196; Quotation / Invoice</span>
+                <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
+                <div class="file-badge" id="fbadge-p"><strong id="fname-p">—</strong><span id="fsize-p"></span></div>
             </div>
-
-            <button type="button" id="btn-submit" class="btn-submit">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                Jalankan Verifikasi Ekstraksi
-            </button>
-        </div>
-
-        <div class="loading-panel" id="loading" role="status" aria-live="polite">
-            <div class="spinner" aria-hidden="true"></div>
-            <p class="loading-title">Dokumen sedang dianalisis oleh AI...</p>
-            <div class="progress-steps">
-                <div class="step-badge" id="step-kirim"><div class="step-dot"></div> Mengirim Dokumen</div>
-                <div class="step-badge" id="step-analisis"><div class="step-dot"></div> Menganalisis AI</div>
-                <div class="step-badge" id="step-mengambil"><div class="step-dot"></div> Mengambil Hasil</div>
+            <div class="upload-zone" id="zone-s">
+                <div class="uz-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <span class="uz-label">&#128196; Laporan Sertifikat</span>
+                <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
+                <div class="file-badge" id="fbadge-s"><strong id="fname-s">—</strong><span id="fsize-s"></span></div>
             </div>
-            <p class="loading-timer" id="timer-text">Waktu berjalan: 0 detik</p>
-            <p class="loading-hint">Proses berjalan di latar belakang. Jangan tutup halaman ini.</p>
+            <div class="upload-zone" id="zone-d">
+                <div class="uz-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                </div>
+                <span class="uz-label">&#128196; Surat Jalan / DO</span>
+                <input type="file" id="file-do" class="file-input" accept="application/pdf">
+                <div class="file-badge" id="fbadge-d"><strong id="fname-d">—</strong><span id="fsize-d"></span></div>
+            </div>
         </div>
+        <button type="button" id="btn-run" class="btn-run">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Jalankan Verifikasi Ekstraksi
+        </button>
+    </div>
 
-        <div class="error-banner" id="error-container" role="alert" aria-live="assertive"></div>
-        <div id="result-container" aria-live="polite"></div>
-    </main>
+    <div class="loading-box" id="loading">
+        <div class="spinner"></div>
+        <p class="loading-title">Dokumen sedang dianalisis oleh AI...</p>
+        <div class="steps">
+            <div class="step" id="step-1"><div class="step-dot"></div> Mengirim Dokumen</div>
+            <div class="step" id="step-2"><div class="step-dot"></div> Menganalisis AI</div>
+            <div class="step" id="step-3"><div class="step-dot"></div> Mengambil Hasil</div>
+        </div>
+        <p class="loading-timer" id="timer">Waktu berjalan: 0 detik</p>
+        <p class="loading-hint">Jangan tutup halaman ini.</p>
+    </div>
 
-    <script>
-    /* ============================================================
-       THEME TOGGLE
-    ============================================================ */
-    (function () {
-        var html = document.documentElement;
-        var btn  = document.querySelector('[data-theme-toggle]');
-        var theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        html.setAttribute('data-theme', theme);
-        function updateIcon() {
-            if (!btn) return;
-            btn.innerHTML = theme === 'dark'
-                ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-                : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    <div class="error-box" id="err-box"></div>
+    <div id="result"></div>
+</main>
+
+<script>
+/* ── THEME ── */
+(function(){
+    var html = document.documentElement;
+    var btn  = document.querySelector('[data-theme-toggle]');
+    var t    = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    html.setAttribute('data-theme', t);
+    function icon(){ if(!btn) return; btn.innerHTML = t==='dark' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'; }
+    icon();
+    if(btn) btn.addEventListener('click', function(){ t = t==='dark'?'light':'dark'; html.setAttribute('data-theme',t); icon(); });
+})();
+
+/* ── FILE BIND ── */
+function fmtSize(b){ return b<1024 ? b+'B' : b<1048576 ? (b/1024).toFixed(1)+'KB' : (b/1048576).toFixed(2)+'MB'; }
+function bindFile(inId, zoneId, nameId, sizeId, badgeId){
+    var inp = document.getElementById(inId);
+    if(!inp) return;
+    inp.addEventListener('change', function(){
+        var z = document.getElementById(zoneId), bd = document.getElementById(badgeId);
+        if(this.files && this.files.length){
+            document.getElementById(nameId).textContent = this.files[0].name;
+            document.getElementById(sizeId).textContent = ' ('+fmtSize(this.files[0].size)+')';
+            bd.classList.add('show'); z.classList.add('has-file');
+        } else { bd.classList.remove('show'); z.classList.remove('has-file'); }
+    });
+}
+bindFile('file-penawaran','zone-p','fname-p','fsize-p','fbadge-p');
+bindFile('file-sertifikat','zone-s','fname-s','fsize-s','fbadge-s');
+bindFile('file-do','zone-d','fname-d','fsize-d','fbadge-d');
+
+/* ── GLOBALS ── */
+var pollInt=null, timerInt=null, elapsed=0, fails=0;
+var MAX_T = 360, MAX_F = 15*1024*1024;
+var WH_SUBMIT  = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
+var WH_POLL    = 'https://n8.waruna-group.co.id/webhook/check-status-audit';
+
+/* ── UI HELPERS ── */
+function setStep(n){
+    ['step-1','step-2','step-3'].forEach(function(id,i){
+        var el=document.getElementById(id); if(!el) return;
+        el.classList.remove('active','done');
+        if(i<n) el.classList.add('done'); else if(i===n) el.classList.add('active');
+    });
+}
+function lockUI(){
+    var b=document.getElementById('btn-run'); b.disabled=true;
+    b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Memproses...';
+    document.getElementById('result').innerHTML='';
+    document.getElementById('err-box').textContent=''; document.getElementById('err-box').classList.remove('show');
+    document.getElementById('loading').classList.add('show');
+}
+function unlockUI(){
+    var b=document.getElementById('btn-run'); b.disabled=false;
+    b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Jalankan Verifikasi Ekstraksi';
+    document.getElementById('loading').classList.remove('show');
+}
+function stopAll(){ clearInterval(pollInt); clearInterval(timerInt); pollInt=null; timerInt=null; }
+function showErr(msg){ stopAll(); unlockUI(); var e=document.getElementById('err-box'); e.innerHTML='<strong>&#9888; Kesalahan:</strong> '+msg; e.classList.add('show'); }
+function esc(s){ var x=(s===null||s===undefined)?'-':String(s); return x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', function(){
+    var b=document.getElementById('btn-run'); if(b) b.addEventListener('click', run);
+});
+
+/* ── RUN ── */
+async function run(){
+    stopAll();
+    var pI=document.getElementById('file-penawaran'), sI=document.getElementById('file-sertifikat'), dI=document.getElementById('file-do');
+    if(!pI.files.length) return showErr('File Quotation/Invoice belum dipilih.');
+    if(!sI.files.length) return showErr('File Laporan Sertifikat belum dipilih.');
+    if(!dI.files.length) return showErr('File Surat Jalan / DO belum dipilih.');
+    var fP=pI.files[0], fS=sI.files[0], fD=dI.files[0];
+    if(fP.size>MAX_F||fS.size>MAX_F||fD.size>MAX_F) return showErr('Ukuran setiap file maksimal 15 MB.');
+
+    fails=0; elapsed=0;
+    var jobId='JOB-'+Date.now();
+    lockUI(); setStep(0);
+    document.getElementById('timer').textContent='Waktu berjalan: 0 detik';
+    timerInt=setInterval(function(){
+        elapsed++;
+        document.getElementById('timer').textContent='Waktu berjalan: '+elapsed+' detik';
+        if(elapsed>=MAX_T){ stopAll(); showErr('Timeout 6 menit. Silakan coba lagi.'); }
+    },1000);
+
+    var fd=new FormData();
+    fd.append('penawaran',fP); fd.append('sertifikat',fS); fd.append('surat_jalan',fD); fd.append('job_id',jobId);
+    try {
+        var res=await fetch(WH_SUBMIT,{method:'POST',body:fd});
+        if(!res.ok) throw new Error('Server error HTTP '+res.status);
+        var rd; try{ rd=await res.json(); }catch(e){ rd={}; }
+        if(rd.status==='processing'||rd.message){ setStep(1); pollInt=setInterval(function(){ poll(jobId); },10000); }
+        else throw new Error('Respons n8n tidak valid.');
+    } catch(e){ showErr(e.message||'Gagal mengirim dokumen.'); }
+}
+
+/* ── POLL ── */
+async function poll(jobId){
+    try {
+        var res=await fetch(WH_POLL+'?job_id='+encodeURIComponent(jobId),{method:'GET'});
+        if(!res.ok){ fails++; if(fails>=6) showErr('Koneksi gagal berulang kali.'); return; }
+        var txt=await res.text();
+        if(!txt||txt.trim().charAt(0)==='<') return;
+        var data; try{ data=JSON.parse(txt); }catch(e){ return; }
+        if(data.status==='processing') return;
+
+        var rows=[];
+        if(Array.isArray(data)) rows=data;
+        else if(data.data&&Array.isArray(data.data)) rows=data.data;
+        else if(typeof data==='object'&&data!==null) rows=[data];
+        rows=rows.filter(function(r){ return r&&typeof r==='object'&&Object.keys(r).length>0; });
+        if(!rows.length) return;
+
+        var ourRow=null;
+        for(var i=0;i<rows.length;i++){
+            var rid=rows[i]['Job ID']||rows[i]['job_id']||rows[i]['Job_ID']||'';
+            if(rid.toString().trim()===jobId.toString().trim()){ ourRow=rows[i]; break; }
         }
-        updateIcon();
-        if (btn) {
-            btn.addEventListener('click', function () {
-                theme = theme === 'dark' ? 'light' : 'dark';
-                html.setAttribute('data-theme', theme);
-                updateIcon();
+        if(!ourRow){ console.log('[POLL] Job ID belum match'); return; }
+
+        stopAll(); unlockUI(); setStep(2); fails=0;
+        var parsed={};
+        try{ parsed=JSON.parse(ourRow['Payload']||'{}'); }catch(e){ parsed=buildFallback(rows); }
+        render(parsed);
+    } catch(e){
+        fails++; console.warn('[POLL] error:',e.message);
+        if(fails>=6) showErr('Koneksi berulang kali gagal.');
+    }
+}
+
+/* ── FALLBACK ── */
+function buildFallback(rows){
+    var status='ALL_MATCH', temuan=[];
+    rows.forEach(function(r){
+        function gv(k){ if(r[k]!==undefined&&r[k]!==null&&r[k]!=='') return r[k]; var fk=Object.keys(r).find(function(x){ return x.toLowerCase().trim()===k.toLowerCase().trim(); }); return fk?r[fk]:''; }
+        if((gv('Status Keseluruhan')||'').toUpperCase().indexOf('DISCREPANCY')!==-1) status='DISCREPANCY_FOUND';
+        var ket=gv('Keterangan');
+        if(ket&&ket!=='-') temuan.push({ keterangan:ket, di_penawaran:gv('Di Penawaran')||'-', di_sertifikat:gv('Di Sertifikat')||'-', di_do:gv('Di DO')||'-', hasil_ai:gv('Hasil AI')||'-' });
+    });
+    return { status_keseluruhan:status, _fallback:true, temuan_anomali:temuan };
+}
+
+/* ── RENDER ── */
+function render(result){
+    var c=document.getElementById('result'); c.innerHTML='';
+    var isOk=result.status_keseluruhan==='ALL_MATCH';
+
+    /* Status banner */
+    var sb=document.createElement('div');
+    sb.className='status-banner '+(isOk?'ok':'err');
+    sb.innerHTML='<div class="sb-label">Status Audit Dokumen</div>'+
+        '<h2 class="sb-title">'+(isOk?'&#9989; Semua Dokumen Sesuai':'&#9888; Ditemukan Ketidaksesuaian')+'</h2>'+
+        (result.nama_kapal?'<p class="sb-meta">Kapal: <strong>'+esc(result.nama_kapal)+'</strong> &nbsp;|&nbsp; Customer: <strong>'+esc(result.customer||'-')+'</strong></p>':'');
+    c.appendChild(sb);
+
+    /* Fallback mode */
+    if(result._fallback){ renderFallback(c, result, isOk); return; }
+
+    var hasAntar = result.check_antar_dokumen && Object.keys(result.check_antar_dokumen).length>0;
+    var hasSert  = result.check_sertifikat && result.check_sertifikat.length>0;
+
+    if(!hasAntar && !hasSert){ renderAllOk(c); return; }
+
+    /* Hitung total anomali */
+    var totalWarn=0, totalOk=0;
+    if(hasAntar){
+        Object.values(result.check_antar_dokumen).forEach(function(v){
+            String(v.status||'').indexOf('⚠')!==-1 ? totalWarn++ : totalOk++;
+        });
+    }
+    if(hasSert){
+        result.check_sertifikat.forEach(function(alat){
+            ['cap_syahbandar','cap_vendor','tanggal_service','tanggal_expired'].forEach(function(k){
+                var v=alat[k]||{};
+                String(v.status||'').indexOf('⚠')!==-1 ? totalWarn++ : totalOk++;
             });
-        }
-    })();
-
-    /* ============================================================
-       FILE INPUT FEEDBACK
-    ============================================================ */
-    function formatSize(b) {
-        if (b < 1024) return b + ' B';
-        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-        return (b / 1048576).toFixed(2) + ' MB';
-    }
-
-    function bindFileInput(inputId, zoneId, nameId, sizeId, infoId) {
-        var input = document.getElementById(inputId);
-        if (!input) return;
-        input.addEventListener('change', function () {
-            var zone  = document.getElementById(zoneId);
-            var info  = document.getElementById(infoId);
-            var nameEl = document.getElementById(nameId);
-            var sizeEl = document.getElementById(sizeId);
-            if (this.files && this.files.length > 0) {
-                nameEl.textContent = this.files[0].name;
-                sizeEl.textContent = ' (' + formatSize(this.files[0].size) + ')';
-                info.classList.add('visible');
-                zone.classList.add('has-file');
-            } else {
-                info.classList.remove('visible');
-                zone.classList.remove('has-file');
-            }
         });
     }
 
-    bindFileInput('file-penawaran',  'zone-penawaran',  'info-penawaran-name',  'info-penawaran-size',  'info-penawaran');
-    bindFileInput('file-sertifikat', 'zone-sertifikat', 'info-sertifikat-name', 'info-sertifikat-size', 'info-sertifikat');
-    bindFileInput('file-do',         'zone-do',         'info-do-name',         'info-do-size',         'info-do');
+    /* Summary bar */
+    var sumBar=document.createElement('div');
+    sumBar.className='summary-bar';
+    sumBar.innerHTML=
+        '<span class="sb-count">'+totalWarn+'</span>'+
+        '<span class="sb-text">anomali ditemukan</span>'+
+        '<span class="sb-sep">|</span>'+
+        '<span class="sb-ok">'+totalOk+'</span>'+
+        '<span class="sb-text">item sesuai</span>'+
+        '<div class="filter-tabs">'+
+            '<button class="ftab active" data-filter="all">Semua</button>'+
+            '<button class="ftab" data-filter="warn">&#9888; Anomali</button>'+
+            '<button class="ftab" data-filter="ok">&#9989; Sesuai</button>'+
+        '</div>';
+    c.appendChild(sumBar);
 
-    /* ============================================================
-       GLOBALS
-    ============================================================ */
-    var pollingInterval = null;
-    var timerInterval   = null;
-    var waktuBerjalan   = 0;
-    var failCount       = 0;
-
-    var MAX_POLLING_TIME = 360;
-    var MAX_FILE_SIZE    = 15 * 1024 * 1024;
-    var WEBHOOK_SUBMIT   = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
-    var WEBHOOK_POLLING  = 'https://n8.waruna-group.co.id/webhook/check-status-audit';
-
-    /* ============================================================
-       UI HELPERS
-    ============================================================ */
-    function setStep(n) {
-        var ids = ['step-kirim', 'step-analisis', 'step-mengambil'];
-        ids.forEach(function (id, i) {
-            var el = document.getElementById(id);
-            if (!el) return;
-            el.classList.remove('active', 'done');
-            if (i < n)      el.classList.add('done');
-            else if (i === n) el.classList.add('active');
+    /* Filter tabs handler */
+    sumBar.querySelectorAll('.ftab').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            sumBar.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
+            this.classList.add('active');
+            var f=this.dataset.filter;
+            document.querySelectorAll('.anomali-card').forEach(function(card){
+                if(f==='all') card.style.display='';
+                else if(f==='warn') card.style.display=card.classList.contains('is-warn')?'':'none';
+                else card.style.display=card.classList.contains('is-ok')?'':'none';
+            });
+            document.querySelectorAll('.sec-wrap').forEach(function(sw){
+                var visible=sw.querySelectorAll('.anomali-card:not([style*="none"])').length>0;
+                sw.style.display=visible?'':'none';
+            });
         });
-    }
-
-    function lockUI() {
-        var btn = document.getElementById('btn-submit');
-        btn.disabled = true;
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Memproses Dokumen...';
-        document.getElementById('result-container').innerHTML = '';
-        document.getElementById('error-container').textContent = '';
-        document.getElementById('error-container').classList.remove('visible');
-        document.getElementById('loading').classList.add('visible');
-    }
-
-    function unlockUI() {
-        var btn = document.getElementById('btn-submit');
-        btn.disabled = false;
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Jalankan Verifikasi Ekstraksi';
-        document.getElementById('loading').classList.remove('visible');
-    }
-
-    function stopTimers() {
-        clearInterval(pollingInterval);
-        clearInterval(timerInterval);
-        pollingInterval = null;
-        timerInterval   = null;
-    }
-
-    function tampilkanError(pesan) {
-        stopTimers();
-        unlockUI();
-        var el = document.getElementById('error-container');
-        el.innerHTML = '<strong>&#9888;&#65039; Terjadi Kesalahan:</strong> ' + pesan;
-        el.classList.add('visible');
-    }
-
-    function escHtml(str) {
-        var s = (str === null || str === undefined) ? '-' : String(str);
-        return s.replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-    }
-
-    function toRoman(n) {
-        return (['i','ii','iii','iv','v','vi','vii','viii','ix','x'])[n - 1] || String(n);
-    }
-
-    function statusBadge(status) {
-        var s = String(status || '');
-        var isWarn = s.indexOf('⚠') !== -1 ||
-                     s.toUpperCase().indexOf('BEDA') !== -1 ||
-                     s.toUpperCase().indexOf('TIDAK ADA') !== -1 ||
-                     s.toUpperCase().indexOf('DISCREPANCY') !== -1;
-        return isWarn
-            ? '<span class="badge badge-warn">&#9888;&#65039; ' + escHtml(status) + '</span>'
-            : '<span class="badge badge-ok">&#9989; OK</span>';
-    }
-
-    /* ============================================================
-       INIT BUTTON
-    ============================================================ */
-    document.addEventListener('DOMContentLoaded', function () {
-        var btn = document.getElementById('btn-submit');
-        if (btn) btn.addEventListener('click', mulaiProses);
     });
 
-    /* ============================================================
-       MAIN PROCESS
-    ============================================================ */
-    async function mulaiProses() {
-        stopTimers();
+    /* Section: Check Antar Dokumen */
+    if(hasAntar) renderSectionAntar(c, result.check_antar_dokumen);
 
-        var pIn = document.getElementById('file-penawaran');
-        var sIn = document.getElementById('file-sertifikat');
-        var dIn = document.getElementById('file-do');
+    /* Section: Per jenis sertifikat */
+    if(hasSert) result.check_sertifikat.forEach(function(alat){ renderSectionSertifikat(c, alat); });
+}
 
-        if (!pIn.files.length)  return tampilkanError('File Quotation/Invoice belum dipilih.');
-        if (!sIn.files.length)  return tampilkanError('File Laporan Sertifikat belum dipilih.');
-        if (!dIn.files.length)  return tampilkanError('File Surat Jalan / DO belum dipilih.');
+/* ── ALL OK ── */
+function renderAllOk(c){
+    var d=document.createElement('div'); d.className='success-full';
+    d.innerHTML='<div class="si">&#9989;</div><h3>Verifikasi Berhasil</h3><p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Sertifikat telah divalidasi dan 100% konsisten.</p>';
+    c.appendChild(d);
+}
 
-        var fP = pIn.files[0], fS = sIn.files[0], fD = dIn.files[0];
-        if (fP.size > MAX_FILE_SIZE || fS.size > MAX_FILE_SIZE || fD.size > MAX_FILE_SIZE)
-            return tampilkanError('Ukuran setiap file maksimal 15 MB.');
+/* ── SECTION ANTAR DOKUMEN ── */
+function renderSectionAntar(c, data){
+    var labelMap={ nama_kapal:'Nama Kapal', customer:'Customer / Owner Kapal', quantity_item:'Quantity Item', harga_item:'Harga Item', jenis_item:'Jenis Item' };
+    var entries=Object.entries(data);
+    var warnCount=entries.filter(function(e){ return String(e[1].status||'').indexOf('⚠')!==-1; }).length;
 
-        failCount     = 0;
-        waktuBerjalan = 0;
-        var jobId = 'JOB-' + Date.now();
+    var wrap=mkSection(
+        'blue',
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+        'Check Antar Dokumen',
+        'Kesesuaian Quotation &#8596; Sertifikat &#8596; DO',
+        warnCount, entries.length
+    );
+    c.appendChild(wrap);
 
-        lockUI();
-        setStep(0);
-        document.getElementById('timer-text').textContent = 'Waktu berjalan: 0 detik';
+    var body=wrap.querySelector('.sec-body');
+    var list=document.createElement('div'); list.className='anomali-list';
 
-        timerInterval = setInterval(function () {
-            waktuBerjalan++;
-            document.getElementById('timer-text').textContent = 'Waktu berjalan: ' + waktuBerjalan + ' detik';
-            if (waktuBerjalan >= MAX_POLLING_TIME) {
-                stopTimers();
-                tampilkanError('Waktu Habis (Timeout). AI belum selesai memproses dalam 6 menit.');
-            }
-        }, 1000);
+    entries.forEach(function(entry, idx){
+        var key=entry[0], val=entry[1];
+        var warn=String(val.status||'').indexOf('⚠')!==-1;
+        var doVal=val['delivery_order']||val['do_val']||'-';
 
-        var fd = new FormData();
-        fd.append('penawaran',   fP);
-        fd.append('sertifikat',  fS);
-        fd.append('surat_jalan', fD);
-        fd.append('job_id',      jobId);
+        var card=document.createElement('div');
+        card.className='anomali-card '+(warn?'is-warn':'is-ok');
+        card.innerHTML=
+            '<div class="ac-head">'+
+                '<div class="ac-num">'+(idx+1)+'</div>'+
+                '<div class="ac-label">'+esc(labelMap[key]||key)+'</div>'+
+                '<span class="ac-status">'+(warn?'&#9888; Tidak Sesuai':'&#9989; Sesuai')+'</span>'+
+            '</div>'+
+            '<div class="ac-body">'+
+                '<div class="ac-doc">'+
+                    '<div class="ac-doc-label">&#128196; Quotation / Invoice</div>'+
+                    '<div class="ac-doc-val'+(warn?' anomali':'')+'">'+esc(val.quotation||'-')+'</div>'+
+                '</div>'+
+                '<div class="ac-doc">'+
+                    '<div class="ac-doc-label">&#128203; Sertifikat</div>'+
+                    '<div class="ac-doc-val'+(warn?' anomali':'')+'">'+esc(val.sertifikat||'-')+'</div>'+
+                '</div>'+
+                '<div class="ac-doc">'+
+                    '<div class="ac-doc-label">&#128666; Delivery Order / DO</div>'+
+                    '<div class="ac-doc-val'+(warn?' anomali':'')+'">'+esc(doVal)+'</div>'+
+                '</div>'+
+                (val.hasil_ai&&val.hasil_ai!=='-'?
+                '<div class="ac-ai">'+
+                    '<span class="ac-ai-icon">&#129302;</span>'+
+                    '<span>'+esc(val.hasil_ai)+'</span>'+
+                '</div>':'')+'</div>';
+        list.appendChild(card);
+    });
 
-        try {
-            var res = await fetch(WEBHOOK_SUBMIT, { method: 'POST', body: fd });
-            if (!res.ok) throw new Error('Server menolak dokumen (HTTP ' + res.status + '). Pastikan N8N aktif.');
-            var rd;
-            try { rd = await res.json(); } catch(e) { rd = {}; }
-            if (rd.status === 'processing' || rd.message) {
-                setStep(1);
-                pollingInterval = setInterval(function () { cekStatusAI(jobId); }, 10000);
-            } else {
-                throw new Error('Respons dari n8n tidak valid. Periksa node "Balas Instan ke Vercel".');
-            }
-        } catch(err) {
-            tampilkanError(err.message || 'Gagal mengirim dokumen ke server.');
-        }
-    }
+    if(!entries.length){ var es=document.createElement('div'); es.className='empty-state'; es.textContent='Tidak ada data.'; list.appendChild(es); }
+    body.appendChild(list);
+}
 
-    /* ============================================================
-       POLLING
-    ============================================================ */
-    async function cekStatusAI(jobId) {
-        try {
-            var res = await fetch(WEBHOOK_POLLING + '?job_id=' + encodeURIComponent(jobId), { method: 'GET' });
-            if (!res.ok) {
-                failCount++;
-                if (failCount >= 6) tampilkanError('Koneksi ke server gagal terus-menerus. Silakan muat ulang halaman.');
-                return;
-            }
+/* ── SECTION SERTIFIKAT ── */
+function renderSectionSertifikat(c, alat){
+    var checkFields=[
+        {key:'cap_syahbandar',  label:'Cap & TTD Syahbandar'},
+        {key:'cap_vendor',      label:'Cap & TTD Vendor'},
+        {key:'tanggal_service', label:'Tanggal Service / Inspeksi'},
+        {key:'tanggal_expired', label:'Tanggal Expired / Next Inspection'}
+    ];
+    var warnCount=checkFields.filter(function(f){ return String((alat[f.key]||{}).status||'').indexOf('⚠')!==-1; }).length;
 
-            var txt = await res.text();
-            if (!txt || txt.trim().charAt(0) === '<') return;
+    var wrap=mkSection(
+        'red',
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>',
+        'Sertifikat: '+esc(alat.jenis_alat||'-'),
+        'Validasi lembar BTKP &#8596; Judul &#8596; Lampiran',
+        warnCount, checkFields.length
+    );
+    c.appendChild(wrap);
 
-            var data;
-            try { data = JSON.parse(txt); } catch(e) { return; }
-            if (data.status === 'processing') return;
+    var body=wrap.querySelector('.sec-body');
 
-            var rows = [];
-            if (Array.isArray(data))                            rows = data;
-            else if (data.data && Array.isArray(data.data))     rows = data.data;
-            else if (typeof data === 'object' && data !== null) rows = [data];
-            rows = rows.filter(function(r) { return r && typeof r === 'object' && Object.keys(r).length > 0; });
-            if (rows.length === 0) return;
+    /* Anomali cards per field */
+    var list=document.createElement('div'); list.className='anomali-list';
+    checkFields.forEach(function(field, idx){
+        var val=alat[field.key]||{};
+        var warn=String(val.status||'').indexOf('⚠')!==-1;
 
-            var ourRow = null;
-            for (var i = 0; i < rows.length; i++) {
-                var rid = rows[i]['Job ID'] || rows[i]['job_id'] || rows[i]['Job_ID'] || '';
-                if (rid.toString().trim() === jobId.toString().trim()) { ourRow = rows[i]; break; }
-            }
-            if (!ourRow) { console.log('[POLLING] Job ID belum cocok, menunggu...'); return; }
-
-            console.log('[POLLING] Data diterima:', jobId);
-            stopTimers(); unlockUI(); setStep(2); failCount = 0;
-
-            var parsed = {};
-            try {
-                parsed = JSON.parse(ourRow['Payload'] || '{}');
-            } catch(e) {
-                parsed = buildFallbackResult(rows);
-            }
-
-            renderHasil(parsed, ourRow);
-
-        } catch(err) {
-            failCount++;
-            console.warn('[POLLING] Gagal:', err.message);
-            if (failCount >= 6) tampilkanError('Koneksi ke server untuk mengecek status gagal terus-menerus.');
-        }
-    }
-
-    /* ============================================================
-       FALLBACK (format lama flat Sheets rows)
-    ============================================================ */
-    function buildFallbackResult(rows) {
-        var status = 'ALL_MATCH';
-        var temuan = [];
-        rows.forEach(function(r) {
-            function gv(k) {
-                if (r[k] !== undefined && r[k] !== null && r[k] !== '') return r[k];
-                var fk = Object.keys(r).find(function(x) { return x.toLowerCase().trim() === k.toLowerCase().trim(); });
-                return fk ? r[fk] : '';
-            }
-            var s = gv('Status Keseluruhan');
-            if (s && s.toUpperCase().indexOf('DISCREPANCY') !== -1) status = 'DISCREPANCY_FOUND';
-            var ket = gv('Keterangan');
-            if (ket && ket !== '-' && ket.toString().trim() !== '') {
-                temuan.push({
-                    keterangan:    ket,
-                    di_penawaran:  gv('Di Penawaran')  || '-',
-                    di_sertifikat: gv('Di Sertifikat') || '-',
-                    di_do:         gv('Di DO')          || '-',
-                    hasil_ai:      gv('Hasil AI')       || '-'
-                });
-            }
-        });
-        return { status_keseluruhan: status, _fallback: true, temuan_anomali: temuan };
-    }
-
-    /* ============================================================
-       RENDER HASIL
-    ============================================================ */
-    function renderHasil(result, rawRow) {
-        var container = document.getElementById('result-container');
-        container.innerHTML = '';
-
-        var isOk = result.status_keseluruhan === 'ALL_MATCH';
-
-        /* Status header */
-        var statusDiv = document.createElement('div');
-        statusDiv.className = 'status-header ' + (isOk ? 'match' : 'mismatch');
-        statusDiv.innerHTML =
-            '<p class="status-label">Status Audit Dokumen</p>' +
-            '<h2 class="status-title">' + (isOk ? '&#9989; Semua Dokumen Sesuai' : '&#9888;&#65039; Ditemukan Ketidaksesuaian') + '</h2>' +
-            (result.nama_kapal
-                ? '<p class="status-meta">Kapal: <strong>' + escHtml(result.nama_kapal) + '</strong> &nbsp;|&nbsp; Customer: <strong>' + escHtml(result.customer || '-') + '</strong></p>'
-                : '');
-        container.appendChild(statusDiv);
-
-        /* Fallback mode */
-        if (result._fallback) { renderFallback(container, result, isOk); return; }
-
-        /* New structured mode */
-        if (!result.check_antar_dokumen && (!result.check_sertifikat || result.check_sertifikat.length === 0)) {
-            renderSuccessCard(container); return;
-        }
-
-        if (result.check_antar_dokumen) renderCheckAntarDokumen(container, result.check_antar_dokumen);
-
-        if (result.check_sertifikat && result.check_sertifikat.length > 0) {
-            result.check_sertifikat.forEach(function(alat) { renderCheckSertifikat(container, alat); });
-        }
-
-        if (isOk && !result.check_antar_dokumen && (!result.check_sertifikat || result.check_sertifikat.length === 0)) {
-            renderSuccessCard(container);
-        }
-    }
-
-    function renderSuccessCard(container) {
-        var card = document.createElement('div');
-        card.className = 'success-card';
-        card.innerHTML =
-            '<div class="success-icon">&#9989;</div>' +
-            '<h3>Verifikasi Berhasil</h3>' +
-            '<p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Laporan Sertifikat telah divalidasi dan 100% konsisten.</p>';
-        container.appendChild(card);
-    }
-
-    /* ---- SECTION 1: Check Antar Dokumen ---- */
-    function renderCheckAntarDokumen(container, data) {
-        var labelMap = {
-            nama_kapal:       '1. Nama Kapal',
-            customer:         '2. Customer / Owner Kapal',
-            quantity_item:    '3. Quantity Item',
-            harga_item:       '4. Harga Item',
-            jenis_item:       '5. Jenis Item'
-        };
-
-        var tbody = '';
-        Object.entries(data).forEach(function(entry) {
-            var key = entry[0];
-            var val = entry[1];
-            var warn = String(val.status || '').indexOf('⚠') !== -1;
-            /* FIXED: gunakan bracket notation untuk menghindari reserved keyword */
-            var doVal = val['delivery_order'] || val['do_val'] || val['do'] || '-';
-            tbody +=
-                '<tr>' +
-                    '<td class="col-keterangan">' + escHtml(labelMap[key] || key) + '</td>' +
-                    '<td class="col-doc' + (warn ? ' anomali' : '') + '">' + escHtml(val.quotation || '-') + '</td>' +
-                    '<td class="col-doc' + (warn ? ' anomali' : '') + '">' + escHtml(val.sertifikat || '-') + '</td>' +
-                    '<td class="col-doc' + (warn ? ' anomali' : '') + '">' + escHtml(doVal) + '</td>' +
-                    '<td class="center">' + statusBadge(val.status) + '</td>' +
-                    '<td class="col-hasil-ai">' + escHtml(val.hasil_ai || '-') + '</td>' +
-                '</tr>';
-        });
-
-        var section = document.createElement('div');
-        section.className = 'audit-section';
-        section.innerHTML =
-            '<div class="audit-section-header primary">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3730a3" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' +
-                '<h3>Check Antar Dokumen</h3>' +
-                '<span class="audit-section-subtitle">Cek kesesuaian &amp; kelengkapan</span>' +
-            '</div>' +
-            '<div class="audit-table-wrapper">' +
-                '<div class="table-wrap">' +
-                    '<table class="audit-table">' +
-                        '<thead><tr>' +
-                            '<th style="min-width:180px;">Keterangan</th>' +
-                            '<th>Final Quotation / Invoice</th>' +
-                            '<th>Sertifikat</th>' +
-                            '<th>Delivery Order / Work Report / Berita Acara</th>' +
-                            '<th class="center">Status</th>' +
-                            '<th>Hasil AI</th>' +
-                        '</tr></thead>' +
-                        '<tbody>' + tbody + '</tbody>' +
-                    '</table>' +
-                '</div>' +
+        var card=document.createElement('div');
+        card.className='anomali-card '+(warn?'is-warn':'is-ok');
+        card.innerHTML=
+            '<div class="ac-head">'+
+                '<div class="ac-num">'+(idx+1)+'</div>'+
+                '<div class="ac-label">'+esc(field.label)+'</div>'+
+                '<span class="ac-status">'+(warn?'&#9888; Tidak Sesuai':'&#9989; Sesuai')+'</span>'+
             '</div>';
-        container.appendChild(section);
-    }
 
-    /* ---- SECTION 2: Sertifikat per Jenis Alat ---- */
-    function renderCheckSertifikat(container, alat) {
-        var checkFields = [
-            { key: 'cap_syahbandar',  label: 'a. Cap & Tanda Tangan Syahbandar' },
-            { key: 'cap_vendor',      label: 'b. Cap & Tanda Tangan Vendor' },
-            { key: 'tanggal_service', label: 'c. Tanggal Service / Inspeksi' },
-            { key: 'tanggal_expired', label: 'd. Tanggal Next Service / Expired / Masa Berlaku' }
-        ];
-
-        var tbody = '';
-
-        checkFields.forEach(function(field) {
-            var val  = alat[field.key] || {};
-            var warn = String(val.status || '').indexOf('⚠') !== -1;
-            var lembarHtml =
-                '<span class="lembar-label">BTKP: </span>' +
-                '<span class="lembar-val' + (warn ? ' anomali' : '') + '">' + escHtml(val.btkp    || '-') + '</span><br>' +
-                '<span class="lembar-label">Judul: </span>' +
-                '<span class="lembar-val' + (warn ? ' anomali' : '') + '">' + escHtml(val.judul   || '-') + '</span><br>' +
-                '<span class="lembar-label">Lampiran: </span>' +
-                '<span class="lembar-val' + (warn ? ' anomali' : '') + '">' + escHtml(val.lampiran || '-') + '</span>';
-            tbody +=
-                '<tr>' +
-                    '<td class="col-keterangan">' + escHtml(field.label) + '</td>' +
-                    '<td class="col-sertifikat" colspan="2">' + lembarHtml + '</td>' +
-                    '<td class="center">' + statusBadge(val.status) + '</td>' +
-                    '<td class="col-hasil-ai">' + escHtml(val.hasil_ai || '-') + '</td>' +
-                '</tr>';
+        /* Lembar rows */
+        var lembarDiv=document.createElement('div'); lembarDiv.className='lembar-rows';
+        [
+            {badge:'BTKP',    cls:'lb-btkp',  val:val.btkp},
+            {badge:'Judul',   cls:'lb-judul', val:val.judul},
+            {badge:'Lampiran',cls:'lb-lamp',  val:val.lampiran}
+        ].forEach(function(l){
+            var lWarn=warn && l.val && l.val!=='-';
+            lembarDiv.innerHTML+=
+                '<div class="lembar-row">'+
+                    '<span class="lembar-badge '+l.cls+'">'+l.badge+'</span>'+
+                    '<span class="lembar-val'+(lWarn?' anomali':'')+'">'+esc(l.val||'-')+'</span>'+
+                '</div>';
         });
-
-        /* Detail spesifik */
-        if (alat.detail_spesifik) {
-            var d = alat.detail_spesifik;
-            var detailRows = [
-                ['i',    'Pabrikan / Merek / Manufacturer',   d.pabrikan],
-                ['ii',   'Kind of Service / Jenis Service',    d.jenis_service],
-                ['iii',  'Manufacture Date / Tahun Pembuatan', d.manufacture_date],
-                ['iv',   'Serial Number / SN',                 d.serial_number],
-                ['v',    'Capacity',                           d.capacity],
-                ['vi',   'Material / Note (Detail)',           d.material],
-                ['vii',  'Catatan Tambahan',                   d.catatan_tambahan]
-            ].filter(function(x) { return x[2] && x[2] !== '-' && x[2].toString().trim() !== ''; });
-
-            if (detailRows.length > 0) {
-                tbody += '<tr class="row-subheader"><td colspan="5">Detail Spesifik Sertifikat</td></tr>';
-                detailRows.forEach(function(item) {
-                    tbody +=
-                        '<tr>' +
-                            '<td class="col-keterangan" style="padding-left:var(--space-6);">' + escHtml(item[0]) + '. ' + escHtml(item[1]) + '</td>' +
-                            '<td colspan="3" style="color:var(--color-text-muted);">' + escHtml(item[2]) + '</td>' +
-                            '<td></td>' +
-                        '</tr>';
-                });
-            }
+        if(val.hasil_ai&&val.hasil_ai!=='-'){
+            lembarDiv.innerHTML+=
+                '<div class="ac-ai" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);">'+
+                    '<span class="ac-ai-icon">&#129302;</span>'+
+                    '<span>'+esc(val.hasil_ai)+'</span>'+
+                '</div>';
         }
+        card.appendChild(lembarDiv);
+        list.appendChild(card);
+    });
+    body.appendChild(list);
 
-        var section = document.createElement('div');
-        section.className = 'audit-section';
-        section.innerHTML =
-            '<div class="audit-section-header danger">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>' +
-                '<h3>Sertifikat: ' + escHtml(alat.jenis_alat || '-') + '</h3>' +
-                '<span class="audit-section-subtitle">Harus sesuai antar lembar BTKP, Judul &amp; Lampiran</span>' +
-            '</div>' +
-            '<div class="audit-table-wrapper danger">' +
-                '<div class="table-wrap">' +
-                    '<table class="audit-table">' +
-                        '<thead><tr>' +
-                            '<th style="min-width:200px;">Keterangan</th>' +
-                            '<th colspan="2">Lembar BTKP / Judul / Lampiran</th>' +
-                            '<th class="center">Status</th>' +
-                            '<th>Hasil AI</th>' +
-                        '</tr></thead>' +
-                        '<tbody>' + tbody + '</tbody>' +
-                    '</table>' +
-                '</div>' +
-            '</div>';
-        container.appendChild(section);
-    }
+    /* Detail spesifik */
+    if(alat.detail_spesifik){
+        var d=alat.detail_spesifik;
+        var dItems=[
+            ['Pabrikan / Merek',         d.pabrikan],
+            ['Jenis Service',             d.jenis_service],
+            ['Manufacture Date',          d.manufacture_date],
+            ['Serial Number / SN',        d.serial_number],
+            ['Capacity',                  d.capacity],
+            ['Material / Note',           d.material],
+            ['Catatan Tambahan',          d.catatan_tambahan]
+        ].filter(function(x){ return x[1]&&x[1]!=='-'&&x[1].toString().trim()!==''; });
 
-    /* ---- FALLBACK: format lama flat rows ---- */
-    function renderFallback(container, result, isOk) {
-        if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
-            renderSuccessCard(container); return;
+        if(dItems.length){
+            var dlabel=document.createElement('div'); dlabel.className='divider-label'; dlabel.textContent='&#128203; Detail Spesifik Sertifikat';
+            body.appendChild(dlabel);
+            var grid=document.createElement('div'); grid.className='detail-grid';
+            dItems.forEach(function(item){
+                grid.innerHTML+='<div class="detail-item"><div class="detail-item-label">'+esc(item[0])+'</div><div class="detail-item-val">'+esc(item[1])+'</div></div>';
+            });
+            body.appendChild(grid);
         }
-        var rows = '';
-        result.temuan_anomali.forEach(function(item, i) {
-            rows +=
-                '<tr>' +
-                    '<td class="center">' + (i + 1) + '</td>' +
-                    '<td class="col-keterangan">' + escHtml(item.keterangan    || '-') + '</td>' +
-                    '<td class="col-doc anomali">' + escHtml(item.di_penawaran  || '-') + '</td>' +
-                    '<td class="col-sertifikat">'  + escHtml(item.di_sertifikat || '-') + '</td>' +
-                    '<td class="col-doc anomali">' + escHtml(item.di_do         || '-') + '</td>' +
-                    '<td class="col-hasil-ai">'    + escHtml(item.hasil_ai      || '-') + '</td>' +
-                '</tr>';
-        });
-
-        var section = document.createElement('div');
-        section.className = 'audit-section';
-        section.innerHTML =
-            '<div class="audit-section-header danger">' +
-                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2">' +
-                    '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>' +
-                    '<line x1="12" y1="9" x2="12" y2="13"/>' +
-                    '<line x1="12" y1="17" x2="12.01" y2="17"/>' +
-                '</svg>' +
-                '<h3>Tabel Rincian Dokumen Tidak Sinkron</h3>' +
-                '<span class="audit-section-subtitle">' + result.temuan_anomali.length + ' Temuan</span>' +
-            '</div>' +
-            '<div class="audit-table-wrapper danger">' +
-                '<div class="table-wrap">' +
-                    '<table class="audit-table">' +
-                        '<thead><tr>' +
-                            '<th class="center" style="width:50px;">No</th>' +
-                            '<th>Keterangan</th>' +
-                            '<th>Final Quotation / Invoice</th>' +
-                            '<th>Sertifikat</th>' +
-                            '<th>Delivery Order / Berita Acara</th>' +
-                            '<th>Hasil AI (Catatan)</th>' +
-                        '</tr></thead>' +
-                        '<tbody>' + rows + '</tbody>' +
-                    '</table>' +
-                '</div>' +
-            '</div>';
-        container.appendChild(section);
     }
-    </script>
+}
+
+/* ── FALLBACK RENDER ── */
+function renderFallback(c, result, isOk){
+    if(isOk||!result.temuan_anomali||!result.temuan_anomali.length){ renderAllOk(c); return; }
+
+    var wrap=mkSection('red',
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+        'Rincian Temuan',
+        'Dokumen tidak sinkron',
+        result.temuan_anomali.length, result.temuan_anomali.length
+    );
+    c.appendChild(wrap);
+    var body=wrap.querySelector('.sec-body');
+    var list=document.createElement('div'); list.className='anomali-list';
+    result.temuan_anomali.forEach(function(item,i){
+        var card=document.createElement('div'); card.className='anomali-card is-warn';
+        card.innerHTML=
+            '<div class="ac-head"><div class="ac-num">'+(i+1)+'</div><div class="ac-label">'+esc(item.keterangan||'-')+'</div><span class="ac-status">&#9888; Anomali</span></div>'+
+            '<div class="ac-body">'+
+                '<div class="ac-doc"><div class="ac-doc-label">&#128196; Quotation</div><div class="ac-doc-val anomali">'+esc(item.di_penawaran||'-')+'</div></div>'+
+                '<div class="ac-doc"><div class="ac-doc-label">&#128203; Sertifikat</div><div class="ac-doc-val">'+esc(item.di_sertifikat||'-')+'</div></div>'+
+                '<div class="ac-doc"><div class="ac-doc-label">&#128666; DO</div><div class="ac-doc-val anomali">'+esc(item.di_do||'-')+'</div></div>'+
+                (item.hasil_ai&&item.hasil_ai!=='-'?'<div class="ac-ai"><span class="ac-ai-icon">&#129302;</span><span>'+esc(item.hasil_ai)+'</span></div>':'')+
+            '</div>';
+        list.appendChild(card);
+    });
+    body.appendChild(list);
+}
+
+/* ── HELPER: buat accordion section ── */
+function mkSection(colorCls, iconSvg, title, subtitle, warnCount, total){
+    var wrap=document.createElement('div'); wrap.className='sec-wrap';
+    var badgeCls=warnCount>0?'has-warn':'all-ok';
+    var badgeTxt=warnCount>0?(warnCount+' anomali'):'Semua Sesuai';
+
+    var trigger=document.createElement('button');
+    trigger.className='sec-trigger'; trigger.setAttribute('aria-expanded','true');
+    trigger.innerHTML=
+        '<div class="sec-icon '+colorCls+'">'+iconSvg+'</div>'+
+        '<div><div class="sec-title">'+title+'</div><div class="sec-subtitle">'+subtitle+'</div></div>'+
+        '<span class="sec-badge '+badgeCls+'">'+badgeTxt+'</span>'+
+        '<svg class="sec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+
+    var body=document.createElement('div'); body.className='sec-body open';
+    trigger.addEventListener('click', function(){
+        var open=body.classList.contains('open');
+        body.classList.toggle('open',!open);
+        trigger.setAttribute('aria-expanded',String(!open));
+    });
+
+    wrap.appendChild(trigger); wrap.appendChild(body);
+    return wrap;
+}
+</script>
 </body>
 </html>
