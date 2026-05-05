@@ -1,70 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Verifikasi Dokumen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #fdfbf3; }
-        .dashed-box { border: 2px dashed #f6e05e; background-color: #fff; }
-    </style>
-</head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="bg-white shadow-sm px-6 py-4 flex items-center gap-3">
-        <div class="bg-indigo-900 text-white w-8 h-8 flex items-center justify-center rounded font-bold text-lg">W</div>
-        <h1 class="text-xl font-bold text-yellow-600 tracking-wide">Waruna Group <span class="text-gray-400 font-normal">| Verifikasi Dokumen</span></h1>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-grow flex flex-col items-center py-10 px-4 w-full">
-        
-        <!-- Upload Card -->
-        <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-4xl border border-gray-100">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                
-                <!-- Input Sertifikat (BERSIH DARI ERROR ONCHANGE) -->
-                <div class="dashed-box rounded-lg p-6 flex flex-col items-center justify-center text-center">
-                    <span class="block text-sm font-bold text-yellow-700 uppercase tracking-wider mb-4">📄 LAPORAN SERTIFIKAT</span>
-                    <input type="file" id="file-sertifikat" accept="application/pdf" 
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                </div>
-
-                <!-- Input Penawaran (BERSIH DARI ERROR ONCHANGE) -->
-                <div class="dashed-box rounded-lg p-6 flex flex-col items-center justify-center text-center">
-                    <span class="block text-sm font-bold text-yellow-700 uppercase tracking-wider mb-4">📄 PENAWARAN VENDOR</span>
-                    <input type="file" id="file-penawaran" accept="application/pdf" 
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                </div>
-
-            </div>
-            
-            <button type="button" id="btn-submit" onclick="mulaiProses()" class="w-full bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-4 px-6 rounded-lg uppercase tracking-wider transition duration-200 shadow-md">
-                Jalankan Verifikasi Ekstraksi
-            </button>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div id="loading" class="hidden mt-8 w-full max-w-4xl text-center">
-            <svg class="animate-spin h-10 w-10 text-indigo-800 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="text-indigo-900 font-bold animate-pulse text-lg">Dokumen sedang dianalisis oleh AI...</p>
-            <p id="timer-text" class="text-gray-500 text-sm mt-2 font-mono">Waktu berjalan: 0 detik</p>
-            <p class="text-gray-400 text-xs mt-1">Proses ini dilakukan di latar belakang. Jangan tutup halaman ini.</p>
-        </div>
-
-        <div id="error-container" class="hidden w-full max-w-5xl mt-6 p-4 bg-red-100 border-l-4 border-red-600 text-red-800 font-medium rounded shadow-sm"></div>
-        <div id="result-container" class="w-full max-w-5xl mt-8"></div>
-    </main>
-
-    <script>
-        let pollingInterval;
+let pollingInterval;
         let waktuBerjalan = 0;
         let timerInterval;
+        let failCount = 0; // Menghitung kegagalan polling
+        const MAX_POLLING_TIME = 360; // Batas maksimal 6 menit (360 detik)
+        const MAX_FILE_SIZE = 15 * 1024 * 1024; // Batas maksimal 15 MB per file
 
         async function mulaiProses() {
             const fileSertifikat = document.getElementById('file-sertifikat').files[0];
@@ -72,14 +11,22 @@
             const btnSubmit = document.getElementById('btn-submit');
             const loading = document.getElementById('loading');
             
+            // 1. Validasi Keberadaan File
             if (!fileSertifikat || !filePenawaran) {
-                alert("Kesalahan: Anda harus memilih/mengunggah kedua file PDF terlebih dahulu.");
+                alert("Kesalahan Objektif: Anda harus memilih kedua file PDF terlebih dahulu.");
+                return;
+            }
+
+            // 2. Validasi Ukuran File (Mencegah n8n Crash / Memory Leak)
+            if (fileSertifikat.size > MAX_FILE_SIZE || filePenawaran.size > MAX_FILE_SIZE) {
+                alert("Kesalahan Objektif: Ukuran maksimal per dokumen adalah 15MB. Silakan kompres PDF Anda terlebih dahulu.");
                 return;
             }
 
             const jobId = "JOB-" + Date.now();
+            failCount = 0; // Reset counter kegagalan
 
-            // Ubah UI Tombol
+            // Kunci UI Tombol
             btnSubmit.disabled = true;
             btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
             btnSubmit.innerText = 'MEMPROSES DOKUMEN...';
@@ -100,13 +47,18 @@
                     body: formData
                 });
 
-                if (!response.ok) throw new Error("Gagal mengirim dokumen ke server n8n.");
+                if (!response.ok) throw new Error(`Gagal mengirim dokumen ke server (HTTP Status: ${response.status}).`);
 
-                // Mulai Timer Visual
+                // Mulai Timer Visual dengan Batas Waktu Terprogram
                 waktuBerjalan = 0;
                 timerInterval = setInterval(() => {
                     waktuBerjalan++;
                     document.getElementById('timer-text').innerText = `Waktu berjalan: ${waktuBerjalan} detik`;
+
+                    // PENGAMAN 1: Hentikan paksa jika melebihi batas waktu maksimal
+                    if (waktuBerjalan >= MAX_POLLING_TIME) {
+                        tampilkanError("Waktu Habis (Timeout). AI tidak memberikan respons dalam 6 menit. Silakan periksa log eksekusi di n8n.");
+                    }
                 }, 1000);
 
                 // TAHAP 2: Mulai Polling ke Webhook 2 setiap 10 detik
@@ -123,6 +75,12 @@
                     method: 'GET'
                 });
 
+                // Jika server mati atau mengembalikan error 500/502
+                if (!response.ok) throw new Error("Server mengembalikan status error saat polling.");
+
+                // Jika berhasil, reset fail count
+                failCount = 0; 
+
                 const responseData = await response.json();
 
                 if (responseData && responseData.status === "completed") {
@@ -130,11 +88,22 @@
                     clearInterval(timerInterval);
                     selesaikanProses();
 
-                    let rows = JSON.parse(responseData.data);
-                    let rowData = rows[0]; 
+                    // Mencegah error jika respon data kosong
+                    if (!responseData.data) {
+                        tampilkanError("Proses selesai, namun Google Sheets tidak mengembalikan data JSON apa pun.");
+                        return;
+                    }
 
+                    let rows = JSON.parse(responseData.data);
+                    if (rows.length === 0) {
+                        tampilkanError("Data untuk Job ID ini tidak ditemukan di Google Sheets.");
+                        return;
+                    }
+
+                    let rowData = rows[0]; 
                     let finalJson = null;
                     
+                    // Mencari kolom yang berisi keyword JSON AI
                     for (let key in rowData) {
                         if (typeof rowData[key] === 'string' && rowData[key].includes("status_keseluruhan")) {
                             try {
@@ -143,7 +112,7 @@
                                 finalJson = JSON.parse(cleanString);
                                 break;
                             } catch (e) {
-                                console.log("Gagal parse isi kolom:", key, e);
+                                console.log("Gagal melakukan parse pada isi kolom:", key, e);
                             }
                         }
                     }
@@ -151,11 +120,17 @@
                     if (finalJson) {
                         renderHasil(finalJson);
                     } else {
-                        tampilkanError("Data ditemukan di Google Sheets, tetapi struktur JSON AI rusak atau tidak valid.");
+                        tampilkanError("Data ditemukan di Google Sheets, tetapi struktur JSON AI rusak (halusinasi) atau tidak valid.");
                     }
                 } 
             } catch (error) {
-                console.warn("Gagal polling ke server, mencoba lagi...", error);
+                // PENGAMAN 2: Hitung kegagalan. Jika gagal berturut-turut 3 kali, batalkan sistem.
+                failCount++;
+                console.warn(`Gagal polling ke server (Percobaan ${failCount}/3)...`, error);
+                
+                if (failCount >= 3) {
+                    tampilkanError("Koneksi ke server n8n terputus atau server tidak merespons setelah 3 kali percobaan. Verifikasi dibatalkan.");
+                }
             }
         }
 
@@ -194,6 +169,7 @@
                 </div>
             `;
 
+            // Tangani kondisi tidak ada anomali
             if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
                 container.innerHTML += `
                     <div class="bg-white border border-green-200 rounded-xl p-8 text-center shadow-sm">
@@ -204,6 +180,7 @@
                 return;
             }
 
+            // Render tabel anomali
             let htmlAnomali = `
                 <div class="bg-white border border-red-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="bg-red-50 px-5 py-4 border-b border-red-200 flex justify-between items-center">
@@ -242,6 +219,3 @@
             htmlAnomali += `</tbody></table></div></div>`;
             container.innerHTML += htmlAnomali;
         }
-    </script>
-</body>
-</html>
