@@ -1,341 +1,7 @@
-/* ============================================================
-   THEME TOGGLE
-============================================================ */
-(function () {
-    const html = document.documentElement;
-    const btn = document.querySelector('[data-theme-toggle]');
-    // Baca tema tersimpan dari localStorage, fallback ke sistem
-    let theme = localStorage.getItem('theme') ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    html.setAttribute('data-theme', theme);
-
-    function updateIcon() {
-        if (!btn) return;
-        btn.innerHTML = theme === 'dark'
-            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-    }
-    updateIcon();
-
-    if (btn) {
-        btn.addEventListener('click', () => {
-            theme = theme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme); // [FIX 1] Simpan preferensi tema
-            updateIcon();
-        });
-    }
-})();
-
-/* ============================================================
-   FILE INPUT FEEDBACK
-============================================================ */
-function formatSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-}
-
-function bindFileInput(inputId, zoneId, nameId, sizeId, infoId) {
-    const input  = document.getElementById(inputId);
-    const zone   = document.getElementById(zoneId);
-    const nameEl = document.getElementById(nameId);
-    const sizeEl = document.getElementById(sizeId);
-    const infoEl = document.getElementById(infoId);
-
-    if (!input || !zone || !nameEl || !sizeEl || !infoEl) return; // [FIX 2] Guard semua elemen
-
-    input.addEventListener('change', function () {
-        if (this.files && this.files.length > 0) {
-            const file = this.files[0];
-            nameEl.textContent = file.name;
-            sizeEl.textContent = ' (' + formatSize(file.size) + ')';
-            infoEl.classList.add('visible');
-            zone.classList.add('has-file');
-        } else {
-            nameEl.textContent = '';
-            sizeEl.textContent = '';
-            infoEl.classList.remove('visible');
-            zone.classList.remove('has-file');
-        }
-    });
-}
-
-bindFileInput('file-penawaran', 'zone-penawaran', 'info-penawaran-name', 'info-penawaran-size', 'info-penawaran');
-bindFileInput('file-sertifikat', 'zone-sertifikat', 'info-sertifikat-name', 'info-sertifikat-size', 'info-sertifikat');
-bindFileInput('file-do',        'zone-do',         'info-do-name',         'info-do-size',         'info-do');
-
-/* ============================================================
-   STATE & GLOBALS
-============================================================ */
-let pollingInterval = null;
-let timerInterval   = null;
-let waktuBerjalan   = 0;
-let failCount       = 0;
-
-const MAX_POLLING_TIME = 360;
-const MAX_FILE_SIZE    = 15 * 1024 * 1024;
-
-const WEBHOOK_SUBMIT  = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
-const WEBHOOK_POLLING = 'https://n8.waruna-group.co.id/webhook/check-status-audit';
-
-/* ============================================================
-   STEP PROGRESS HELPERS
-============================================================ */
-function setStep(stepNum) {
-    const steps = ['step-kirim', 'step-analisis', 'step-mengambil'];
-    steps.forEach((id, i) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.classList.remove('active', 'done');
-        if (i < stepNum) el.classList.add('done');
-        else if (i === stepNum) el.classList.add('active');
-    });
-}
-
-/* ============================================================
-   UI HELPERS
-============================================================ */
-function lockUI() {
-    const btn = document.getElementById('btn-submit');
-    if (!btn) return;
-    btn.disabled = true;
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10" class="spin-path"/></svg> Memproses Dokumen...';
-    document.getElementById('result-container').innerHTML = '';
-    const errDiv = document.getElementById('error-container');
-    errDiv.textContent = '';
-    errDiv.classList.remove('visible');
-    document.getElementById('loading').classList.add('visible');
-}
-
-function unlockUI(resetLabel) {
-    const btn = document.getElementById('btn-submit');
-    if (!btn) return;
-    btn.disabled = false;
-    if (resetLabel !== false) {
-        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Jalankan Verifikasi Ekstraksi';
-    }
-    document.getElementById('loading').classList.remove('visible');
-}
-
-function stopTimers() {
-    clearInterval(pollingInterval);
-    clearInterval(timerInterval);
-    pollingInterval = null;
-    timerInterval   = null;
-}
-
-function tampilkanError(pesan) {
-    stopTimers();
-    unlockUI();
-    const errDiv = document.getElementById('error-container');
-    errDiv.innerHTML = '<strong>⚠️ Terjadi Kesalahan:</strong> ' + escHtml(pesan); // [FIX 3] Escape pesan error
-    errDiv.classList.add('visible');
-}
-
-/* ============================================================
-   MAIN PROCESS
-============================================================ */
-document.addEventListener('DOMContentLoaded', function () {
-    const btn = document.getElementById('btn-submit');
-    if (btn) {
-        btn.addEventListener('click', mulaiProses);
-    }
-});
-
-async function mulaiProses() {
-    stopTimers(); // Hentikan proses sebelumnya jika ada
-
-    const penawaranInput  = document.getElementById('file-penawaran');
-    const sertifikatInput = document.getElementById('file-sertifikat');
-    const doInput         = document.getElementById('file-do');
-
-    // Validasi file
-    if (!penawaranInput.files  || penawaranInput.files.length === 0)  { tampilkanError('File Quotation/Invoice belum dipilih.'); return; }
-    if (!sertifikatInput.files || sertifikatInput.files.length === 0) { tampilkanError('File Laporan Sertifikat belum dipilih.'); return; }
-    if (!doInput.files         || doInput.files.length === 0)         { tampilkanError('File Surat Jalan / DO belum dipilih.'); return; }
-
-    const filePenawaran  = penawaranInput.files[0];
-    const fileSertifikat = sertifikatInput.files[0];
-    const fileDO         = doInput.files[0];
-
-    const allowedTypes = ['application/pdf'];
-    if (!allowedTypes.includes(filePenawaran.type)  ||
-        !allowedTypes.includes(fileSertifikat.type) ||
-        !allowedTypes.includes(fileDO.type)) {
-        tampilkanError('Semua file harus berformat PDF.'); return;
-    }
-
-    if (filePenawaran.size > MAX_FILE_SIZE || fileSertifikat.size > MAX_FILE_SIZE || fileDO.size > MAX_FILE_SIZE) {
-        tampilkanError('Ukuran setiap file maksimal 15 MB.'); return;
-    }
-
-    // Reset state
-    failCount     = 0;
-    waktuBerjalan = 0;
-
-    const jobId = 'JOB-' + Date.now();
-
-    // [FIX 4] Set step SEBELUM lockUI agar urutan visual benar
-    setStep(0);
-    lockUI();
-
-    const timerEl = document.getElementById('timer-text');
-    if (timerEl) timerEl.textContent = 'Waktu berjalan: 0 detik';
-
-    timerInterval = setInterval(function () {
-        waktuBerjalan++;
-        if (timerEl) timerEl.textContent = 'Waktu berjalan: ' + waktuBerjalan + ' detik';
-        if (waktuBerjalan >= MAX_POLLING_TIME) {
-            tampilkanError('Waktu Habis (Timeout). AI belum selesai memproses dalam 6 menit. Silakan coba lagi.');
-        }
-    }, 1000);
-
-    const formData = new FormData();
-    formData.append('penawaran',   filePenawaran);
-    formData.append('sertifikat',  fileSertifikat);
-    formData.append('surat_jalan', fileDO);
-    formData.append('job_id',      jobId);
-
-    try {
-        console.log('🚀 [SUBMIT] Mengirim dokumen dengan job_id:', jobId);
-
-        const response = await fetch(WEBHOOK_SUBMIT, { method: 'POST', body: formData });
-
-        if (!response.ok) {
-            throw new Error('Server menolak dokumen (HTTP ' + response.status + '). Pastikan N8N aktif.');
-        }
-
-        const data = await response.json();
-
-        if (data.status === 'processing') {
-            console.log('✅ [SUBMIT] Dokumen diterima n8n. Memulai polling...');
-            setStep(1);
-            pollingInterval = setInterval(function () { cekStatusAI(jobId); }, 10000);
-        } else {
-            throw new Error('Respons format dari n8n tidak sesuai. Pastikan node Respond to Webhook mengirim { "status": "processing" }.');
-        }
-
-    } catch (err) {
-        tampilkanError(err.message || 'Gagal mengirim dokumen ke server.');
-    }
-}
-
-/* ============================================================
-   POLLING
-============================================================ */
-async function cekStatusAI(jobId) {
-    try {
-        console.log('🔎 [POLLING] Mengecek status job_id:', jobId);
-
-        const response = await fetch(WEBHOOK_POLLING + '?job_id=' + encodeURIComponent(jobId), { method: 'GET' });
-
-        if (!response.ok) {
-            console.error('❌ [POLLING] HTTP Error:', response.status);
-            failCount++;
-            if (failCount >= 6) tampilkanError('Koneksi ke server gagal terus-menerus. Silakan muat ulang halaman.');
-            return;
-        }
-
-        const textData = await response.text();
-
-        if (!textData || textData.trim().startsWith('<')) {
-            console.warn('⚠️ [POLLING] Respons bukan JSON valid (mungkin HTML error page).');
-            return;
-        }
-
-        let responseData;
-        try {
-            responseData = JSON.parse(textData);
-        } catch (e) {
-            console.error('❌ [POLLING] Gagal parse JSON:', e);
-            return;
-        }
-
-        if (responseData.status === 'processing') {
-            console.log('⏳ [POLLING] AI masih memproses...');
-            return;
-        }
-
-        // Normalisasi rows
-        let rows = [];
-        if (Array.isArray(responseData))                            rows = responseData;
-        else if (responseData.data && Array.isArray(responseData.data)) rows = responseData.data;
-        else if (typeof responseData === 'object' && responseData !== null) rows = [responseData];
-
-        // [FIX 5] Filter rows kosong sebelum diproses
-        rows = rows.filter(r => r && typeof r === 'object' && Object.keys(r).length > 0);
-
-        if (rows.length === 0) {
-            console.log('⚠️ [POLLING] Rows kosong, kemungkinan belum ada data.');
-            return;
-        }
-
-        // Validasi job_id
-        const isOurJob = rows.some(r => {
-            const rowId = r['job_id'] || r['Job ID'] || r.id || '';
-            return rowId.toString().trim() === jobId.toString().trim();
-        });
-
-        if (!isOurJob) {
-            console.log('⚠️ [POLLING] Data ada, tapi job_id tidak cocok.');
-            return;
-        }
-
-        console.log('✅ [POLLING] Data audit berhasil diterima!');
-        stopTimers();
-        unlockUI();
-        setStep(2);
-
-        failCount = 0; // Reset setelah sukses
-
-        let statusKeseluruhan = 'ALL_MATCH';
-        let temuanArray = [];
-
-        rows.forEach(function (r) {
-            const getVal = (colName) => {
-                if (r[colName] !== undefined && r[colName] !== null) return r[colName];
-                const fuzzyKey = Object.keys(r).find(k => k.toLowerCase().trim() === colName.toLowerCase().trim());
-                return fuzzyKey ? r[fuzzyKey] : '';
-            };
-
-            const stat = getVal('Status Keseluruhan');
-            if (stat && stat.toUpperCase().includes('DISCREPANCY')) {
-                statusKeseluruhan = 'DISCREPANCY_FOUND';
-            }
-
-            const itemVal = getVal('Item / Komponen');
-            if (itemVal && itemVal !== '-' && itemVal.toString().trim() !== '') {
-                temuanArray.push({
-                    kategori:    getVal('Kategori Anomali') || '-',
-                    item:        itemVal,
-                    tipe_anomali: getVal('Tipe Anomali') || '-',
-                    di_penawaran: getVal('Standar / Penawaran') || '-',
-                    di_sertifikat: getVal('Fakta Sertifikat') || '-',
-                    catatan:     getVal('Catatan Detail') || '-'
-                });
-            }
-        });
-
-        renderHasil({ status_keseluruhan: statusKeseluruhan, temuan_anomali: temuanArray });
-
-    } catch (err) {
-        failCount++;
-        console.warn('⚠️ [POLLING] Gagal (percobaan ' + failCount + '):', err.message);
-        if (failCount >= 6) {
-            tampilkanError('Koneksi ke server untuk mengecek status gagal terus-menerus. Silakan muat ulang halaman.');
-        }
-    }
-}
-
-/* ============================================================
-   RENDER HASIL
-============================================================ */
 function renderHasil(result) {
     const container = document.getElementById('result-container');
     container.innerHTML = '';
 
-    // [FIX 6] Normalisasi status selain ALL_MATCH / DISCREPANCY_FOUND
     const isOk      = !result.status_keseluruhan || result.status_keseluruhan === 'ALL_MATCH';
     const statusCls = isOk ? 'match' : 'mismatch';
     const statusTxt = isOk ? '✅ Semua Item Sesuai' : '⚠️ Ditemukan Selisih / Anomali';
@@ -343,20 +9,19 @@ function renderHasil(result) {
     const statusDiv = document.createElement('div');
     statusDiv.className = 'status-header ' + statusCls;
     statusDiv.setAttribute('role', 'status');
-    statusDiv.innerHTML = `
-        <p class="status-label">Status Audit Dokumen</p>
-        <h2 class="status-title">${escHtml(statusTxt)}</h2>
-    `;
+    // [FIX] Ganti template literal dengan concatenation
+    statusDiv.innerHTML =
+        '<p class="status-label">Status Audit Dokumen</p>' +
+        '<h2 class="status-title">' + escHtml(statusTxt) + '</h2>';
     container.appendChild(statusDiv);
 
     if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
         const successCard = document.createElement('div');
         successCard.className = 'success-card';
-        successCard.innerHTML = `
-            <div class="success-icon" aria-hidden="true">✅</div>
-            <h3>Verifikasi Berhasil</h3>
-            <p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Laporan Sertifikat (termasuk Cap &amp; Tanggal) telah divalidasi silang dan 100% konsisten.</p>
-        `;
+        successCard.innerHTML =
+            '<div class="success-icon" aria-hidden="true">✅</div>' +
+            '<h3>Verifikasi Berhasil</h3>' +
+            '<p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Laporan Sertifikat (termasuk Cap &amp; Tanggal) telah divalidasi silang dan 100% konsisten.</p>';
         container.appendChild(successCard);
         return;
     }
@@ -367,58 +32,44 @@ function renderHasil(result) {
 
     let rowsHtml = '';
     result.temuan_anomali.forEach(function (item) {
-        rowsHtml += `
-            <tr>
-                <td>
-                    <div class="item-category">${escHtml(item.kategori || 'UMUM')}</div>
-                    <div class="item-name">
-                        <span class="item-name-x" aria-hidden="true">❌</span>
-                        <span>${escHtml(item.item || '-')}</span>
-                    </div>
-                </td>
-                <td class="center val-penawaran">${escHtml(item.di_penawaran || '-')}</td>
-                <td class="center val-sertifikat">${escHtml(item.di_sertifikat || '-')}</td>
-                <td><span class="catatan-text">${escHtml(item.catatan || '-')}</span></td>
-            </tr>
-        `;
+        rowsHtml +=
+            '<tr>' +
+                '<td>' +
+                    '<div class="item-category">' + escHtml(item.kategori || 'UMUM') + '</div>' +
+                    '<div class="item-name">' +
+                        '<span class="item-name-x" aria-hidden="true">❌</span>' +
+                        '<span>' + escHtml(item.item || '-') + '</span>' +
+                    '</div>' +
+                '</td>' +
+                '<td class="center val-penawaran">' + escHtml(item.di_penawaran || '-') + '</td>' +
+                '<td class="center val-sertifikat">' + escHtml(item.di_sertifikat || '-') + '</td>' +
+                '<td><span class="catatan-text">' + escHtml(item.catatan || '-') + '</span></td>' +
+            '</tr>';
     });
 
-    panel.innerHTML = `
-        <div class="anomali-header">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            <h3>Daftar Temuan Selisih</h3>
-            <span class="anomali-count" aria-label="${anomaliCount} temuan">${anomaliCount}</span>
-        </div>
-        <div class="table-wrap">
-            <table class="anomali-table" role="table" aria-label="Tabel temuan selisih dokumen">
-                <thead>
-                    <tr>
-                        <th scope="col">Kategori &amp; Item</th>
-                        <th scope="col" class="center">Standar Penawaran</th>
-                        <th scope="col" class="center">Fakta (Sertifikat/DO)</th>
-                        <th scope="col">Catatan Auditor</th>
-                    </tr>
-                </thead>
-                <tbody>${rowsHtml}</tbody>
-            </table>
-        </div>
-    `;
-    container.appendChild(panel);
-}
+    panel.innerHTML =
+        '<div class="anomali-header">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+                '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>' +
+                '<line x1="12" y1="9" x2="12" y2="13"/>' +
+                '<line x1="12" y1="17" x2="12.01" y2="17"/>' +
+            '</svg>' +
+            '<h3>Daftar Temuan Selisih</h3>' +
+            '<span class="anomali-count" aria-label="' + anomaliCount + ' temuan">' + anomaliCount + '</span>' +
+        '</div>' +
+        '<div class="table-wrap">' +
+            '<table class="anomali-table" role="table" aria-label="Tabel temuan selisih dokumen">' +
+                '<thead>' +
+                    '<tr>' +
+                        '<th scope="col">Kategori &amp; Item</th>' +
+                        '<th scope="col" class="center">Standar Penawaran</th>' +
+                        '<th scope="col" class="center">Fakta (Sertifikat/DO)</th>' +
+                        '<th scope="col">Catatan Auditor</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rowsHtml + '</tbody>' +
+            '</table>' +
+        '</div>';
 
-/* ============================================================
-   UTILS
-============================================================ */
-function escHtml(str) {
-    if (typeof str !== 'string') return String(str ?? '');
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    container.appendChild(panel);
 }
