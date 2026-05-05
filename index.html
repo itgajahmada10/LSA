@@ -59,7 +59,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="text-indigo-900 font-semibold animate-pulse">AI sedang membaca dan membandingkan dokumen. Harap tunggu...</p>
+            <p class="text-indigo-900 font-semibold animate-pulse">AI (Model Flash) sedang mengekstrak anomali. Harap tunggu...</p>
         </div>
 
         <!-- Error Container -->
@@ -127,7 +127,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Server merespons dengan status: ${response.status}. Pastikan Workflow Aktif (ON) dan CORS Webhook terbuka.`);
+                    throw new Error(`Server merespons dengan status: ${response.status}. Pastikan Workflow Aktif (ON) dan batas timeout server memadai.`);
                 }
 
                 const data = await response.json();
@@ -160,15 +160,15 @@
             }
         }
 
-        // Fungsi untuk merender JSON berjenjang ke HTML
+        // Fungsi untuk merender JSON Anomali ke HTML
         function renderHasil(result) {
             const container = document.getElementById('result-container');
             container.innerHTML = '';
 
             // Render Status Keseluruhan & Expiry Date
-            const isOk = result.status_keseluruhan !== 'DISCREPANCY_FOUND';
+            const isOk = result.status_keseluruhan === 'ALL_MATCH';
             const statusClass = isOk ? 'bg-green-100 text-green-800 border-green-500' : 'bg-red-100 text-red-800 border-red-500';
-            const statusText = result.status_keseluruhan ? result.status_keseluruhan.replace(/_/g, ' ') : 'UNKNOWN STATUS';
+            const statusText = isOk ? 'SEMUA ITEM SESUAI' : 'DITEMUKAN SELISIH / ANOMALI';
             const expDate = result.tanggal_expired_sertifikat || 'Tidak Diketahui / Tidak Tercetak';
             
             container.innerHTML += `
@@ -180,79 +180,61 @@
                 </div>
             `;
 
-            // Jika tidak ada verifikasi per kategori
-            if (!result.verifikasi_per_kategori || result.verifikasi_per_kategori.length === 0) {
-                container.innerHTML += `<p class="text-center text-gray-500">Tidak ada data kategori yang diekstrak.</p>`;
+            // Jika semua sesuai atau array anomali kosong/tidak ada
+            if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
+                container.innerHTML += `
+                    <div class="bg-white border border-green-200 rounded-xl p-8 text-center shadow-sm">
+                        <span class="text-4xl block mb-3">✅</span>
+                        <h3 class="text-lg font-bold text-green-800">Verifikasi Selesai</h3>
+                        <p class="text-gray-600 mt-2">Seluruh kuantitas dan pengujian pada Penawaran telah terbukti dan sesuai dengan Laporan Sertifikat.</p>
+                    </div>`;
                 return;
             }
 
-            // Looping Kategori
-            result.verifikasi_per_kategori.forEach(kategori => {
-                const catIsOk = kategori.status_kategori === 'SESUAI';
-                const catColor = catIsOk ? 'text-green-700 bg-green-50 px-3 py-1 rounded border border-green-200' : 'text-red-700 bg-red-50 px-3 py-1 rounded border border-red-200';
-                
-                let htmlKategori = `
-                    <div class="mb-8 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                        <div class="bg-gray-50 px-5 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <h3 class="font-bold text-indigo-900 text-lg">${kategori.nama_kategori || 'Kategori Tidak Bernama'}</h3>
-                            <span class="font-bold text-sm uppercase tracking-wider ${catColor}">
-                                ${kategori.status_kategori ? kategori.status_kategori.replace(/_/g, ' ') : '-'}
-                            </span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-100">
-                                    <tr>
-                                        <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">Item Penawaran</th>
-                                        <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Qty Penawaran</th>
-                                        <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Qty Sertifikat</th>
-                                        <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">Catatan Auditor</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                `;
-
-                // Cek jika daftar temuan kosong
-                if (!kategori.daftar_temuan || kategori.daftar_temuan.length === 0) {
-                    htmlKategori += `<tr><td colspan="4" class="px-5 py-4 text-center text-gray-500 italic">Tidak ada item dalam kategori ini.</td></tr>`;
-                } else {
-                    // Looping Item di dalam Kategori
-                    kategori.daftar_temuan.forEach(item => {
-                        const isMatch = item.tipe_anomali === 'MATCH';
-                        const rowClass = isMatch ? 'hover:bg-gray-50' : 'bg-red-50/50 hover:bg-red-50';
-                        const icon = isMatch ? '<span class="text-green-600 text-lg leading-none mr-2">✅</span>' : '<span class="text-red-600 text-lg leading-none mr-2">❌</span>';
-
-                        htmlKategori += `
-                            <tr class="${rowClass} transition-colors">
-                                <td class="px-5 py-4 text-sm text-gray-800 font-medium align-top">
-                                    <div class="flex items-start">
-                                        ${icon}
-                                        <div>
-                                            <span class="block">${item.item || '-'}</span>
-                                            <div class="text-xs text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100 font-normal">
-                                                <span class="font-semibold text-gray-600">Kutipan Asli:</span><br> 
-                                                <span class="italic">"${item.kutipan_verbatim || 'Tidak ada kutipan'}"</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-5 py-4 text-sm text-center font-bold text-gray-700 align-top pt-5">${item.di_penawaran || '-'}</td>
-                                <td class="px-5 py-4 text-sm text-center font-bold ${isMatch ? 'text-green-600' : 'text-red-600'} align-top pt-5">${item.di_sertifikat || '-'}</td>
-                                <td class="px-5 py-4 text-sm text-gray-700 leading-relaxed align-top pt-5">${item.catatan || '-'}</td>
-                            </tr>
-                        `;
-                    });
-                }
-
-                htmlKategori += `
-                                </tbody>
-                            </table>
-                        </div>
+            // Render Tabel Anomali jika ditemukan ketidaksesuaian
+            let htmlAnomali = `
+                <div class="bg-white border border-red-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="bg-red-50 px-5 py-4 border-b border-red-200 flex justify-between items-center">
+                        <h3 class="font-bold text-red-900 text-lg">⚠️ Daftar Temuan Selisih (Perlu Perhatian)</h3>
                     </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/4">Kategori & Item</th>
+                                    <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-1/6">Di Penawaran</th>
+                                    <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-1/6">Di Sertifikat</th>
+                                    <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Catatan Auditor</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            result.temuan_anomali.forEach(item => {
+                htmlAnomali += `
+                    <tr class="hover:bg-red-50 transition-colors border-b border-gray-100">
+                        <td class="px-5 py-4 text-sm text-gray-800 font-medium align-top">
+                            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider block mb-2">${item.kategori || 'UMUM'}</span>
+                            <div class="flex items-start">
+                                <span class="text-red-600 text-lg leading-none mr-2 mt-0.5">❌</span>
+                                <span class="block">${item.item || '-'}</span>
+                            </div>
+                        </td>
+                        <td class="px-5 py-4 text-sm text-center font-bold text-gray-700 align-top pt-8">${item.di_penawaran || '-'}</td>
+                        <td class="px-5 py-4 text-sm text-center font-bold text-red-600 align-top pt-8">${item.di_sertifikat || '-'}</td>
+                        <td class="px-5 py-4 text-sm text-gray-700 leading-relaxed align-top pt-8">${item.catatan || '-'}</td>
+                    </tr>
                 `;
-                
-                container.innerHTML += htmlKategori;
             });
+
+            htmlAnomali += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML += htmlAnomali;
         }
     </script>
 </body>
