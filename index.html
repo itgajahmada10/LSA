@@ -53,7 +53,7 @@
             </svg>
             <p class="text-indigo-900 font-bold animate-pulse text-lg">Dokumen sedang dianalisis oleh AI...</p>
             <p id="timer-text" class="text-gray-500 text-sm mt-2 font-mono">Waktu berjalan: 0 detik</p>
-            <p class="text-gray-400 text-xs mt-1">Proses ini memakan waktu 3-5 menit. Halaman ini akan otomatis memuat hasil saat siap.</p>
+            <p class="text-gray-400 text-xs mt-1">Proses ini dilakukan di latar belakang. Jangan tutup halaman ini.</p>
         </div>
 
         <div id="error-container" class="hidden w-full max-w-5xl mt-6 p-4 bg-red-100 border-l-4 border-red-600 text-red-800 font-medium rounded shadow-sm"></div>
@@ -88,7 +88,7 @@
                 return;
             }
 
-            // Buat ID unik untuk melacak dokumen ini
+            // Buat Job ID
             const jobId = "JOB-" + Date.now();
 
             btnSubmit.disabled = true;
@@ -100,25 +100,25 @@
             const formData = new FormData();
             formData.append('sertifikat', fileSertifikat);
             formData.append('penawaran', filePenawaran);
-            formData.append('job_id', jobId); // Kirim Job ID ke n8n
+            formData.append('job_id', jobId);
 
             try {
-                // TAHAP 1: Kirim Dokumen (N8N Harus diset "Respond Immediately")
+                // TAHAP 1: Kirim Dokumen (Workflow 1: Upload PDF)
                 const response = await fetch('https://n8.waruna-group.co.id/webhook/audit-dokumen', {
                     method: 'POST',
                     body: formData
                 });
 
-                if (!response.ok) throw new Error("Gagal mengunggah dokumen ke server.");
+                if (!response.ok) throw new Error("Gagal menginisiasi pengunggahan dokumen ke server.");
 
-                // Mulai Timer Visual
+                // Mulai Timer
                 waktuBerjalan = 0;
                 timerInterval = setInterval(() => {
                     waktuBerjalan++;
                     document.getElementById('timer-text').innerText = `Waktu berjalan: ${waktuBerjalan} detik`;
                 }, 1000);
 
-                // TAHAP 2: Mulai Polling (Tanya n8n setiap 10 detik)
+                // TAHAP 2: Polling (Workflow 2: Tanya Google Sheets)
                 pollingInterval = setInterval(() => cekStatusAI(jobId), 10000);
 
             } catch (error) {
@@ -128,25 +128,49 @@
 
         async function cekStatusAI(jobId) {
             try {
-                // GANTI URL INI DENGAN URL WEBHOOK POLLING ANDA DI N8N
-                const response = await fetch(`https://n8.waruna-group.co.id/webhook/check-status-audit`, {
+                // URL sudah disesuaikan dengan Path di n8n (check-status-audit)
+                const response = await fetch(`https://n8.waruna-group.co.id/webhook/check-status-audit?job_id=${jobId}`, {
                     method: 'GET'
                 });
 
-                const data = await response.json();
+                const responseData = await response.json();
 
-                // Logika: Jika n8n membalas ada data JSON, berarti AI sudah selesai
-                if (data && data.status_keseluruhan) {
+                if (responseData && responseData.status === "completed") {
                     clearInterval(pollingInterval);
                     clearInterval(timerInterval);
                     selesaikanProses();
-                    renderHasil(data);
+
+                    // Bongkar data dari Google Sheets
+                    let rows = JSON.parse(responseData.data);
+                    let rowData = rows[0]; 
+
+                    let finalJson = null;
+                    
+                    // Mencari kolom mana yang berisi JSON hasil ekstraksi AI
+                    for (let key in rowData) {
+                        if (typeof rowData[key] === 'string' && rowData[key].includes("status_keseluruhan")) {
+                            try {
+                                // Bersihkan string markdown ```json dari AI jika terbawa ke Sheets
+                                let cleanString = rowData[key].replace(/
+```json/g, '').replace(/```/g, '').trim();
+                                finalJson = JSON.parse(cleanString);
+                                break;
+                            } catch (e) {
+                                console.log("Gagal parse isi kolom:", key);
+                            }
+                        }
+                    }
+
+                    if (finalJson) {
+                        renderHasil(finalJson);
+                    } else {
+                        tampilkanError("Data ditemukan di Google Sheets, tetapi struktur JSON AI rusak atau tidak valid.");
+                    }
                 } 
-                // Jika n8n membalas {"status": "TUNGGU"} atau belum ada data, biarkan interval berjalan
+                // Jika responseData.status === "processing", sistem akan diam dan mengulang interval 10 detik lagi.
 
             } catch (error) {
-                // Jangan batalkan proses jika hanya gagal fetch 1 kali (mungkin kedip jaringan)
-                console.warn("Gagal mengecek status, akan mencoba lagi dalam 10 detik...", error);
+                console.warn("Gagal polling (CORS atau Jaringan), mencoba lagi...", error);
             }
         }
 
