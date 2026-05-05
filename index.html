@@ -26,24 +26,22 @@
         <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-4xl border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 
-                <!-- Input Sertifikat (100% NATIVE HTML LABEL) -->
+                <!-- Input Sertifikat (KEMBALI KE VERSI LAMA YANG BERFUNGSI) -->
                 <div>
-                    <span class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</span>
-                    <!-- Label ini akan otomatis membuka input file di bawahnya saat diklik -->
-                    <label for="file-sertifikat" class="dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer w-full block">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</label>
+                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-sertifikat').click()">
                         <span id="label-sertifikat" class="text-sm font-bold text-yellow-700 text-center px-4">PILIH FILE PDF SERTIFIKAT</span>
-                    </label>
-                    <input type="file" id="file-sertifikat" accept="application/pdf" class="hidden" onchange="updateLabel('sertifikat')">
+                        <input type="file" id="file-sertifikat" accept="application/pdf" class="hidden" onchange="updateLabel('sertifikat')">
+                    </div>
                 </div>
 
-                <!-- Input Penawaran (100% NATIVE HTML LABEL) -->
+                <!-- Input Penawaran (KEMBALI KE VERSI LAMA YANG BERFUNGSI) -->
                 <div>
-                    <span class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</span>
-                    <!-- Label ini akan otomatis membuka input file di bawahnya saat diklik -->
-                    <label for="file-penawaran" class="dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer w-full block">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</label>
+                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-penawaran').click()">
                         <span id="label-penawaran" class="text-sm font-bold text-yellow-700 text-center px-4">PILIH FILE PDF PENAWARAN</span>
-                    </label>
-                    <input type="file" id="file-penawaran" accept="application/pdf" class="hidden" onchange="updateLabel('penawaran')">
+                        <input type="file" id="file-penawaran" accept="application/pdf" class="hidden" onchange="updateLabel('penawaran')">
+                    </div>
                 </div>
 
             </div>
@@ -72,12 +70,15 @@
         function updateLabel(type) {
             const fileInput = document.getElementById(`file-${type}`);
             const label = document.getElementById(`label-${type}`);
+            
             if (fileInput.files.length > 0) {
                 label.innerText = fileInput.files[0].name.toUpperCase();
-                label.className = "text-sm font-bold text-indigo-800 text-center px-4";
+                label.classList.remove('text-yellow-700');
+                label.classList.add('text-indigo-800');
             } else {
                 label.innerText = `PILIH FILE PDF ${type.toUpperCase()}`;
-                label.className = "text-sm font-bold text-yellow-700 text-center px-4";
+                label.classList.add('text-yellow-700');
+                label.classList.remove('text-indigo-800');
             }
         }
 
