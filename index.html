@@ -25,22 +25,30 @@
         <!-- Upload Card -->
         <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-4xl border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                
+                <!-- Input Sertifikat (DIPERBAIKI) -->
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</label>
-                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-sertifikat').click()">
+                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center overflow-hidden">
                         <span id="label-sertifikat" class="text-sm font-bold text-yellow-700 text-center px-4">PILIH FILE PDF SERTIFIKAT</span>
-                        <input type="file" id="file-sertifikat" accept="application/pdf" class="hidden" onchange="updateLabel('sertifikat')">
+                        <!-- Input file dibuat transparan penuh menutupi area box -->
+                        <input type="file" id="file-sertifikat" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateLabel('sertifikat')">
                     </div>
                 </div>
+
+                <!-- Input Penawaran (DIPERBAIKI) -->
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</label>
-                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-penawaran').click()">
+                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center overflow-hidden">
                         <span id="label-penawaran" class="text-sm font-bold text-yellow-700 text-center px-4">PILIH FILE PDF PENAWARAN</span>
-                        <input type="file" id="file-penawaran" accept="application/pdf" class="hidden" onchange="updateLabel('penawaran')">
+                        <!-- Input file dibuat transparan penuh menutupi area box -->
+                        <input type="file" id="file-penawaran" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateLabel('penawaran')">
                     </div>
                 </div>
+
             </div>
-            <button id="btn-submit" onclick="mulaiProses()" class="w-full bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-4 px-6 rounded-lg uppercase tracking-wider transition duration-200 shadow-md">
+            
+            <button id="btn-submit" onclick="mulaiProses()" class="w-full bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-4 px-6 rounded-lg uppercase tracking-wider transition duration-200 shadow-md relative z-20">
                 Jalankan Verifikasi Ekstraksi
             </button>
         </div>
@@ -66,10 +74,10 @@
             const label = document.getElementById(`label-${type}`);
             if (file) {
                 label.innerText = file.name.toUpperCase();
-                label.className = "text-sm font-bold text-indigo-800 text-center px-4";
+                label.className = "text-sm font-bold text-indigo-800 text-center px-4 relative z-0 pointer-events-none";
             } else {
                 label.innerText = `PILIH FILE PDF ${type.toUpperCase()}`;
-                label.className = "text-sm font-bold text-yellow-700 text-center px-4";
+                label.className = "text-sm font-bold text-yellow-700 text-center px-4 relative z-0 pointer-events-none";
             }
         }
 
@@ -118,7 +126,7 @@
                     document.getElementById('timer-text').innerText = `Waktu berjalan: ${waktuBerjalan} detik`;
                 }, 1000);
 
-                // TAHAP 2: Polling (Workflow 2: Tanya Google Sheets)
+                // TAHAP 2: Polling (Workflow 2: Tanya n8n via URL check-status-audit)
                 pollingInterval = setInterval(() => cekStatusAI(jobId), 10000);
 
             } catch (error) {
@@ -128,7 +136,6 @@
 
         async function cekStatusAI(jobId) {
             try {
-                // URL sudah disesuaikan dengan Path di n8n (check-status-audit)
                 const response = await fetch(`https://n8.waruna-group.co.id/webhook/check-status-audit?job_id=${jobId}`, {
                     method: 'GET'
                 });
@@ -140,7 +147,7 @@
                     clearInterval(timerInterval);
                     selesaikanProses();
 
-                    // Bongkar data dari Google Sheets
+                    // Bongkar data dari n8n (Google Sheets)
                     let rows = JSON.parse(responseData.data);
                     let rowData = rows[0]; 
 
@@ -164,7 +171,7 @@
                     if (finalJson) {
                         renderHasil(finalJson);
                     } else {
-                        tampilkanError("Data ditemukan di Google Sheets, tetapi struktur JSON AI rusak atau tidak valid.");
+                        tampilkanError("Data ditemukan di server, tetapi struktur JSON AI rusak atau tidak valid.");
                     }
                 } 
                 // Jika responseData.status === "processing", sistem akan diam dan mengulang interval 10 detik lagi.
