@@ -1,75 +1,679 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waruna Group | Audit Dokumen</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --warning-bg: #fffbeb;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success-bg: #052e16;
+            --danger-bg: #450a0a;
+            --warning-bg: #1c1400;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px;
+            transition: background .3s, color .3s;
+        }
+
+        .page-wrapper { max-width: 860px; margin: 0 auto; }
+
+        /* HEADER */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .page-header h1 { font-size: 1.3rem; font-weight: 700; }
+        .page-header p  { font-size: .85rem; color: var(--text-muted); margin-top: 2px; }
+        .btn-theme {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            cursor: pointer;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        .card-title {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* FILE UPLOAD */
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        @media (max-width: 640px) { .upload-grid { grid-template-columns: 1fr; } }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            position: relative;
+        }
+        .upload-zone:hover, .upload-zone:focus-within { border-color: var(--primary); background: rgba(37,99,235,.04); }
+        .upload-zone.has-file { border-color: var(--success); background: var(--success-bg); }
+        .upload-zone input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+        .upload-label { font-size: .8rem; font-weight: 600; color: var(--text); display: block; margin-bottom: 4px; }
+        .upload-hint  { font-size: .72rem; color: var(--text-muted); }
+        .upload-icon  { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+        .file-info    { font-size: .72rem; color: var(--success); margin-top: 6px; display: none; word-break: break-all; }
+        .file-info.visible { display: block; }
+
+        /* STEPS */
+        .steps { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+        .step  {
+            display: flex; align-items: center; gap: 8px;
+            font-size: .8rem; color: var(--text-muted); font-weight: 500;
+            flex: 1;
+        }
+        .step-num {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: .72rem; font-weight: 700; flex-shrink: 0;
+        }
+        .step.active .step-num { border-color: var(--primary); color: var(--primary); }
+        .step.done   .step-num { border-color: var(--success); background: var(--success); color: #fff; }
+        .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 4px; }
+        .step.done + .step-line { background: var(--success); }
+
+        /* BUTTON */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: .95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background .2s, opacity .2s;
+        }
+        .btn-submit:hover:not(:disabled) { background: var(--primary-hover); }
+        .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+        /* LOADING */
+        .loading-box { display: none; align-items: center; gap: 12px; padding: 14px; background: var(--warning-bg); border-radius: 10px; margin-top: 16px; }
+        .loading-box.visible { display: flex; }
+        .loading-box p { font-size: .85rem; color: var(--text-muted); }
+        .timer-text { font-size: .8rem; color: var(--text-muted); margin-top: 8px; display: none; }
+        .loading-box.visible ~ .timer-text { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin-icon { animation: spin 1s linear infinite; display: inline-block; }
+
+        /* ERROR */
+        .error-box { display: none; padding: 14px 16px; background: var(--danger-bg); border: 1px solid var(--danger); border-radius: 10px; color: var(--danger); font-size: .85rem; margin-top: 16px; }
+        .error-box.visible { display: block; }
+
+        /* RESULT */
+        .status-header { padding: 20px 24px; border-radius: 10px; margin-bottom: 16px; }
+        .status-header.match    { background: var(--success-bg); border: 1px solid #86efac; }
+        .status-header.mismatch { background: var(--danger-bg);  border: 1px solid #fca5a5; }
+        .status-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+        .status-title { font-size: 1.2rem; font-weight: 700; margin-top: 4px; }
+
+        .success-card { text-align: center; padding: 40px 24px; }
+        .success-icon { font-size: 3rem; }
+        .success-card h3 { font-size: 1.1rem; margin: 12px 0 8px; }
+        .success-card p  { color: var(--text-muted); font-size: .88rem; }
+
+        /* ANOMALI */
+        .anomali-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .anomali-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 20px;
+            background: var(--danger-bg);
+            border-bottom: 1px solid var(--border);
+        }
+        .anomali-header h3 { font-size: .95rem; flex: 1; }
+        .anomali-count {
+            background: var(--danger); color: #fff;
+            border-radius: 20px; padding: 2px 10px;
+            font-size: .75rem; font-weight: 700;
+        }
+        .table-wrap { overflow-x: auto; }
+        .anomali-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+        .anomali-table th {
+            background: var(--bg);
+            padding: 10px 14px;
+            text-align: left;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .anomali-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .anomali-table tr:last-child td { border-bottom: none; }
+        .anomali-table .center { text-align: center; }
+        .item-category { font-size: .7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+        .item-name { display: flex; align-items: flex-start; gap: 6px; font-weight: 600; }
+        .catatan-text { color: var(--text-muted); font-size: .8rem; }
+        .val-penawaran { color: var(--success); font-weight: 600; }
+        .val-sertifikat { color: var(--danger); font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h1>🔍 Audit Dokumen Logistik</h1>
+            <p>Waruna Group — Verifikasi Penawaran, Sertifikat &amp; Surat Jalan</p>
+        </div>
+        <button class="btn-theme" data-theme-toggle aria-label="Toggle tema"></button>
+    </div>
+
+    <!-- UPLOAD CARD -->
+    <div class="card">
+        <div class="card-title">Upload Dokumen (PDF, maks. 15 MB per file)</div>
+        <div class="upload-grid">
+
+            <div class="upload-zone" id="zone-penawaran">
+                <input type="file" id="file-penawaran" accept="application/pdf">
+                <span class="upload-icon">📄</span>
+                <span class="upload-label">Quotation / Invoice</span>
+                <span class="upload-hint">Klik atau seret file PDF</span>
+                <div class="file-info" id="info-penawaran">
+                    <span id="info-penawaran-name"></span><span id="info-penawaran-size"></span>
+                </div>
+            </div>
+
+            <div class="upload-zone" id="zone-sertifikat">
+                <input type="file" id="file-sertifikat" accept="application/pdf">
+                <span class="upload-icon">📋</span>
+                <span class="upload-label">Laporan Sertifikat</span>
+                <span class="upload-hint">Klik atau seret file PDF</span>
+                <div class="file-info" id="info-sertifikat">
+                    <span id="info-sertifikat-name"></span><span id="info-sertifikat-size"></span>
+                </div>
+            </div>
+
+            <div class="upload-zone" id="zone-do">
+                <input type="file" id="file-do" accept="application/pdf">
+                <span class="upload-icon">🚚</span>
+                <span class="upload-label">Surat Jalan / DO</span>
+                <span class="upload-hint">Klik atau seret file PDF</span>
+                <div class="file-info" id="info-do">
+                    <span id="info-do-name"></span><span id="info-do-size"></span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PROGRESS & SUBMIT -->
+    <div class="card">
+        <div class="steps">
+            <div class="step" id="step-kirim">
+                <div class="step-num">1</div>
+                <span>Kirim Dokumen</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-analisis">
+                <div class="step-num">2</div>
+                <span>Analisis AI</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-mengambil">
+                <div class="step-num">3</div>
+                <span>Mengambil Hasil</span>
+            </div>
+        </div>
+
+        <button class="btn-submit" id="btn-submit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Jalankan Verifikasi Ekstraksi
+        </button>
+
+        <div class="loading-box" id="loading">
+            <span class="spin-icon">⏳</span>
+            <p>AI sedang menganalisis dokumen, harap tunggu...</p>
+        </div>
+        <p class="timer-text" id="timer-text"></p>
+
+        <div class="error-box" id="error-container"></div>
+    </div>
+
+    <!-- HASIL -->
+    <div id="result-container"></div>
+
+</div><!-- end .page-wrapper -->
+
+<script>
+/* ============================================================
+   THEME TOGGLE
+============================================================ */
+(function () {
+    var html = document.documentElement;
+    var btn  = document.querySelector('[data-theme-toggle]');
+    var theme = localStorage.getItem('theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    html.setAttribute('data-theme', theme);
+
+    function updateIcon() {
+        if (!btn) return;
+        btn.innerHTML = theme === 'dark'
+            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    }
+    updateIcon();
+
+    if (btn) {
+        btn.addEventListener('click', function () {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateIcon();
+        });
+    }
+})();
+
+/* ============================================================
+   FILE INPUT FEEDBACK
+============================================================ */
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function bindFileInput(inputId, zoneId, nameId, sizeId, infoId) {
+    var input  = document.getElementById(inputId);
+    var zone   = document.getElementById(zoneId);
+    var nameEl = document.getElementById(nameId);
+    var sizeEl = document.getElementById(sizeId);
+    var infoEl = document.getElementById(infoId);
+    if (!input || !zone || !nameEl || !sizeEl || !infoEl) return;
+
+    input.addEventListener('change', function () {
+        if (this.files && this.files.length > 0) {
+            var file = this.files[0];
+            nameEl.textContent = file.name;
+            sizeEl.textContent = ' (' + formatSize(file.size) + ')';
+            infoEl.classList.add('visible');
+            zone.classList.add('has-file');
+        } else {
+            nameEl.textContent = '';
+            sizeEl.textContent = '';
+            infoEl.classList.remove('visible');
+            zone.classList.remove('has-file');
+        }
+    });
+}
+
+bindFileInput('file-penawaran', 'zone-penawaran', 'info-penawaran-name', 'info-penawaran-size', 'info-penawaran');
+bindFileInput('file-sertifikat', 'zone-sertifikat', 'info-sertifikat-name', 'info-sertifikat-size', 'info-sertifikat');
+bindFileInput('file-do', 'zone-do', 'info-do-name', 'info-do-size', 'info-do');
+
+/* ============================================================
+   STATE & GLOBALS
+============================================================ */
+var pollingInterval = null;
+var timerInterval   = null;
+var waktuBerjalan   = 0;
+var failCount       = 0;
+
+var MAX_POLLING_TIME = 360;
+var MAX_FILE_SIZE    = 15 * 1024 * 1024;
+
+var WEBHOOK_SUBMIT  = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
+var WEBHOOK_POLLING = 'https://n8.waruna-group.co.id/webhook/check-status-audit';
+
+/* ============================================================
+   STEP PROGRESS
+============================================================ */
+function setStep(stepNum) {
+    var steps = ['step-kirim', 'step-analisis', 'step-mengambil'];
+    steps.forEach(function (id, i) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('active', 'done');
+        if (i < stepNum)      el.classList.add('done');
+        else if (i === stepNum) el.classList.add('active');
+    });
+}
+
+/* ============================================================
+   UI HELPERS
+============================================================ */
+function lockUI() {
+    var btn = document.getElementById('btn-submit');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin-icon">⏳</span> Memproses Dokumen...';
+    document.getElementById('result-container').innerHTML = '';
+    var errDiv = document.getElementById('error-container');
+    errDiv.textContent = '';
+    errDiv.classList.remove('visible');
+    document.getElementById('loading').classList.add('visible');
+}
+
+function unlockUI(resetLabel) {
+    var btn = document.getElementById('btn-submit');
+    if (!btn) return;
+    btn.disabled = false;
+    if (resetLabel !== false) {
+        btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Jalankan Verifikasi Ekstraksi';
+    }
+    document.getElementById('loading').classList.remove('visible');
+}
+
+function stopTimers() {
+    clearInterval(pollingInterval);
+    clearInterval(timerInterval);
+    pollingInterval = null;
+    timerInterval   = null;
+}
+
+function tampilkanError(pesan) {
+    stopTimers();
+    unlockUI();
+    var errDiv = document.getElementById('error-container');
+    errDiv.innerHTML = '<strong>Terjadi Kesalahan:</strong> ' + escHtml(pesan);
+    errDiv.classList.add('visible');
+}
+
+/* ============================================================
+   MAIN PROCESS
+============================================================ */
+document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('btn-submit');
+    if (btn) btn.addEventListener('click', mulaiProses);
+});
+
+function mulaiProses() {
+    stopTimers();
+
+    var penawaranInput  = document.getElementById('file-penawaran');
+    var sertifikatInput = document.getElementById('file-sertifikat');
+    var doInput         = document.getElementById('file-do');
+
+    if (!penawaranInput.files  || penawaranInput.files.length === 0)  { tampilkanError('File Quotation/Invoice belum dipilih.'); return; }
+    if (!sertifikatInput.files || sertifikatInput.files.length === 0) { tampilkanError('File Laporan Sertifikat belum dipilih.'); return; }
+    if (!doInput.files         || doInput.files.length === 0)         { tampilkanError('File Surat Jalan / DO belum dipilih.'); return; }
+
+    var filePenawaran  = penawaranInput.files[0];
+    var fileSertifikat = sertifikatInput.files[0];
+    var fileDO         = doInput.files[0];
+
+    if (filePenawaran.type  !== 'application/pdf' ||
+        fileSertifikat.type !== 'application/pdf' ||
+        fileDO.type         !== 'application/pdf') {
+        tampilkanError('Semua file harus berformat PDF.'); return;
+    }
+
+    if (filePenawaran.size > MAX_FILE_SIZE || fileSertifikat.size > MAX_FILE_SIZE || fileDO.size > MAX_FILE_SIZE) {
+        tampilkanError('Ukuran setiap file maksimal 15 MB.'); return;
+    }
+
+    failCount     = 0;
+    waktuBerjalan = 0;
+    var jobId = 'JOB-' + Date.now();
+
+    setStep(0);
+    lockUI();
+
+    var timerEl = document.getElementById('timer-text');
+    if (timerEl) timerEl.textContent = 'Waktu berjalan: 0 detik';
+
+    timerInterval = setInterval(function () {
+        waktuBerjalan++;
+        if (timerEl) timerEl.textContent = 'Waktu berjalan: ' + waktuBerjalan + ' detik';
+        if (waktuBerjalan >= MAX_POLLING_TIME) {
+            tampilkanError('Waktu Habis (Timeout). Silakan coba lagi.');
+        }
+    }, 1000);
+
+    var formData = new FormData();
+    formData.append('penawaran',   filePenawaran);
+    formData.append('sertifikat',  fileSertifikat);
+    formData.append('surat_jalan', fileDO);
+    formData.append('job_id',      jobId);
+
+    fetch(WEBHOOK_SUBMIT, { method: 'POST', body: formData })
+        .then(function (response) {
+            if (!response.ok) throw new Error('Server menolak dokumen (HTTP ' + response.status + '). Pastikan N8N aktif.');
+            return response.json();
+        })
+        .then(function (data) {
+            if (data.status === 'processing') {
+                setStep(1);
+                pollingInterval = setInterval(function () { cekStatusAI(jobId); }, 10000);
+            } else {
+                throw new Error('Respons n8n tidak sesuai. Pastikan node Respond to Webhook mengirim {"status":"processing"}.');
+            }
+        })
+        .catch(function (err) {
+            tampilkanError(err.message || 'Gagal mengirim dokumen ke server.');
+        });
+}
+
+/* ============================================================
+   POLLING
+============================================================ */
+function cekStatusAI(jobId) {
+    fetch(WEBHOOK_POLLING + '?job_id=' + encodeURIComponent(jobId), { method: 'GET' })
+        .then(function (response) {
+            if (!response.ok) {
+                failCount++;
+                if (failCount >= 6) tampilkanError('Koneksi ke server gagal terus-menerus. Silakan muat ulang halaman.');
+                return null;
+            }
+            return response.text();
+        })
+        .then(function (textData) {
+            if (!textData) return;
+            if (textData.trim().startsWith('<')) return;
+
+            var responseData;
+            try { responseData = JSON.parse(textData); }
+            catch (e) { return; }
+
+            if (responseData.status === 'processing') return;
+
+            var rows = [];
+            if (Array.isArray(responseData))                                  rows = responseData;
+            else if (responseData.data && Array.isArray(responseData.data))   rows = responseData.data;
+            else if (typeof responseData === 'object' && responseData !== null) rows = [responseData];
+
+            rows = rows.filter(function (r) { return r && typeof r === 'object' && Object.keys(r).length > 0; });
+            if (rows.length === 0) return;
+
+            var isOurJob = rows.some(function (r) {
+                var rowId = r['job_id'] || r['Job ID'] || r.id || '';
+                return rowId.toString().trim() === jobId.toString().trim();
+            });
+            if (!isOurJob) return;
+
+            stopTimers();
+            unlockUI();
+            setStep(2);
+            failCount = 0;
+
+            var statusKeseluruhan = 'ALL_MATCH';
+            var temuanArray = [];
+
+            rows.forEach(function (r) {
+                function getVal(colName) {
+                    if (r[colName] !== undefined && r[colName] !== null) return r[colName];
+                    var fuzzyKey = Object.keys(r).find(function (k) {
+                        return k.toLowerCase().trim() === colName.toLowerCase().trim();
+                    });
+                    return fuzzyKey ? r[fuzzyKey] : '';
+                }
+
+                var stat = getVal('Status Keseluruhan');
+                if (stat && stat.toUpperCase().includes('DISCREPANCY')) {
+                    statusKeseluruhan = 'DISCREPANCY_FOUND';
+                }
+
+                var itemVal = getVal('Item / Komponen');
+                if (itemVal && itemVal !== '-' && itemVal.toString().trim() !== '') {
+                    temuanArray.push({
+                        kategori:      getVal('Kategori Anomali') || '-',
+                        item:          itemVal,
+                        tipe_anomali:  getVal('Tipe Anomali') || '-',
+                        di_penawaran:  getVal('Standar / Penawaran') || '-',
+                        di_sertifikat: getVal('Fakta Sertifikat') || '-',
+                        catatan:       getVal('Catatan Detail') || '-'
+                    });
+                }
+            });
+
+            renderHasil({ status_keseluruhan: statusKeseluruhan, temuan_anomali: temuanArray });
+        })
+        .catch(function (err) {
+            failCount++;
+            if (failCount >= 6) tampilkanError('Koneksi ke server gagal terus-menerus. Silakan muat ulang halaman.');
+        });
+}
+
+/* ============================================================
+   RENDER HASIL
+============================================================ */
 function renderHasil(result) {
-    const container = document.getElementById('result-container');
+    var container = document.getElementById('result-container');
     container.innerHTML = '';
 
-    const isOk      = !result.status_keseluruhan || result.status_keseluruhan === 'ALL_MATCH';
-    const statusCls = isOk ? 'match' : 'mismatch';
-    const statusTxt = isOk ? '✅ Semua Item Sesuai' : '⚠️ Ditemukan Selisih / Anomali';
+    var isOk      = !result.status_keseluruhan || result.status_keseluruhan === 'ALL_MATCH';
+    var statusCls = isOk ? 'match' : 'mismatch';
+    var statusTxt = isOk ? '\u2705 Semua Item Sesuai' : '\u26A0\uFE0F Ditemukan Selisih / Anomali';
 
-    const statusDiv = document.createElement('div');
+    var statusDiv = document.createElement('div');
     statusDiv.className = 'status-header ' + statusCls;
     statusDiv.setAttribute('role', 'status');
-    // [FIX] Ganti template literal dengan concatenation
     statusDiv.innerHTML =
         '<p class="status-label">Status Audit Dokumen</p>' +
         '<h2 class="status-title">' + escHtml(statusTxt) + '</h2>';
     container.appendChild(statusDiv);
 
     if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
-        const successCard = document.createElement('div');
+        var successCard = document.createElement('div');
         successCard.className = 'success-card';
         successCard.innerHTML =
-            '<div class="success-icon" aria-hidden="true">✅</div>' +
+            '<div class="success-icon">\u2705</div>' +
             '<h3>Verifikasi Berhasil</h3>' +
-            '<p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Laporan Sertifikat (termasuk Cap &amp; Tanggal) telah divalidasi silang dan 100% konsisten.</p>';
+            '<p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Laporan Sertifikat telah divalidasi silang dan 100% konsisten.</p>';
         container.appendChild(successCard);
         return;
     }
 
-    const anomaliCount = result.temuan_anomali.length;
-    const panel = document.createElement('div');
+    var anomaliCount = result.temuan_anomali.length;
+    var panel = document.createElement('div');
     panel.className = 'anomali-panel';
 
-    let rowsHtml = '';
+    var rowsHtml = '';
     result.temuan_anomali.forEach(function (item) {
         rowsHtml +=
             '<tr>' +
-                '<td>' +
-                    '<div class="item-category">' + escHtml(item.kategori || 'UMUM') + '</div>' +
-                    '<div class="item-name">' +
-                        '<span class="item-name-x" aria-hidden="true">❌</span>' +
-                        '<span>' + escHtml(item.item || '-') + '</span>' +
-                    '</div>' +
-                '</td>' +
-                '<td class="center val-penawaran">' + escHtml(item.di_penawaran || '-') + '</td>' +
-                '<td class="center val-sertifikat">' + escHtml(item.di_sertifikat || '-') + '</td>' +
-                '<td><span class="catatan-text">' + escHtml(item.catatan || '-') + '</span></td>' +
+            '<td>' +
+                '<div class="item-category">' + escHtml(item.kategori || 'UMUM') + '</div>' +
+                '<div class="item-name">' +
+                    '<span>\u274C</span>' +
+                    '<span>' + escHtml(item.item || '-') + '</span>' +
+                '</div>' +
+            '</td>' +
+            '<td class="center val-penawaran">' + escHtml(item.di_penawaran || '-') + '</td>' +
+            '<td class="center val-sertifikat">' + escHtml(item.di_sertifikat || '-') + '</td>' +
+            '<td><span class="catatan-text">' + escHtml(item.catatan || '-') + '</span></td>' +
             '</tr>';
     });
 
     panel.innerHTML =
         '<div class="anomali-header">' +
-            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>' +
                 '<line x1="12" y1="9" x2="12" y2="13"/>' +
                 '<line x1="12" y1="17" x2="12.01" y2="17"/>' +
             '</svg>' +
             '<h3>Daftar Temuan Selisih</h3>' +
-            '<span class="anomali-count" aria-label="' + anomaliCount + ' temuan">' + anomaliCount + '</span>' +
+            '<span class="anomali-count">' + anomaliCount + '</span>' +
         '</div>' +
         '<div class="table-wrap">' +
-            '<table class="anomali-table" role="table" aria-label="Tabel temuan selisih dokumen">' +
-                '<thead>' +
-                    '<tr>' +
-                        '<th scope="col">Kategori &amp; Item</th>' +
-                        '<th scope="col" class="center">Standar Penawaran</th>' +
-                        '<th scope="col" class="center">Fakta (Sertifikat/DO)</th>' +
-                        '<th scope="col">Catatan Auditor</th>' +
-                    '</tr>' +
-                '</thead>' +
+            '<table class="anomali-table">' +
+                '<thead><tr>' +
+                    '<th>Kategori &amp; Item</th>' +
+                    '<th class="center">Standar Penawaran</th>' +
+                    '<th class="center">Fakta (Sertifikat/DO)</th>' +
+                    '<th>Catatan Auditor</th>' +
+                '</tr></thead>' +
                 '<tbody>' + rowsHtml + '</tbody>' +
             '</table>' +
         '</div>';
 
     container.appendChild(panel);
 }
+
+/* ============================================================
+   UTILS
+============================================================ */
+function escHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+</script>
+</body>
+</html>
