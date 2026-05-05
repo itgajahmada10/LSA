@@ -7,37 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #fdfbf3; }
-        .dashed-box { border: 2px dashed #f6e05e; background-color: #fff; transition: all 0.3s ease; }
+        .dashed-box { border: 2px dashed #f6e05e; background-color: #fff; transition: all 0.3s ease; cursor: pointer; }
         .dashed-box:hover { background-color: #fefcbf; border-color: #d69e2e; }
-    </style>
-</head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="bg-white shadow-sm px-6 py-4 flex items-center gap-3">
-        <div class="bg-indigo-900 text-white w-8 h-8 flex items-center justify-center rounded font-bold text-lg">W</div>
-        <h1 class="text-xl font-bold text-yellow-600 tracking-wide">Waruna Group <span class="text-gray-400 font-normal">| Verifikasi Dokumen</span></h1>
-    </header>
-
-    <!-- Main Content --><!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Verifikasi Dokumen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #fdfbf3; }
-        .dashed-box { border: 2px dashed #f6e05e; background-color: #fff; transition: all 0.3s ease; }
-        .dashed-box:hover { background-color: #fefcbf; border-color: #d69e2e; }
-        /* FIX #2: Sembunyikan input file dengan opacity bukan display:none */
-        .file-input-hidden {
-            position: absolute;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
@@ -57,22 +28,20 @@
                 
                 <!-- Input Sertifikat -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</label>
-                    <!-- FIX #1: Hapus overflow-hidden, tambah position:relative agar input absolute bisa diposisikan -->
-                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer" onclick="document.getElementById('file-sertifikat').click()">
-                        <span id="label-sertifikat" class="text-sm font-bold text-yellow-700 text-center px-4 pointer-events-none">📄 PILIH FILE PDF SERTIFIKAT</span>
-                        <!-- FIX #2: Pakai class CSS opacity-based, bukan class="hidden" -->
-                        <input type="file" id="file-sertifikat" accept="application/pdf" class="file-input-hidden" onchange="updateLabel('sertifikat')">
-                    </div>
+                    <span class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</span>
+                    <label for="file-sertifikat" class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center w-full block">
+                        <span id="label-sertifikat" class="text-sm font-bold text-yellow-700 text-center px-4">📄 PILIH FILE PDF SERTIFIKAT</span>
+                    </label>
+                    <input type="file" id="file-sertifikat" accept="application/pdf" class="hidden" onchange="updateLabel('sertifikat')">
                 </div>
 
                 <!-- Input Penawaran -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</label>
-                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer" onclick="document.getElementById('file-penawaran').click()">
-                        <span id="label-penawaran" class="text-sm font-bold text-yellow-700 text-center px-4 pointer-events-none">📄 PILIH FILE PDF PENAWARAN</span>
-                        <input type="file" id="file-penawaran" accept="application/pdf" class="file-input-hidden" onchange="updateLabel('penawaran')">
-                    </div>
+                    <span class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</span>
+                    <label for="file-penawaran" class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center w-full block">
+                        <span id="label-penawaran" class="text-sm font-bold text-yellow-700 text-center px-4">📄 PILIH FILE PDF PENAWARAN</span>
+                    </label>
+                    <input type="file" id="file-penawaran" accept="application/pdf" class="hidden" onchange="updateLabel('penawaran')">
                 </div>
 
             </div>
@@ -103,7 +72,7 @@
             const label = document.getElementById(`label-${type}`);
             
             if (fileInput.files.length > 0) {
-                label.innerText = '✅ ' + fileInput.files.name.toUpperCase();
+                label.innerText = '✅ ' + fileInput.files[0].name.toUpperCase();
                 label.classList.remove('text-yellow-700');
                 label.classList.add('text-indigo-800');
             } else {
@@ -118,8 +87,9 @@
         let timerInterval;
 
         async function mulaiProses() {
-            const fileSertifikat = document.getElementById('file-sertifikat').files;
-            const filePenawaran = document.getElementById('file-penawaran').files;
+            // Perbaikan Bug JavaScript: Tambahkan index [0] untuk mengambil file fisik
+            const fileSertifikat = document.getElementById('file-sertifikat').files[0];
+            const filePenawaran = document.getElementById('file-penawaran').files[0];
             const btnSubmit = document.getElementById('btn-submit');
             const loading = document.getElementById('loading');
             
@@ -176,17 +146,17 @@
                     selesaikanProses();
 
                     let rows = JSON.parse(responseData.data);
-                    let rowData = rows; 
+                    let rowData = rows[0]; 
 
                     let finalJson = null;
                     
                     for (let key in rowData) {
                         if (typeof rowData[key] === 'string' && rowData[key].includes("status_keseluruhan")) {
                             try {
-                                // FIX #3: Regex diperbaiki, tidak ada newline literal
                                 let cleanString = rowData[key]
                                     .replace(/```json/g, '')
-                                    .replace(/```/g, '')
+                                    .replace(/
+```/g, '')
                                     .trim();
                                 finalJson = JSON.parse(cleanString);
                                 break;
@@ -202,253 +172,6 @@
                         tampilkanError("Data ditemukan di server, tetapi struktur JSON AI rusak atau tidak valid.");
                     }
                 }
-
-            } catch (error) {
-                console.warn("Gagal polling (CORS atau Jaringan), mencoba lagi...", error);
-            }
-        }
-
-        function tampilkanError(pesan) {
-            clearInterval(pollingInterval);
-            clearInterval(timerInterval);
-            selesaikanProses();
-            const errDiv = document.getElementById('error-container');
-            errDiv.innerText = pesan;
-            errDiv.classList.remove('hidden');
-        }
-
-        function selesaikanProses() {
-            document.getElementById('loading').classList.add('hidden');
-            const btn = document.getElementById('btn-submit');
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            btn.innerText = 'JALANKAN VERIFIKASI EKSTRAKSI';
-        }
-
-        function renderHasil(result) {
-            const container = document.getElementById('result-container');
-            container.innerHTML = '';
-
-            const isOk = result.status_keseluruhan === 'ALL_MATCH';
-            const statusClass = isOk ? 'bg-green-100 text-green-800 border-green-500' : 'bg-red-100 text-red-800 border-red-500';
-            const statusText = isOk ? 'SEMUA ITEM SESUAI' : 'DITEMUKAN SELISIH / ANOMALI';
-            const expDate = result.tanggal_expired_sertifikat || 'Tidak Diketahui / Tidak Tercetak';
-            
-            container.innerHTML += `
-                <div class="p-5 mb-8 rounded-lg ${statusClass} border-l-4 shadow-sm text-center">
-                    <h2 class="font-bold text-xl tracking-wide mb-3">STATUS AUDIT: ${statusText}</h2>
-                    <div class="inline-block bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm text-sm text-gray-700">
-                        🗓️ Masa Berlaku Sertifikat: <span class="font-bold text-indigo-700 ml-1">${expDate}</span>
-                    </div>
-                </div>
-            `;
-
-            if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
-                container.innerHTML += `
-                    <div class="bg-white border border-green-200 rounded-xl p-8 text-center shadow-sm">
-                        <span class="text-4xl block mb-3">✅</span>
-                        <h3 class="text-lg font-bold text-green-800">Verifikasi Selesai</h3>
-                        <p class="text-gray-600 mt-2">Seluruh kuantitas dan pengujian pada Penawaran telah terbukti dan sesuai dengan Laporan Sertifikat.</p>
-                    </div>`;
-                return;
-            }
-
-            let htmlAnomali = `
-                <div class="bg-white border border-red-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="bg-red-50 px-5 py-4 border-b border-red-200 flex justify-between items-center">
-                        <h3 class="font-bold text-red-900 text-lg">⚠️ Daftar Temuan Selisih (Perlu Perhatian)</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/4">Kategori & Item</th>
-                                    <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-1/6">Di Penawaran</th>
-                                    <th class="px-5 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-1/6">Di Sertifikat</th>
-                                    <th class="px-5 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Catatan Auditor</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-            `;
-
-            result.temuan_anomali.forEach(item => {
-                htmlAnomali += `
-                    <tr class="hover:bg-red-50 transition-colors border-b border-gray-100">
-                        <td class="px-5 py-4 text-sm text-gray-800 font-medium align-top">
-                            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider block mb-2">${item.kategori || 'UMUM'}</span>
-                            <div class="flex items-start">
-                                <span class="text-red-600 text-lg leading-none mr-2 mt-0.5">❌</span>
-                                <span class="block">${item.item || '-'}</span>
-                            </div>
-                        </td>
-                        <td class="px-5 py-4 text-sm text-center font-bold text-gray-700 align-top pt-8">${item.di_penawaran || '-'}</td>
-                        <td class="px-5 py-4 text-sm text-center font-bold text-red-600 align-top pt-8">${item.di_sertifikat || '-'}</td>
-                        <td class="px-5 py-4 text-sm text-gray-700 leading-relaxed align-top pt-8">${item.catatan || '-'}</td>
-                    </tr>
-                `;
-            });
-
-            htmlAnomali += `</tbody></table></div></div>`;
-            container.innerHTML += htmlAnomali;
-        }
-    </script>
-</body>
-</html>    <main class="flex-grow flex flex-col items-center py-10 px-4 w-full">
-        
-        <!-- Upload Card -->
-        <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-4xl border border-gray-100">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                
-                <!-- Input Sertifikat (KEMBALI KE VERSI LAMA YANG BERFUNGSI) -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</label>
-                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-sertifikat').click()">
-                        <span id="label-sertifikat" class="text-sm font-bold text-yellow-700 text-center px-4">PILIH FILE PDF SERTIFIKAT</span>
-                        <input type="file" id="file-sertifikat" accept="application/pdf" class="hidden" onchange="updateLabel('sertifikat')">
-                    </div>
-                </div>
-
-                <!-- Input Penawaran (KEMBALI KE VERSI LAMA YANG BERFUNGSI) -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</label>
-                    <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-penawaran').click()">
-                        <span id="label-penawaran" class="text-sm font-bold text-yellow-700 text-center px-4">PILIH FILE PDF PENAWARAN</span>
-                        <input type="file" id="file-penawaran" accept="application/pdf" class="hidden" onchange="updateLabel('penawaran')">
-                    </div>
-                </div>
-
-            </div>
-            
-            <button id="btn-submit" onclick="mulaiProses()" class="w-full bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-4 px-6 rounded-lg uppercase tracking-wider transition duration-200 shadow-md">
-                Jalankan Verifikasi Ekstraksi
-            </button>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div id="loading" class="hidden mt-8 w-full max-w-4xl text-center">
-            <svg class="animate-spin h-10 w-10 text-indigo-800 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="text-indigo-900 font-bold animate-pulse text-lg">Dokumen sedang dianalisis oleh AI...</p>
-            <p id="timer-text" class="text-gray-500 text-sm mt-2 font-mono">Waktu berjalan: 0 detik</p>
-            <p class="text-gray-400 text-xs mt-1">Proses ini dilakukan di latar belakang. Jangan tutup halaman ini.</p>
-        </div>
-
-        <div id="error-container" class="hidden w-full max-w-5xl mt-6 p-4 bg-red-100 border-l-4 border-red-600 text-red-800 font-medium rounded shadow-sm"></div>
-        <div id="result-container" class="w-full max-w-5xl mt-8"></div>
-    </main>
-
-    <script>
-        function updateLabel(type) {
-            const fileInput = document.getElementById(`file-${type}`);
-            const label = document.getElementById(`label-${type}`);
-            
-            if (fileInput.files.length > 0) {
-                label.innerText = fileInput.files[0].name.toUpperCase();
-                label.classList.remove('text-yellow-700');
-                label.classList.add('text-indigo-800');
-            } else {
-                label.innerText = `PILIH FILE PDF ${type.toUpperCase()}`;
-                label.classList.add('text-yellow-700');
-                label.classList.remove('text-indigo-800');
-            }
-        }
-
-        let pollingInterval;
-        let waktuBerjalan = 0;
-        let timerInterval;
-
-        async function mulaiProses() {
-            const fileSertifikat = document.getElementById('file-sertifikat').files[0];
-            const filePenawaran = document.getElementById('file-penawaran').files[0];
-            const btnSubmit = document.getElementById('btn-submit');
-            const loading = document.getElementById('loading');
-            
-            if (!fileSertifikat || !filePenawaran) {
-                alert("Anda harus mengunggah kedua file PDF.");
-                return;
-            }
-
-            // Buat Job ID
-            const jobId = "JOB-" + Date.now();
-
-            btnSubmit.disabled = true;
-            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
-            document.getElementById('result-container').innerHTML = '';
-            document.getElementById('error-container').classList.add('hidden');
-            loading.classList.remove('hidden');
-
-            const formData = new FormData();
-            formData.append('sertifikat', fileSertifikat);
-            formData.append('penawaran', filePenawaran);
-            formData.append('job_id', jobId);
-
-            try {
-                // TAHAP 1: Kirim Dokumen (Workflow 1: Upload PDF)
-                const response = await fetch('https://n8.waruna-group.co.id/webhook/audit-dokumen', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) throw new Error("Gagal menginisiasi pengunggahan dokumen ke server.");
-
-                // Mulai Timer
-                waktuBerjalan = 0;
-                timerInterval = setInterval(() => {
-                    waktuBerjalan++;
-                    document.getElementById('timer-text').innerText = `Waktu berjalan: ${waktuBerjalan} detik`;
-                }, 1000);
-
-                // TAHAP 2: Polling (Workflow 2: Tanya n8n via URL check-status-audit)
-                pollingInterval = setInterval(() => cekStatusAI(jobId), 10000);
-
-            } catch (error) {
-                tampilkanError(error.message);
-            }
-        }
-
-        async function cekStatusAI(jobId) {
-            try {
-                const response = await fetch(`https://n8.waruna-group.co.id/webhook/check-status-audit?job_id=${jobId}`, {
-                    method: 'GET'
-                });
-
-                const responseData = await response.json();
-
-                if (responseData && responseData.status === "completed") {
-                    clearInterval(pollingInterval);
-                    clearInterval(timerInterval);
-                    selesaikanProses();
-
-                    // Bongkar data dari n8n (Google Sheets)
-                    let rows = JSON.parse(responseData.data);
-                    let rowData = rows[0]; 
-
-                    let finalJson = null;
-                    
-                    // Mencari kolom mana yang berisi JSON hasil ekstraksi AI
-                    for (let key in rowData) {
-                        if (typeof rowData[key] === 'string' && rowData[key].includes("status_keseluruhan")) {
-                            try {
-                                // Bersihkan string markdown ```json dari AI jika terbawa ke Sheets
-                                let cleanString = rowData[key].replace(/
-```json/g, '').replace(/```/g, '').trim();
-                                finalJson = JSON.parse(cleanString);
-                                break;
-                            } catch (e) {
-                                console.log("Gagal parse isi kolom:", key);
-                            }
-                        }
-                    }
-
-                    if (finalJson) {
-                        renderHasil(finalJson);
-                    } else {
-                        tampilkanError("Data ditemukan di server, tetapi struktur JSON AI rusak atau tidak valid.");
-                    }
-                } 
-                // Jika responseData.status === "processing", sistem akan diam dan mengulang interval 10 detik lagi.
 
             } catch (error) {
                 console.warn("Gagal polling (CORS atau Jaringan), mencoba lagi...", error);
