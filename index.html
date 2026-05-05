@@ -165,14 +165,18 @@
             const container = document.getElementById('result-container');
             container.innerHTML = '';
 
-            // Render Status Keseluruhan
+            // Render Status Keseluruhan & Expiry Date
             const isOk = result.status_keseluruhan !== 'DISCREPANCY_FOUND';
             const statusClass = isOk ? 'bg-green-100 text-green-800 border-green-500' : 'bg-red-100 text-red-800 border-red-500';
             const statusText = result.status_keseluruhan ? result.status_keseluruhan.replace(/_/g, ' ') : 'UNKNOWN STATUS';
+            const expDate = result.tanggal_expired_sertifikat || 'Tidak Diketahui / Tidak Tercetak';
             
             container.innerHTML += `
                 <div class="p-5 mb-8 rounded-lg ${statusClass} border-l-4 shadow-sm text-center">
-                    <h2 class="font-bold text-xl tracking-wide">STATUS AUDIT: ${statusText}</h2>
+                    <h2 class="font-bold text-xl tracking-wide mb-3">STATUS AUDIT: ${statusText}</h2>
+                    <div class="inline-block bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm text-sm text-gray-700">
+                        🗓️ Masa Berlaku Sertifikat: <span class="font-bold text-indigo-700 ml-1">${expDate}</span>
+                    </div>
                 </div>
             `;
 
