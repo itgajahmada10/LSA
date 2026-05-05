@@ -25,14 +25,14 @@
         <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-4xl border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 
-                <!-- Input Sertifikat -->
+                <!-- Input Sertifikat (BERSIH DARI ERROR ONCHANGE) -->
                 <div class="dashed-box rounded-lg p-6 flex flex-col items-center justify-center text-center">
                     <span class="block text-sm font-bold text-yellow-700 uppercase tracking-wider mb-4">📄 LAPORAN SERTIFIKAT</span>
                     <input type="file" id="file-sertifikat" accept="application/pdf" 
                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
                 </div>
 
-                <!-- Input Penawaran -->
+                <!-- Input Penawaran (BERSIH DARI ERROR ONCHANGE) -->
                 <div class="dashed-box rounded-lg p-6 flex flex-col items-center justify-center text-center">
                     <span class="block text-sm font-bold text-yellow-700 uppercase tracking-wider mb-4">📄 PENAWARAN VENDOR</span>
                     <input type="file" id="file-penawaran" accept="application/pdf" 
@@ -73,7 +73,7 @@
             const loading = document.getElementById('loading');
             
             if (!fileSertifikat || !filePenawaran) {
-                alert("Anda harus memilih/mengunggah kedua file PDF terlebih dahulu.");
+                alert("Kesalahan: Anda harus memilih/mengunggah kedua file PDF terlebih dahulu.");
                 return;
             }
 
