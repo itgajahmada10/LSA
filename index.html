@@ -241,13 +241,6 @@
         .status-title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 400; line-height: 1.3; margin: 0; }
         .status-header.match .status-title { color: var(--color-success); }
         .status-header.mismatch .status-title { color: var(--color-error); }
-        .expire-badge {
-            display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3);
-            padding: var(--space-2) var(--space-4); background: var(--color-surface-2);
-            border: 1px solid var(--color-divider); border-radius: var(--radius-full);
-            font-size: var(--text-xs); color: var(--color-text-muted); box-shadow: var(--shadow-sm);
-        }
-        .expire-badge strong { color: var(--color-primary); font-weight: 700; }
 
         .success-card {
             background: var(--color-surface-2); border: 1px solid var(--color-success-highlight);
@@ -489,7 +482,7 @@
     const MAX_FILE_SIZE    = 15 * 1024 * 1024; // 15 MB
 
     const WEBHOOK_SUBMIT  = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
-    const WEBHOOK_POLLING = 'https://n8.waruna-group.co.id/webhook/check-status-audit';
+    const WEBHOOK_POLLING = 'https://n8.waruna-group.co.id/webhook/check-status-audit'; // PASTIKAN URL INI SESUAI DENGAN WORKFLOW CHECKER ANDA
 
     /* ============================================================
        STEP PROGRESS HELPERS
@@ -601,7 +594,7 @@
             document.getElementById('timer-text').textContent = 'Waktu berjalan: ' + waktuBerjalan + ' detik';
             if (waktuBerjalan >= MAX_POLLING_TIME) {
                 stopTimers();
-                tampilkanError('Waktu Habis (Timeout). AI tidak memberikan respons dalam 6 menit. Silakan coba lagi.');
+                tampilkanError('Waktu Habis (Timeout). AI belum selesai memproses dalam 6 menit. Silakan coba lagi.');
             }
         }, 1000);
 
@@ -617,22 +610,23 @@
             });
 
             if (!response.ok) {
-                throw new Error('Server menolak dokumen (HTTP ' + response.status + '). Pastikan N8N aktif dan URL webhook benar.');
+                throw new Error('Server menolak dokumen (HTTP ' + response.status + '). Pastikan N8N aktif dan URL webhook POST benar.');
             }
 
             setStep(1);
 
+            // Start Polling
             pollingInterval = setInterval(function () {
                 cekStatusAI(jobId);
-            }, 10000);
+            }, 10000); // Polling per 10 detik
 
         } catch (err) {
-            tampilkanError(err.message || 'Gagal mengirim dokumen ke server. Periksa koneksi dan status N8N.');
+            tampilkanError(err.message || 'Gagal mengirim dokumen ke server. Periksa koneksi CORS dan status N8N.');
         }
     }
 
     /* ============================================================
-       POLLING
+       POLLING & RECONSTRUCT JSON FROM GOOGLE SHEETS ROWS
     ============================================================ */
     async function cekStatusAI(jobId) {
         try {
@@ -641,89 +635,103 @@
             });
 
             if (!response.ok) {
-                throw new Error('Server polling mengembalikan HTTP ' + response.status);
+                // Jangan error langsung, tunggu iterasi berikutnya (mungkin server N8N sedang sibuk)
+                return;
+            }
+
+            const textData = await response.text();
+            
+            // Jika balasan kosong atau berupa halaman HTML dari Cloudflare, abaikan dan tunggu iterasi selanjutnya
+            if (!textData || textData.includes('<html')) {
+                return;
+            }
+
+            let responseData;
+            try {
+                responseData = JSON.parse(textData);
+            } catch (e) {
+                return; // Bukan JSON, abaikan sementara
             }
 
             failCount = 0;
-            setStep(2);
 
-            const responseData = await response.json();
+            // N8N membaca dari Google Sheets. Biasanya outputnya berupa Array Objek
+            let rows = [];
+            if (Array.isArray(responseData) && responseData.length > 0) {
+                rows = responseData;
+            } else if (responseData && responseData.data && Array.isArray(responseData.data) && responseData.data.length > 0) {
+                rows = responseData.data;
+            }
 
-            if (responseData && responseData.status === 'completed') {
+            // Jika ada baris data masuk dari Sheet
+            if (rows.length > 0) {
+                
+                // PENGAMANAN: Pastikan data ini milik Job ID yang sedang diproses
+                const isOurJob = rows.some(r => (r['Job ID'] || r['job_id'] || r['Job_ID']) === jobId);
+                
+                // Jika Anda tidak memfilter Job ID di N8N, kita tetap lanjut jika ada row baru masuk
                 stopTimers();
                 unlockUI();
+                setStep(2);
 
-                if (!responseData.data) {
-                    tampilkanError('Proses selesai, namun server tidak mengembalikan data hasil. Periksa node Google Sheets di N8N.');
-                    return;
-                }
+                // REKONSTRUKSI DATA DARI KOLOM SPREADSHEET
+                let statusKeseluruhan = 'ALL_MATCH';
+                let temuanArray = [];
 
-                let rows;
-                try {
-                    rows = typeof responseData.data === 'string'
-                        ? JSON.parse(responseData.data)
-                        : responseData.data;
-                } catch (e) {
-                    tampilkanError('Gagal membaca data dari server: format JSON tidak valid.');
-                    return;
-                }
+                rows.forEach(function(r) {
+                    // Utility untuk membaca nama kolom yang mungkin huruf besar/kecil
+                    const getVal = (colName) => {
+                        const exact = r[colName];
+                        if (exact) return exact;
+                        const fuzzyKey = Object.keys(r).find(k => k.toLowerCase().trim() === colName.toLowerCase().trim());
+                        return fuzzyKey ? r[fuzzyKey] : '';
+                    };
 
-                if (!rows || rows.length === 0) {
-                    tampilkanError('Tidak ada data yang dikembalikan untuk Job ID ini. Proses mungkin belum selesai di sisi N8N.');
-                    return;
-                }
-
-                const rowData  = rows[0];
-                let finalJson  = null;
-
-                for (const key in rowData) {
-                    const val = rowData[key];
-                    if (typeof val === 'string' && val.includes('status_keseluruhan')) {
-                        try {
-                            // PENGAMANAN BARU: Tidak menggunakan metode Regex Literal untuk string backticks
-                            let clean = val;
-                            clean = clean.replace(new RegExp('```json', 'gi'), '');
-                            clean = clean.replace(new RegExp('```', 'g'), '');
-                            clean = clean.trim();
-                            
-                            finalJson = JSON.parse(clean);
-                            break;
-                        } catch (e) {
-                            console.error('Gagal parse JSON dari key: ' + key, e);
-                        }
+                    const stat = getVal('Status Keseluruhan');
+                    if (stat && stat.toUpperCase().includes('DISCREPANCY')) {
+                        statusKeseluruhan = 'DISCREPANCY_FOUND';
                     }
-                    if (typeof val === 'object' && val !== null && val.status_keseluruhan) {
-                        finalJson = val;
-                        break;
-                    }
-                }
 
-                if (finalJson) {
-                    renderHasil(finalJson);
-                } else {
-                    tampilkanError('Data ditemukan di server, tetapi struktur JSON tidak dapat dibaca. Periksa output AI di N8N.');
-                }
+                    const itemVal = getVal('Item / Komponen');
+                    // Abaikan baris ALL_MATCH yang tidak punya rincian anomali
+                    if (itemVal && itemVal !== '-' && itemVal !== '') {
+                        temuanArray.push({
+                            kategori: getVal('Kategori Anomali') || '-',
+                            item: itemVal,
+                            tipe_anomali: getVal('Tipe Anomali') || '-',
+                            di_penawaran: getVal('Standar / Penawaran') || '-',
+                            di_sertifikat: getVal('Fakta Sertifikat') || '-',
+                            catatan: getVal('Catatan Detail') || '-'
+                        });
+                    }
+                });
+
+                const finalJson = {
+                    status_keseluruhan: statusKeseluruhan,
+                    temuan_anomali: temuanArray
+                };
+
+                renderHasil(finalJson);
             }
 
         } catch (err) {
             failCount++;
-            console.warn('Polling gagal (percobaan ' + failCount + '/3):', err.message);
+            console.warn('Polling gagal sejenak (percobaan ' + failCount + '):', err.message);
 
-            if (failCount >= 3) {
-                tampilkanError('Koneksi ke server N8N terputus setelah 3 percobaan. Verifikasi dibatalkan. Periksa status server.');
+            if (failCount >= 6) { // Jika gagal 6x berturut-turut (1 menit)
+                tampilkanError('Koneksi ke server untuk mengecek status gagal terus-menerus. Silakan muat ulang halaman.');
             }
         }
     }
 
     /* ============================================================
-       RENDER HASIL
+       RENDER HASIL KE LAYAR
     ============================================================ */
     function renderHasil(result) {
         const container = document.getElementById('result-container');
         container.innerHTML = '';
 
         const isOk      = result.status_keseluruhan === 'ALL_MATCH';
-        const expDate   = result.tanggal_expired_sertifikat || 'Tidak Diketahui / Tidak Tercetak';
         const statusCls = isOk ? 'match' : 'mismatch';
         const statusTxt = isOk ? '✅ Semua Item Sesuai' : '⚠️ Ditemukan Selisih / Anomali';
 
@@ -733,15 +741,6 @@
         statusDiv.innerHTML = `
             <p class="status-label">Status Audit Dokumen</p>
             <h2 class="status-title">${escHtml(statusTxt)}</h2>
-            <div class="expire-badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                Masa Berlaku Sertifikat: <strong>${escHtml(expDate)}</strong>
-            </div>
         `;
         container.appendChild(statusDiv);
 
