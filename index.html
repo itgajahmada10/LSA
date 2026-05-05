@@ -1,712 +1,229 @@
-<!DOCTYPE html>
-<html lang="id" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Verifikasi Dokumen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --primary:          #3730a3;
-            --primary-dark:     #312e81;
-            --primary-hl:       #c7d2fe;
-            --primary-surf:     #e0e7ff;
-            --surface:          #f3f4f6;
-            --surface-2:        #ffffff;
-            --success:          #166534;
-            --success-surf:     #dcfce7;
-            --success-hl:       #86efac;
-            --error:            #991b1b;
-            --error-surf:       #fee2e2;
-            --error-hl:         #fca5a5;
-            --warn:             #92400e;
-            --warn-surf:        #fef3c7;
-            --warn-hl:          #fde68a;
-            --text:             #1f2937;
-            --text-muted:       #4b5563;
-            --text-faint:       #9ca3af;
-            --text-inv:         #ffffff;
-            --border:           #e5e7eb;
-            --radius-sm:        0.25rem;
-            --radius-md:        0.5rem;
-            --radius-lg:        0.75rem;
-            --radius-xl:        1rem;
-            --radius-full:      9999px;
-            --shadow-sm:        0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md:        0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-lg:        0 10px 15px -3px rgba(0,0,0,0.1);
-            --t:                0.2s ease;
-            --max-w:            72rem;
-        }
-        [data-theme="dark"] {
-            --surface:   #111827;
-            --surface-2: #1f2937;
-            --text:      #f9fafb;
-            --text-muted:#d1d5db;
-            --text-faint:#6b7280;
-            --border:    #374151;
-        }
+/* ============================================================
+   HELPER: mapping detail field per jenis alat
+============================================================ */
+function getDetailFields(jenis_alat, d) {
+    var j = (jenis_alat || '').toLowerCase();
 
-        *, *::before, *::after { box-sizing: border-box; }
-        body { background: var(--surface); color: var(--text); font-family: system-ui,-apple-system,sans-serif; margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
-
-        /* ── HEADER ── */
-        .app-header { display:flex; justify-content:space-between; align-items:center; background:var(--surface-2); padding:1rem 1.5rem; box-shadow:var(--shadow-sm); border-bottom:1px solid var(--border); }
-        .brand { display:flex; align-items:center; gap:.75rem; }
-        .brand-logo { background:var(--primary); color:#fff; border-radius:var(--radius-md); padding:.25rem; display:flex; align-items:center; justify-content:center; }
-        .brand-name { font-weight:700; font-size:1.1rem; color:#ca8a04; }
-        .brand-name span { color:var(--text-faint); font-weight:400; }
-        .theme-btn { background:none; border:none; color:var(--text-muted); cursor:pointer; padding:.5rem; border-radius:var(--radius-full); transition:background var(--t); }
-        .theme-btn:hover { background:var(--surface); }
-
-        /* ── MAIN ── */
-        main { padding:2.5rem 1rem; display:flex; flex-direction:column; align-items:center; flex-grow:1; gap:1.5rem; }
-
-        .page-title { text-align:center; }
-        .page-title h1 { font-size:1.5rem; font-weight:700; margin:0 0 .5rem; }
-        .page-title p { color:var(--text-muted); font-size:.875rem; margin:0; }
-
-        /* ── UPLOAD CARD ── */
-        .upload-card { background:var(--surface-2); border-radius:var(--radius-xl); padding:2rem; box-shadow:var(--shadow-md); width:100%; max-width:var(--max-w); border:1px solid var(--border); }
-        .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:1.5rem; }
-        .upload-zone { border:2px dashed var(--primary-hl); border-radius:var(--radius-lg); padding:1.5rem; text-align:center; transition:all var(--t); background:var(--surface-2); }
-        .upload-zone:hover { border-color:var(--primary); background:var(--primary-surf); }
-        .upload-zone.has-file { border-color:var(--success-hl); background:var(--success-surf); border-style:solid; }
-        .uz-icon { display:flex; justify-content:center; margin-bottom:.75rem; color:var(--primary-hl); }
-        .upload-zone.has-file .uz-icon { color:var(--success); }
-        .uz-label { display:block; font-weight:700; color:#a16207; font-size:.8rem; text-transform:uppercase; margin-bottom:1rem; }
-        .file-input { display:block; width:100%; font-size:.875rem; color:var(--text-muted); cursor:pointer; }
-        .file-input::file-selector-button { display:block; width:100%; text-align:center; margin-bottom:.5rem; padding:.4rem 1rem; border-radius:var(--radius-md); border:none; font-weight:700; font-size:.75rem; background:var(--primary-surf); color:var(--primary); cursor:pointer; transition:background var(--t); }
-        .file-input::file-selector-button:hover { background:var(--primary-hl); }
-        .file-badge { display:none; margin-top:.75rem; font-size:.8rem; background:var(--surface-2); border:1px solid var(--success-hl); border-radius:.25rem; padding:.35rem .6rem; word-break:break-all; }
-        .file-badge.show { display:block; }
-        .file-badge strong { color:var(--success); }
-
-        /* ── BUTTON ── */
-        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:.875rem; padding:1rem; border-radius:var(--radius-lg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem; letter-spacing:.05em; text-transform:uppercase; transition:background var(--t),transform var(--t),box-shadow var(--t); box-shadow:var(--shadow-sm); }
-        .btn-run:hover:not(:disabled) { background:var(--primary-dark); transform:translateY(-1px); box-shadow:var(--shadow-md); }
-        .btn-run:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-
-        /* ── LOADING ── */
-        .loading-box { display:none; background:var(--surface-2); border:1px solid var(--primary-hl); border-radius:var(--radius-xl); padding:2.5rem 2rem; text-align:center; width:100%; max-width:var(--max-w); box-shadow:var(--shadow-sm); }
-        .loading-box.show { display:block; }
-        .spinner { width:48px; height:48px; margin:0 auto 1.25rem; border:3px solid var(--primary-hl); border-top-color:var(--primary); border-radius:var(--radius-full); animation:spin .9s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .loading-title { font-weight:700; color:var(--primary-dark); margin-bottom:.5rem; }
-        .loading-timer { font-family:'Courier New',monospace; font-size:.75rem; color:var(--text-muted); }
-        .loading-hint { font-size:.75rem; color:var(--text-faint); margin-top:.25rem; }
-        .steps { display:flex; justify-content:center; gap:.5rem; margin:1.5rem 0 1rem; flex-wrap:wrap; }
-        .step { display:flex; align-items:center; gap:.4rem; font-size:.75rem; font-weight:600; padding:.2rem .75rem; border-radius:var(--radius-full); border:1px solid var(--border); color:var(--text-faint); background:var(--surface); transition:all .4s; }
-        .step.active { color:var(--primary); background:var(--primary-surf); border-color:var(--primary-hl); }
-        .step.done { color:var(--success); background:var(--success-surf); border-color:var(--success-hl); }
-        .step-dot { width:6px; height:6px; border-radius:var(--radius-full); background:currentColor; }
-        .step.active .step-dot { animation:blink 1.2s infinite; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-        /* ── ERROR ── */
-        .error-box { display:none; background:var(--error-surf); border:1px solid var(--error-hl); border-left:4px solid var(--error); border-radius:var(--radius-lg); padding:1rem 1.25rem; color:var(--error); font-size:.875rem; font-weight:500; width:100%; max-width:var(--max-w); }
-        .error-box.show { display:block; }
-
-        /* ── RESULT ── */
-        #result { width:100%; max-width:var(--max-w); display:flex; flex-direction:column; gap:1rem; }
-
-        /* STATUS BANNER */
-        .status-banner { border-radius:var(--radius-xl); padding:1.25rem 1.5rem; text-align:center; }
-        .status-banner.ok  { background:var(--success-surf); border:1px solid var(--success-hl); }
-        .status-banner.err { background:var(--error-surf);   border:1px solid var(--error-hl); }
-        .status-banner .sb-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.4rem; }
-        .status-banner.ok  .sb-label { color:var(--success); }
-        .status-banner.err .sb-label { color:var(--error); }
-        .status-banner .sb-title { font-size:1.125rem; margin:0; font-weight:600; }
-        .status-banner.ok  .sb-title { color:var(--success); }
-        .status-banner.err .sb-title { color:var(--error); }
-        .status-banner .sb-meta { font-size:.85rem; margin:.5rem 0 0; opacity:.85; }
-
-        /* SUMMARY BAR */
-        .summary-bar { display:flex; align-items:center; gap:.75rem; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:.875rem 1.25rem; font-size:.875rem; flex-wrap:wrap; }
-        .summary-bar .sb-count { font-weight:700; font-size:1.5rem; color:var(--error); }
-        .summary-bar .sb-ok    { font-weight:700; font-size:1.5rem; color:var(--success); }
-        .summary-bar .sb-sep   { color:var(--border); font-size:1.2rem; }
-        .summary-bar .sb-text  { color:var(--text-muted); flex:1; }
-        .filter-tabs { display:flex; gap:.5rem; margin-left:auto; flex-wrap:wrap; }
-        .ftab { font-size:.75rem; font-weight:600; padding:.3rem .85rem; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all var(--t); }
-        .ftab:hover { border-color:var(--primary-hl); color:var(--primary); }
-        .ftab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
-
-        /* SUCCESS CARD */
-        .success-full { background:var(--surface-2); border:1px solid var(--success-hl); border-radius:var(--radius-xl); padding:3rem 2rem; text-align:center; }
-        .success-full .si { font-size:3rem; margin-bottom:1rem; }
-        .success-full h3 { color:var(--success); font-weight:700; margin:0 0 .5rem; }
-        .success-full p { color:var(--text-muted); margin:0; font-size:.9rem; }
-
-        /* ── SECTION HEADER (accordion trigger) ── */
-        .sec-wrap { background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-xl); overflow:hidden; }
-        .sec-trigger { width:100%; display:flex; align-items:center; gap:.75rem; padding:.875rem 1.25rem; background:none; border:none; cursor:pointer; text-align:left; transition:background var(--t); }
-        .sec-trigger:hover { background:var(--surface); }
-        .sec-trigger .sec-icon { flex-shrink:0; width:32px; height:32px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; }
-        .sec-trigger .sec-icon.blue  { background:var(--primary-surf); color:var(--primary); }
-        .sec-trigger .sec-icon.red   { background:var(--error-surf);   color:var(--error); }
-        .sec-trigger .sec-icon.green { background:var(--success-surf); color:var(--success); }
-        .sec-trigger .sec-title { font-weight:700; font-size:.9rem; }
-        .sec-trigger .sec-subtitle { font-size:.75rem; color:var(--text-muted); margin-top:.1rem; }
-        .sec-trigger .sec-badge { margin-left:auto; padding:.2rem .65rem; border-radius:var(--radius-full); font-size:.7rem; font-weight:700; flex-shrink:0; }
-        .sec-badge.all-ok   { background:var(--success-surf); color:var(--success); border:1px solid var(--success-hl); }
-        .sec-badge.has-warn { background:var(--error-surf); color:var(--error); border:1px solid var(--error-hl); }
-        .sec-chevron { margin-left:.5rem; transition:transform var(--t); flex-shrink:0; color:var(--text-faint); }
-        .sec-trigger[aria-expanded="true"] .sec-chevron { transform:rotate(180deg); }
-        .sec-body { display:none; border-top:1px solid var(--border); }
-        .sec-body.open { display:block; }
-
-        /* ── ANOMALI CARDS ── */
-        .anomali-list { padding:1rem; display:flex; flex-direction:column; gap:.75rem; }
-
-        .anomali-card { border-radius:var(--radius-lg); border:1px solid var(--border); overflow:hidden; }
-        .anomali-card.is-warn { border-color:var(--error-hl); }
-        .anomali-card.is-ok   { border-color:var(--success-hl); }
-
-        .ac-head { display:flex; align-items:center; gap:.75rem; padding:.75rem 1rem; }
-        .anomali-card.is-warn .ac-head { background:#fff5f5; }
-        .anomali-card.is-ok   .ac-head { background:#f0fdf4; }
-        [data-theme="dark"] .anomali-card.is-warn .ac-head { background:#2d1515; }
-        [data-theme="dark"] .anomali-card.is-ok   .ac-head { background:#0f2318; }
-
-        .ac-num { width:24px; height:24px; border-radius:var(--radius-full); font-size:.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-        .is-warn .ac-num { background:var(--error);   color:#fff; }
-        .is-ok   .ac-num { background:var(--success); color:#fff; }
-        .ac-label { font-weight:700; font-size:.875rem; flex:1; }
-        .ac-status { font-size:.7rem; font-weight:700; padding:.15rem .6rem; border-radius:var(--radius-full); }
-        .is-warn .ac-status { background:var(--error-surf); color:var(--error); border:1px solid var(--error-hl); }
-        .is-ok   .ac-status { background:var(--success-surf); color:var(--success); border:1px solid var(--success-hl); }
-
-        .ac-body { padding:.75rem 1rem; display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; border-top:1px solid var(--border); }
-        .ac-doc { }
-        .ac-doc-label { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); margin-bottom:.35rem; display:flex; align-items:center; gap:.3rem; }
-        .ac-doc-val { font-size:.82rem; line-height:1.5; color:var(--text-muted); background:var(--surface); padding:.4rem .6rem; border-radius:var(--radius-sm); min-height:2rem; }
-        .is-warn .ac-doc-val.anomali { color:var(--error); background:var(--error-surf); font-weight:600; }
-
-        .ac-ai { grid-column:1/-1; display:flex; align-items:flex-start; gap:.5rem; font-size:.8rem; color:var(--text-muted); padding-top:.5rem; border-top:1px solid var(--border); margin-top:.25rem; }
-        .ac-ai-icon { flex-shrink:0; margin-top:.1rem; }
-
-        /* ── DETAIL SPESIFIK (inside accordion) ── */
-        .detail-grid { padding:1rem; display:grid; grid-template-columns:repeat(2,1fr); gap:.6rem; }
-        .detail-item { background:var(--surface); border-radius:var(--radius-md); padding:.6rem .85rem; }
-        .detail-item-label { font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); font-weight:600; margin-bottom:.2rem; }
-        .detail-item-val { font-size:.82rem; color:var(--text-muted); line-height:1.4; }
-
-        /* LEMBAR BTKP badge rows */
-        .lembar-rows { padding:.75rem 1rem .25rem; display:flex; flex-direction:column; gap:.5rem; }
-        .lembar-row  { display:flex; align-items:flex-start; gap:.6rem; font-size:.82rem; }
-        .lembar-badge { flex-shrink:0; font-size:.65rem; font-weight:700; padding:.1rem .5rem; border-radius:var(--radius-full); min-width:65px; text-align:center; }
-        .lb-btkp  { background:#ede9fe; color:#5b21b6; border:1px solid #c4b5fd; }
-        .lb-judul { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
-        .lb-lamp  { background:#fef9c3; color:#854d0e; border:1px solid #fde68a; }
-        .lembar-val { flex:1; color:var(--text-muted); line-height:1.4; }
-        .lembar-val.anomali { color:var(--error); font-weight:600; }
-
-        .divider-label { padding:.4rem 1rem; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
-
-        /* EMPTY STATE */
-        .empty-state { padding:2rem 1rem; text-align:center; color:var(--text-faint); font-size:.875rem; }
-
-        @media (max-width:640px) {
-            .upload-grid { grid-template-columns:1fr; }
-            .ac-body { grid-template-columns:1fr; }
-            .detail-grid { grid-template-columns:1fr; }
-            .filter-tabs { margin-left:0; }
-        }
-    </style>
-</head>
-<body>
-
-<header class="app-header">
-    <div class="brand">
-        <div class="brand-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-            </svg>
-        </div>
-        <span class="brand-name">Waruna Group <span>| Verifikasi Dokumen</span></span>
-    </div>
-    <button class="theme-btn" data-theme-toggle aria-label="Toggle dark mode"></button>
-</header>
-
-<main>
-    <div class="page-title">
-        <h1>Audit &amp; Verifikasi Dokumen Vendor</h1>
-        <p>Upload Quotation, Sertifikat, dan DO/Surat Jalan untuk diverifikasi silang oleh AI.</p>
-    </div>
-
-    <div class="upload-card">
-        <div class="upload-grid">
-            <div class="upload-zone" id="zone-p">
-                <div class="uz-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                </div>
-                <span class="uz-label">&#128196; Quotation / Invoice</span>
-                <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
-                <div class="file-badge" id="fbadge-p"><strong id="fname-p">—</strong><span id="fsize-p"></span></div>
-            </div>
-            <div class="upload-zone" id="zone-s">
-                <div class="uz-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                </div>
-                <span class="uz-label">&#128196; Laporan Sertifikat</span>
-                <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
-                <div class="file-badge" id="fbadge-s"><strong id="fname-s">—</strong><span id="fsize-s"></span></div>
-            </div>
-            <div class="upload-zone" id="zone-d">
-                <div class="uz-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-                </div>
-                <span class="uz-label">&#128196; Surat Jalan / DO</span>
-                <input type="file" id="file-do" class="file-input" accept="application/pdf">
-                <div class="file-badge" id="fbadge-d"><strong id="fname-d">—</strong><span id="fsize-d"></span></div>
-            </div>
-        </div>
-        <button type="button" id="btn-run" class="btn-run">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Jalankan Verifikasi Ekstraksi
-        </button>
-    </div>
-
-    <div class="loading-box" id="loading">
-        <div class="spinner"></div>
-        <p class="loading-title">Dokumen sedang dianalisis oleh AI...</p>
-        <div class="steps">
-            <div class="step" id="step-1"><div class="step-dot"></div> Mengirim Dokumen</div>
-            <div class="step" id="step-2"><div class="step-dot"></div> Menganalisis AI</div>
-            <div class="step" id="step-3"><div class="step-dot"></div> Mengambil Hasil</div>
-        </div>
-        <p class="loading-timer" id="timer">Waktu berjalan: 0 detik</p>
-        <p class="loading-hint">Jangan tutup halaman ini.</p>
-    </div>
-
-    <div class="error-box" id="err-box"></div>
-    <div id="result"></div>
-</main>
-
-<script>
-/* ── THEME ── */
-(function(){
-    var html = document.documentElement;
-    var btn  = document.querySelector('[data-theme-toggle]');
-    var t    = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    html.setAttribute('data-theme', t);
-    function icon(){ if(!btn) return; btn.innerHTML = t==='dark' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'; }
-    icon();
-    if(btn) btn.addEventListener('click', function(){ t = t==='dark'?'light':'dark'; html.setAttribute('data-theme',t); icon(); });
-})();
-
-/* ── FILE BIND ── */
-function fmtSize(b){ return b<1024 ? b+'B' : b<1048576 ? (b/1024).toFixed(1)+'KB' : (b/1048576).toFixed(2)+'MB'; }
-function bindFile(inId, zoneId, nameId, sizeId, badgeId){
-    var inp = document.getElementById(inId);
-    if(!inp) return;
-    inp.addEventListener('change', function(){
-        var z = document.getElementById(zoneId), bd = document.getElementById(badgeId);
-        if(this.files && this.files.length){
-            document.getElementById(nameId).textContent = this.files[0].name;
-            document.getElementById(sizeId).textContent = ' ('+fmtSize(this.files[0].size)+')';
-            bd.classList.add('show'); z.classList.add('has-file');
-        } else { bd.classList.remove('show'); z.classList.remove('has-file'); }
-    });
-}
-bindFile('file-penawaran','zone-p','fname-p','fsize-p','fbadge-p');
-bindFile('file-sertifikat','zone-s','fname-s','fsize-s','fbadge-s');
-bindFile('file-do','zone-d','fname-d','fsize-d','fbadge-d');
-
-/* ── GLOBALS ── */
-var pollInt=null, timerInt=null, elapsed=0, fails=0;
-var MAX_T = 360, MAX_F = 15*1024*1024;
-var WH_SUBMIT  = 'https://n8.waruna-group.co.id/webhook/audit-dokumen';
-var WH_POLL    = 'https://n8.waruna-group.co.id/webhook/check-status-audit';
-
-/* ── UI HELPERS ── */
-function setStep(n){
-    ['step-1','step-2','step-3'].forEach(function(id,i){
-        var el=document.getElementById(id); if(!el) return;
-        el.classList.remove('active','done');
-        if(i<n) el.classList.add('done'); else if(i===n) el.classList.add('active');
-    });
-}
-function lockUI(){
-    var b=document.getElementById('btn-run'); b.disabled=true;
-    b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Memproses...';
-    document.getElementById('result').innerHTML='';
-    document.getElementById('err-box').textContent=''; document.getElementById('err-box').classList.remove('show');
-    document.getElementById('loading').classList.add('show');
-}
-function unlockUI(){
-    var b=document.getElementById('btn-run'); b.disabled=false;
-    b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Jalankan Verifikasi Ekstraksi';
-    document.getElementById('loading').classList.remove('show');
-}
-function stopAll(){ clearInterval(pollInt); clearInterval(timerInt); pollInt=null; timerInt=null; }
-function showErr(msg){ stopAll(); unlockUI(); var e=document.getElementById('err-box'); e.innerHTML='<strong>&#9888; Kesalahan:</strong> '+msg; e.classList.add('show'); }
-function esc(s){ var x=(s===null||s===undefined)?'-':String(s); return x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* ── INIT ── */
-document.addEventListener('DOMContentLoaded', function(){
-    var b=document.getElementById('btn-run'); if(b) b.addEventListener('click', run);
-});
-
-/* ── RUN ── */
-async function run(){
-    stopAll();
-    var pI=document.getElementById('file-penawaran'), sI=document.getElementById('file-sertifikat'), dI=document.getElementById('file-do');
-    if(!pI.files.length) return showErr('File Quotation/Invoice belum dipilih.');
-    if(!sI.files.length) return showErr('File Laporan Sertifikat belum dipilih.');
-    if(!dI.files.length) return showErr('File Surat Jalan / DO belum dipilih.');
-    var fP=pI.files[0], fS=sI.files[0], fD=dI.files[0];
-    if(fP.size>MAX_F||fS.size>MAX_F||fD.size>MAX_F) return showErr('Ukuran setiap file maksimal 15 MB.');
-
-    fails=0; elapsed=0;
-    var jobId='JOB-'+Date.now();
-    lockUI(); setStep(0);
-    document.getElementById('timer').textContent='Waktu berjalan: 0 detik';
-    timerInt=setInterval(function(){
-        elapsed++;
-        document.getElementById('timer').textContent='Waktu berjalan: '+elapsed+' detik';
-        if(elapsed>=MAX_T){ stopAll(); showErr('Timeout 6 menit. Silakan coba lagi.'); }
-    },1000);
-
-    var fd=new FormData();
-    fd.append('penawaran',fP); fd.append('sertifikat',fS); fd.append('surat_jalan',fD); fd.append('job_id',jobId);
-    try {
-        var res=await fetch(WH_SUBMIT,{method:'POST',body:fd});
-        if(!res.ok) throw new Error('Server error HTTP '+res.status);
-        var rd; try{ rd=await res.json(); }catch(e){ rd={}; }
-        if(rd.status==='processing'||rd.message){ setStep(1); pollInt=setInterval(function(){ poll(jobId); },10000); }
-        else throw new Error('Respons n8n tidak valid.');
-    } catch(e){ showErr(e.message||'Gagal mengirim dokumen.'); }
-}
-
-/* ── POLL ── */
-async function poll(jobId){
-    try {
-        var res=await fetch(WH_POLL+'?job_id='+encodeURIComponent(jobId),{method:'GET'});
-        if(!res.ok){ fails++; if(fails>=6) showErr('Koneksi gagal berulang kali.'); return; }
-        var txt=await res.text();
-        if(!txt||txt.trim().charAt(0)==='<') return;
-        var data; try{ data=JSON.parse(txt); }catch(e){ return; }
-        if(data.status==='processing') return;
-
-        var rows=[];
-        if(Array.isArray(data)) rows=data;
-        else if(data.data&&Array.isArray(data.data)) rows=data.data;
-        else if(typeof data==='object'&&data!==null) rows=[data];
-        rows=rows.filter(function(r){ return r&&typeof r==='object'&&Object.keys(r).length>0; });
-        if(!rows.length) return;
-
-        var ourRow=null;
-        for(var i=0;i<rows.length;i++){
-            var rid=rows[i]['Job ID']||rows[i]['job_id']||rows[i]['Job_ID']||'';
-            if(rid.toString().trim()===jobId.toString().trim()){ ourRow=rows[i]; break; }
-        }
-        if(!ourRow){ console.log('[POLL] Job ID belum match'); return; }
-
-        stopAll(); unlockUI(); setStep(2); fails=0;
-        var parsed={};
-        try{ parsed=JSON.parse(ourRow['Payload']||'{}'); }catch(e){ parsed=buildFallback(rows); }
-        render(parsed);
-    } catch(e){
-        fails++; console.warn('[POLL] error:',e.message);
-        if(fails>=6) showErr('Koneksi berulang kali gagal.');
+    if (j.indexOf('liferaft') !== -1 && j.indexOf('hru') === -1 && j.indexOf('air cylinder') === -1) {
+        return [
+            ['Pabrikan / Merek / Manufacturer',         d.pabrikan],
+            ['Kind of Service / Jenis Service',         d.jenis_service],
+            ['Manufacture Date / Tahun Pembuatan',      d.manufacture_date],
+            ['Serial Number / SN Liferaft',             d.serial_number_liferaft || d.serial_number],
+            ['Capacity Liferaft',                       d.capacity],
+            ['Material Liferaft',                       d.material_liferaft || d.material],
+            ['Jumlah Gas / CO2 Cylinder',               d.jumlah_gas_cylinder],
+            ['Serial Number Gas / CO2 Cylinder',        d.serial_number_gas_cylinder],
+            ['WP-Test',                                 d.wp_test],
+            ['FS-Test',                                 d.fs_test],
+            ['NAP-Test',                                d.nap_test],
+            ['GI-Test',                                 d.gi_test],
+        ];
     }
-}
-
-/* ── FALLBACK ── */
-function buildFallback(rows){
-    var status='ALL_MATCH', temuan=[];
-    rows.forEach(function(r){
-        function gv(k){ if(r[k]!==undefined&&r[k]!==null&&r[k]!=='') return r[k]; var fk=Object.keys(r).find(function(x){ return x.toLowerCase().trim()===k.toLowerCase().trim(); }); return fk?r[fk]:''; }
-        if((gv('Status Keseluruhan')||'').toUpperCase().indexOf('DISCREPANCY')!==-1) status='DISCREPANCY_FOUND';
-        var ket=gv('Keterangan');
-        if(ket&&ket!=='-') temuan.push({ keterangan:ket, di_penawaran:gv('Di Penawaran')||'-', di_sertifikat:gv('Di Sertifikat')||'-', di_do:gv('Di DO')||'-', hasil_ai:gv('Hasil AI')||'-' });
-    });
-    return { status_keseluruhan:status, _fallback:true, temuan_anomali:temuan };
-}
-
-/* ── RENDER ── */
-function render(result){
-    var c=document.getElementById('result'); c.innerHTML='';
-    var isOk=result.status_keseluruhan==='ALL_MATCH';
-
-    /* Status banner */
-    var sb=document.createElement('div');
-    sb.className='status-banner '+(isOk?'ok':'err');
-    sb.innerHTML='<div class="sb-label">Status Audit Dokumen</div>'+
-        '<h2 class="sb-title">'+(isOk?'&#9989; Semua Dokumen Sesuai':'&#9888; Ditemukan Ketidaksesuaian')+'</h2>'+
-        (result.nama_kapal?'<p class="sb-meta">Kapal: <strong>'+esc(result.nama_kapal)+'</strong> &nbsp;|&nbsp; Customer: <strong>'+esc(result.customer||'-')+'</strong></p>':'');
-    c.appendChild(sb);
-
-    /* Fallback mode */
-    if(result._fallback){ renderFallback(c, result, isOk); return; }
-
-    var hasAntar = result.check_antar_dokumen && Object.keys(result.check_antar_dokumen).length>0;
-    var hasSert  = result.check_sertifikat && result.check_sertifikat.length>0;
-
-    if(!hasAntar && !hasSert){ renderAllOk(c); return; }
-
-    /* Hitung total anomali */
-    var totalWarn=0, totalOk=0;
-    if(hasAntar){
-        Object.values(result.check_antar_dokumen).forEach(function(v){
-            String(v.status||'').indexOf('⚠')!==-1 ? totalWarn++ : totalOk++;
-        });
+    if (j.indexOf('fire extinguisher') !== -1) {
+        return [
+            ['Type / Jenis Fire Extinguisher',          d.type_jenis],
+            ['Other Service Item / Working Code',       d.working_code],
+            ['Serial Number / SN',                      d.serial_number],
+            ['Capacity',                                d.capacity],
+            ['Material Replacement / Note',             d.material_replacement || d.material],
+        ];
     }
-    if(hasSert){
-        result.check_sertifikat.forEach(function(alat){
-            ['cap_syahbandar','cap_vendor','tanggal_service','tanggal_expired'].forEach(function(k){
-                var v=alat[k]||{};
-                String(v.status||'').indexOf('⚠')!==-1 ? totalWarn++ : totalOk++;
-            });
-        });
+    if (j.indexOf('fixed co2') !== -1 || j.indexOf('fixed galley') !== -1) {
+        return [
+            ['Other Service Item / Working Code',       d.working_code],
+            ['Serial Number / SN',                      d.serial_number],
+            ['Capacity',                                d.capacity],
+            ['Material Replacement / Note',             d.material_replacement || d.material],
+            ['Quantity of Cylinders',                   d.qty_cylinders],
+            ['Quantity of Pilots',                      d.qty_pilots],
+        ];
     }
-
-    /* Summary bar */
-    var sumBar=document.createElement('div');
-    sumBar.className='summary-bar';
-    sumBar.innerHTML=
-        '<span class="sb-count">'+totalWarn+'</span>'+
-        '<span class="sb-text">anomali ditemukan</span>'+
-        '<span class="sb-sep">|</span>'+
-        '<span class="sb-ok">'+totalOk+'</span>'+
-        '<span class="sb-text">item sesuai</span>'+
-        '<div class="filter-tabs">'+
-            '<button class="ftab active" data-filter="all">Semua</button>'+
-            '<button class="ftab" data-filter="warn">&#9888; Anomali</button>'+
-            '<button class="ftab" data-filter="ok">&#9989; Sesuai</button>'+
-        '</div>';
-    c.appendChild(sumBar);
-
-    /* Filter tabs handler */
-    sumBar.querySelectorAll('.ftab').forEach(function(btn){
-        btn.addEventListener('click', function(){
-            sumBar.querySelectorAll('.ftab').forEach(function(b){ b.classList.remove('active'); });
-            this.classList.add('active');
-            var f=this.dataset.filter;
-            document.querySelectorAll('.anomali-card').forEach(function(card){
-                if(f==='all') card.style.display='';
-                else if(f==='warn') card.style.display=card.classList.contains('is-warn')?'':'none';
-                else card.style.display=card.classList.contains('is-ok')?'':'none';
-            });
-            document.querySelectorAll('.sec-wrap').forEach(function(sw){
-                var visible=sw.querySelectorAll('.anomali-card:not([style*="none"])').length>0;
-                sw.style.display=visible?'':'none';
-            });
-        });
-    });
-
-    /* Section: Check Antar Dokumen */
-    if(hasAntar) renderSectionAntar(c, result.check_antar_dokumen);
-
-    /* Section: Per jenis sertifikat */
-    if(hasSert) result.check_sertifikat.forEach(function(alat){ renderSectionSertifikat(c, alat); });
+    if (j.indexOf('foam') !== -1) {
+        return [
+            ['Capacity',                                d.capacity],
+            ['Maker / Manufacturer',                    d.maker || d.pabrikan],
+        ];
+    }
+    if (j.indexOf('dry powder') !== -1) {
+        return [
+            ['Capacity',                                d.capacity],
+            ['Quantity of Propellants',                 d.qty_propellants],
+            ['Quantity of Pilots',                      d.qty_pilots],
+            ['Quantity of Tanks',                       d.qty_tanks],
+            ['Other Service Item / Working Code',       d.working_code],
+            ['Serial Number / SN',                      d.serial_number],
+        ];
+    }
+    if (j.indexOf('watermist') !== -1 || j.indexOf('ba compressor') !== -1) {
+        return [
+            ['Hasil Pengecekan',                        d.hasil_passed],
+        ];
+    }
+    if (j.indexOf('lifeboat') !== -1 || j.indexOf('davit') !== -1 ||
+        j.indexOf('winch')    !== -1 || j.indexOf('rescue boat') !== -1 ||
+        j.indexOf('release gear') !== -1) {
+        return [
+            ['Pabrikan / Merek / Manufacturer',         d.pabrikan],
+            ['Kind of Service / Jenis Service',         d.jenis_service],
+            ['Manufacture Date / Tahun Pembuatan',      d.manufacture_date],
+            ['Serial Number / SN',                      d.serial_number],
+            ['Capacity',                                d.capacity],
+            ['Material',                                d.material],
+            ['Model / Type',                            d.model_type],
+            ['Posisi',                                  d.posisi],
+        ];
+    }
+    if (j.indexOf('air cylinder') !== -1) {
+        return [
+            ['Other Service Item / Working Code',       d.working_code],
+            ['Serial Number / SN',                      d.serial_number],
+            ['Capacity',                                d.capacity],
+        ];
+    }
+    if (j.indexOf('hru') !== -1 || j.indexOf('hydrostatic') !== -1) {
+        return [
+            ['Serial Number / SN HRU',                  d.serial_number],
+            ['New Supply / Inspection',                 d.new_supply_inspection],
+            ['Exp Date HRU (2 Tahun dari service)',     d.exp_date_hru],
+            ['Exp Date Certificate / Next Inspection',  d.exp_date_certificate],
+        ];
+    }
+    if (j.indexOf('scba') !== -1 || j.indexOf('eebd') !== -1 ||
+        j.indexOf('medical') !== -1 || j.indexOf('oxygen') !== -1 ||
+        j.indexOf('safety equipment') !== -1) {
+        return [
+            ['Serial Number / SN Tabung',               d.serial_number],
+            ['Working Code Tabung / Cylinder',          d.working_code],
+            ['Capacity',                                d.capacity],
+            ['Catatan (Mask/Set & Tabung)',              d.catatan],
+        ];
+    }
+    /* Fallback: tampilkan semua key yang ada */
+    return Object.entries(d).map(function(e) { return [e[0], e[1]]; });
 }
 
-/* ── ALL OK ── */
-function renderAllOk(c){
-    var d=document.createElement('div'); d.className='success-full';
-    d.innerHTML='<div class="si">&#9989;</div><h3>Verifikasi Berhasil</h3><p>Seluruh dokumen Penawaran, DO/Surat Jalan, dan Sertifikat telah divalidasi dan 100% konsisten.</p>';
-    c.appendChild(d);
-}
+/* ============================================================
+   RENDER SECTION SERTIFIKAT (per jenis alat)
+============================================================ */
+function renderSectionSertifikat(c, alat) {
 
-/* ── SECTION ANTAR DOKUMEN ── */
-function renderSectionAntar(c, data){
-    var labelMap={ nama_kapal:'Nama Kapal', customer:'Customer / Owner Kapal', quantity_item:'Quantity Item', harga_item:'Harga Item', jenis_item:'Jenis Item' };
-    var entries=Object.entries(data);
-    var warnCount=entries.filter(function(e){ return String(e[1].status||'').indexOf('⚠')!==-1; }).length;
-
-    var wrap=mkSection(
-        'blue',
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
-        'Check Antar Dokumen',
-        'Kesesuaian Quotation &#8596; Sertifikat &#8596; DO',
-        warnCount, entries.length
-    );
-    c.appendChild(wrap);
-
-    var body=wrap.querySelector('.sec-body');
-    var list=document.createElement('div'); list.className='anomali-list';
-
-    entries.forEach(function(entry, idx){
-        var key=entry[0], val=entry[1];
-        var warn=String(val.status||'').indexOf('⚠')!==-1;
-        var doVal=val['delivery_order']||val['do_val']||'-';
-
-        var card=document.createElement('div');
-        card.className='anomali-card '+(warn?'is-warn':'is-ok');
-        card.innerHTML=
-            '<div class="ac-head">'+
-                '<div class="ac-num">'+(idx+1)+'</div>'+
-                '<div class="ac-label">'+esc(labelMap[key]||key)+'</div>'+
-                '<span class="ac-status">'+(warn?'&#9888; Tidak Sesuai':'&#9989; Sesuai')+'</span>'+
-            '</div>'+
-            '<div class="ac-body">'+
-                '<div class="ac-doc">'+
-                    '<div class="ac-doc-label">&#128196; Quotation / Invoice</div>'+
-                    '<div class="ac-doc-val'+(warn?' anomali':'')+'">'+esc(val.quotation||'-')+'</div>'+
-                '</div>'+
-                '<div class="ac-doc">'+
-                    '<div class="ac-doc-label">&#128203; Sertifikat</div>'+
-                    '<div class="ac-doc-val'+(warn?' anomali':'')+'">'+esc(val.sertifikat||'-')+'</div>'+
-                '</div>'+
-                '<div class="ac-doc">'+
-                    '<div class="ac-doc-label">&#128666; Delivery Order / DO</div>'+
-                    '<div class="ac-doc-val'+(warn?' anomali':'')+'">'+esc(doVal)+'</div>'+
-                '</div>'+
-                (val.hasil_ai&&val.hasil_ai!=='-'?
-                '<div class="ac-ai">'+
-                    '<span class="ac-ai-icon">&#129302;</span>'+
-                    '<span>'+esc(val.hasil_ai)+'</span>'+
-                '</div>':'')+'</div>';
-        list.appendChild(card);
-    });
-
-    if(!entries.length){ var es=document.createElement('div'); es.className='empty-state'; es.textContent='Tidak ada data.'; list.appendChild(es); }
-    body.appendChild(list);
-}
-
-/* ── SECTION SERTIFIKAT ── */
-function renderSectionSertifikat(c, alat){
-    var checkFields=[
-        {key:'cap_syahbandar',  label:'Cap & TTD Syahbandar'},
-        {key:'cap_vendor',      label:'Cap & TTD Vendor'},
-        {key:'tanggal_service', label:'Tanggal Service / Inspeksi'},
-        {key:'tanggal_expired', label:'Tanggal Expired / Next Inspection'}
+    var checkFields = [
+        { key: 'cap_syahbandar',   label: 'a. Cap & Tanda Tangan Syahbandar' },
+        { key: 'cap_vendor',       label: 'b. Cap & Tanda Tangan Vendor' },
+        { key: 'tanggal_service',  label: 'c. Tanggal Service / Inspeksi' },
+        { key: 'tanggal_expired',  label: 'd. Tanggal Next Service / Expired / Masa Berlaku' }
     ];
-    var warnCount=checkFields.filter(function(f){ return String((alat[f.key]||{}).status||'').indexOf('⚠')!==-1; }).length;
 
-    var wrap=mkSection(
+    var warnCount = checkFields.filter(function(f) {
+        return String((alat[f.key] || {}).status || '').indexOf('⚠') !== -1;
+    }).length;
+
+    /* ── Buat accordion section ── */
+    var wrap = mkSection(
         'red',
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>',
-        'Sertifikat: '+esc(alat.jenis_alat||'-'),
+        'Sertifikat: ' + esc(alat.jenis_alat || '-'),
         'Validasi lembar BTKP &#8596; Judul &#8596; Lampiran',
-        warnCount, checkFields.length
+        warnCount,
+        checkFields.length
     );
     c.appendChild(wrap);
 
-    var body=wrap.querySelector('.sec-body');
+    var body = wrap.querySelector('.sec-body');
 
-    /* Anomali cards per field */
-    var list=document.createElement('div'); list.className='anomali-list';
-    checkFields.forEach(function(field, idx){
-        var val=alat[field.key]||{};
-        var warn=String(val.status||'').indexOf('⚠')!==-1;
+    /* ── BAGIAN A: 4 field cek utama (cap, tanggal) ── */
+    var list = document.createElement('div');
+    list.className = 'anomali-list';
 
-        var card=document.createElement('div');
-        card.className='anomali-card '+(warn?'is-warn':'is-ok');
-        card.innerHTML=
-            '<div class="ac-head">'+
-                '<div class="ac-num">'+(idx+1)+'</div>'+
-                '<div class="ac-label">'+esc(field.label)+'</div>'+
-                '<span class="ac-status">'+(warn?'&#9888; Tidak Sesuai':'&#9989; Sesuai')+'</span>'+
+    checkFields.forEach(function(field, idx) {
+        var val  = alat[field.key] || {};
+        var warn = String(val.status || '').indexOf('⚠') !== -1;
+
+        var card = document.createElement('div');
+        card.className = 'anomali-card ' + (warn ? 'is-warn' : 'is-ok');
+        card.innerHTML =
+            '<div class="ac-head">' +
+                '<div class="ac-num">' + String.fromCharCode(97 + idx) + '</div>' +
+                '<div class="ac-label">' + esc(field.label) + '</div>' +
+                '<span class="ac-status">' + (warn ? '&#9888; Tidak Sesuai' : '&#9989; Sesuai') + '</span>' +
             '</div>';
 
-        /* Lembar rows */
-        var lembarDiv=document.createElement('div'); lembarDiv.className='lembar-rows';
+        /* Lembar BTKP / Judul / Lampiran */
+        var lembarDiv = document.createElement('div');
+        lembarDiv.className = 'lembar-rows';
+
         [
-            {badge:'BTKP',    cls:'lb-btkp',  val:val.btkp},
-            {badge:'Judul',   cls:'lb-judul', val:val.judul},
-            {badge:'Lampiran',cls:'lb-lamp',  val:val.lampiran}
-        ].forEach(function(l){
-            var lWarn=warn && l.val && l.val!=='-';
-            lembarDiv.innerHTML+=
-                '<div class="lembar-row">'+
-                    '<span class="lembar-badge '+l.cls+'">'+l.badge+'</span>'+
-                    '<span class="lembar-val'+(lWarn?' anomali':'')+'">'+esc(l.val||'-')+'</span>'+
+            { badge: 'BTKP',     cls: 'lb-btkp',  val: val.btkp },
+            { badge: 'Judul',    cls: 'lb-judul', val: val.judul },
+            { badge: 'Lampiran', cls: 'lb-lamp',  val: val.lampiran }
+        ].forEach(function(l) {
+            var vStr  = (l.val || '-').toString().trim();
+            var isAnomali = warn && vStr !== '-';
+            lembarDiv.innerHTML +=
+                '<div class="lembar-row">' +
+                    '<span class="lembar-badge ' + l.cls + '">' + l.badge + '</span>' +
+                    '<span class="lembar-val' + (isAnomali ? ' anomali' : '') + '">' + esc(vStr) + '</span>' +
                 '</div>';
         });
-        if(val.hasil_ai&&val.hasil_ai!=='-'){
-            lembarDiv.innerHTML+=
-                '<div class="ac-ai" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);">'+
-                    '<span class="ac-ai-icon">&#129302;</span>'+
-                    '<span>'+esc(val.hasil_ai)+'</span>'+
+
+        /* AI note */
+        if (val.hasil_ai && val.hasil_ai !== '-') {
+            lembarDiv.innerHTML +=
+                '<div class="ac-ai" style="margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);">' +
+                    '<span class="ac-ai-icon">&#129302;</span>' +
+                    '<span>' + esc(val.hasil_ai) + '</span>' +
                 '</div>';
         }
+
         card.appendChild(lembarDiv);
         list.appendChild(card);
     });
+
     body.appendChild(list);
 
-    /* Detail spesifik */
-    if(alat.detail_spesifik){
-        var d=alat.detail_spesifik;
-        var dItems=[
-            ['Pabrikan / Merek',         d.pabrikan],
-            ['Jenis Service',             d.jenis_service],
-            ['Manufacture Date',          d.manufacture_date],
-            ['Serial Number / SN',        d.serial_number],
-            ['Capacity',                  d.capacity],
-            ['Material / Note',           d.material],
-            ['Catatan Tambahan',          d.catatan_tambahan]
-        ].filter(function(x){ return x[1]&&x[1]!=='-'&&x[1].toString().trim()!==''; });
-
-        if(dItems.length){
-            var dlabel=document.createElement('div'); dlabel.className='divider-label'; dlabel.textContent='&#128203; Detail Spesifik Sertifikat';
-            body.appendChild(dlabel);
-            var grid=document.createElement('div'); grid.className='detail-grid';
-            dItems.forEach(function(item){
-                grid.innerHTML+='<div class="detail-item"><div class="detail-item-label">'+esc(item[0])+'</div><div class="detail-item-val">'+esc(item[1])+'</div></div>';
+    /* ── BAGIAN B: Detail Spesifik per jenis alat ── */
+    if (alat.detail_spesifik && typeof alat.detail_spesifik === 'object') {
+        var d      = alat.detail_spesifik;
+        var dItems = getDetailFields(alat.jenis_alat, d)
+            .filter(function(x) {
+                return x[1] && x[1] !== '-' && x[1] !== null &&
+                       x[1] !== undefined && x[1].toString().trim() !== '';
             });
+
+        if (dItems.length > 0) {
+
+            /* Divider label */
+            var dlabel = document.createElement('div');
+            dlabel.className = 'divider-label';
+            dlabel.innerHTML =
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:.35rem;">' +
+                    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' +
+                '</svg>' +
+                'Detail Spesifik &mdash; ' + esc(alat.jenis_alat || '');
+            body.appendChild(dlabel);
+
+            /* Grid cards */
+            var grid = document.createElement('div');
+            grid.className = 'detail-grid';
+
+            dItems.forEach(function(item) {
+                var label = item[0];
+                var value = item[1].toString();
+
+                /* Deteksi apakah ini field test (WP/FS/NAP/GI) supaya tampilannya beda */
+                var isTest = /^(WP|FS|NAP|GI)[\s\-]Test$/i.test(label.trim());
+                var isWarnVal = value.toLowerCase().indexOf('fail') !== -1 ||
+                                value.toLowerCase().indexOf('tidak') !== -1;
+
+                grid.innerHTML +=
+                    '<div class="detail-item' + (isTest && isWarnVal ? ' detail-item-warn' : isTest ? ' detail-item-test' : '') + '">' +
+                        '<div class="detail-item-label">' + esc(label) + '</div>' +
+                        '<div class="detail-item-val' + (isWarnVal ? ' anomali' : '') + '">' + esc(value) + '</div>' +
+                    '</div>';
+            });
+
             body.appendChild(grid);
         }
     }
 }
-
-/* ── FALLBACK RENDER ── */
-function renderFallback(c, result, isOk){
-    if(isOk||!result.temuan_anomali||!result.temuan_anomali.length){ renderAllOk(c); return; }
-
-    var wrap=mkSection('red',
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-        'Rincian Temuan',
-        'Dokumen tidak sinkron',
-        result.temuan_anomali.length, result.temuan_anomali.length
-    );
-    c.appendChild(wrap);
-    var body=wrap.querySelector('.sec-body');
-    var list=document.createElement('div'); list.className='anomali-list';
-    result.temuan_anomali.forEach(function(item,i){
-        var card=document.createElement('div'); card.className='anomali-card is-warn';
-        card.innerHTML=
-            '<div class="ac-head"><div class="ac-num">'+(i+1)+'</div><div class="ac-label">'+esc(item.keterangan||'-')+'</div><span class="ac-status">&#9888; Anomali</span></div>'+
-            '<div class="ac-body">'+
-                '<div class="ac-doc"><div class="ac-doc-label">&#128196; Quotation</div><div class="ac-doc-val anomali">'+esc(item.di_penawaran||'-')+'</div></div>'+
-                '<div class="ac-doc"><div class="ac-doc-label">&#128203; Sertifikat</div><div class="ac-doc-val">'+esc(item.di_sertifikat||'-')+'</div></div>'+
-                '<div class="ac-doc"><div class="ac-doc-label">&#128666; DO</div><div class="ac-doc-val anomali">'+esc(item.di_do||'-')+'</div></div>'+
-                (item.hasil_ai&&item.hasil_ai!=='-'?'<div class="ac-ai"><span class="ac-ai-icon">&#129302;</span><span>'+esc(item.hasil_ai)+'</span></div>':'')+
-            '</div>';
-        list.appendChild(card);
-    });
-    body.appendChild(list);
-}
-
-/* ── HELPER: buat accordion section ── */
-function mkSection(colorCls, iconSvg, title, subtitle, warnCount, total){
-    var wrap=document.createElement('div'); wrap.className='sec-wrap';
-    var badgeCls=warnCount>0?'has-warn':'all-ok';
-    var badgeTxt=warnCount>0?(warnCount+' anomali'):'Semua Sesuai';
-
-    var trigger=document.createElement('button');
-    trigger.className='sec-trigger'; trigger.setAttribute('aria-expanded','true');
-    trigger.innerHTML=
-        '<div class="sec-icon '+colorCls+'">'+iconSvg+'</div>'+
-        '<div><div class="sec-title">'+title+'</div><div class="sec-subtitle">'+subtitle+'</div></div>'+
-        '<span class="sec-badge '+badgeCls+'">'+badgeTxt+'</span>'+
-        '<svg class="sec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
-
-    var body=document.createElement('div'); body.className='sec-body open';
-    trigger.addEventListener('click', function(){
-        var open=body.classList.contains('open');
-        body.classList.toggle('open',!open);
-        trigger.setAttribute('aria-expanded',String(!open));
-    });
-
-    wrap.appendChild(trigger); wrap.appendChild(body);
-    return wrap;
-}
-</script>
-</body>
-</html>
