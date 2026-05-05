@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waruna Group | Verifikasi Dokumen</title>
-    <!-- Menggunakan Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #fdfbf3; }
@@ -26,8 +25,6 @@
         <!-- Upload Card -->
         <div class="bg-white shadow-md rounded-xl p-8 w-full max-w-4xl border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                
-                <!-- Input Sertifikat -->
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Laporan Sertifikat</label>
                     <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-sertifikat').click()">
@@ -35,8 +32,6 @@
                         <input type="file" id="file-sertifikat" accept="application/pdf" class="hidden" onchange="updateLabel('sertifikat')">
                     </div>
                 </div>
-
-                <!-- Input Penawaran -->
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penawaran Vendor</label>
                     <div class="relative dashed-box rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="document.getElementById('file-penawaran').click()">
@@ -44,128 +39,138 @@
                         <input type="file" id="file-penawaran" accept="application/pdf" class="hidden" onchange="updateLabel('penawaran')">
                     </div>
                 </div>
-
             </div>
-
-            <!-- Submit Button -->
-            <button id="btn-submit" onclick="jalankanVerifikasi()" class="w-full bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-4 px-6 rounded-lg uppercase tracking-wider transition duration-200 shadow-md">
+            <button id="btn-submit" onclick="mulaiProses()" class="w-full bg-indigo-800 hover:bg-indigo-900 text-white font-bold py-4 px-6 rounded-lg uppercase tracking-wider transition duration-200 shadow-md">
                 Jalankan Verifikasi Ekstraksi
             </button>
         </div>
 
         <!-- Loading Indicator -->
-        <div id="loading" class="hidden mt-8 flex flex-col items-center">
-            <svg class="animate-spin h-10 w-10 text-indigo-800 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <div id="loading" class="hidden mt-8 w-full max-w-4xl text-center">
+            <svg class="animate-spin h-10 w-10 text-indigo-800 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="text-indigo-900 font-semibold animate-pulse">AI (Model Flash) sedang mengekstrak anomali. Harap tunggu...</p>
+            <p class="text-indigo-900 font-bold animate-pulse text-lg">Dokumen sedang dianalisis oleh AI...</p>
+            <p id="timer-text" class="text-gray-500 text-sm mt-2 font-mono">Waktu berjalan: 0 detik</p>
+            <p class="text-gray-400 text-xs mt-1">Proses ini memakan waktu 3-5 menit. Halaman ini akan otomatis memuat hasil saat siap.</p>
         </div>
 
-        <!-- Error Container -->
-        <div id="error-container" class="hidden w-full max-w-5xl mt-6 p-4 bg-red-100 border-l-4 border-red-600 text-red-800 font-medium rounded shadow-sm">
-        </div>
-
-        <!-- Result Container -->
-        <div id="result-container" class="w-full max-w-5xl mt-8">
-            <!-- Hasil JSON akan dirender di sini -->
-        </div>
-
+        <div id="error-container" class="hidden w-full max-w-5xl mt-6 p-4 bg-red-100 border-l-4 border-red-600 text-red-800 font-medium rounded shadow-sm"></div>
+        <div id="result-container" class="w-full max-w-5xl mt-8"></div>
     </main>
 
-    <!-- JavaScript Logic -->
     <script>
-        // Update label saat file dipilih
         function updateLabel(type) {
-            const fileInput = document.getElementById(`file-${type}`);
+            const file = document.getElementById(`file-${type}`).files[0];
             const label = document.getElementById(`label-${type}`);
-            
-            if (fileInput.files.length > 0) {
-                label.innerText = fileInput.files[0].name.toUpperCase();
-                label.classList.remove('text-yellow-700');
-                label.classList.add('text-indigo-800');
+            if (file) {
+                label.innerText = file.name.toUpperCase();
+                label.className = "text-sm font-bold text-indigo-800 text-center px-4";
             } else {
                 label.innerText = `PILIH FILE PDF ${type.toUpperCase()}`;
-                label.classList.add('text-yellow-700');
-                label.classList.remove('text-indigo-800');
+                label.className = "text-sm font-bold text-yellow-700 text-center px-4";
             }
         }
 
-        // Fungsi utama pengiriman ke Webhook n8n
-        async function jalankanVerifikasi() {
+        let pollingInterval;
+        let waktuBerjalan = 0;
+        let timerInterval;
+
+        async function mulaiProses() {
             const fileSertifikat = document.getElementById('file-sertifikat').files[0];
             const filePenawaran = document.getElementById('file-penawaran').files[0];
             const btnSubmit = document.getElementById('btn-submit');
             const loading = document.getElementById('loading');
-            const resultContainer = document.getElementById('result-container');
-            const errorContainer = document.getElementById('error-container');
-
-            // Validasi Input
+            
             if (!fileSertifikat || !filePenawaran) {
-                alert("Kesalahan Objektif: Anda harus mengunggah kedua file (Sertifikat dan Penawaran) sebelum menjalankan verifikasi.");
+                alert("Anda harus mengunggah kedua file PDF.");
                 return;
             }
 
-            // Siapkan UI untuk loading
+            // Buat ID unik untuk melacak dokumen ini
+            const jobId = "JOB-" + Date.now();
+
             btnSubmit.disabled = true;
             btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
-            btnSubmit.innerText = 'MEMPROSES...';
+            document.getElementById('result-container').innerHTML = '';
+            document.getElementById('error-container').classList.add('hidden');
             loading.classList.remove('hidden');
-            resultContainer.innerHTML = '';
-            errorContainer.classList.add('hidden');
 
-            // Siapkan FormData
             const formData = new FormData();
             formData.append('sertifikat', fileSertifikat);
             formData.append('penawaran', filePenawaran);
+            formData.append('job_id', jobId); // Kirim Job ID ke n8n
 
             try {
-                // Tembak Webhook n8n Produksi
+                // TAHAP 1: Kirim Dokumen (N8N Harus diset "Respond Immediately")
                 const response = await fetch('https://n8.waruna-group.co.id/webhook/audit-dokumen', {
                     method: 'POST',
                     body: formData
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Server merespons dengan status: ${response.status}. Pastikan Workflow Aktif (ON) dan batas timeout server memadai.`);
-                }
+                if (!response.ok) throw new Error("Gagal mengunggah dokumen ke server.");
 
-                const data = await response.json();
-                
-                // 1. Tangani perbedaan format: Jika Array ambil index 0, jika Object pakai langsung
-                const result = Array.isArray(data) ? data[0] : data;
-                
-                // 2. Cek jika AI mengalami halusinasi dan n8n mengirimkan status "ERROR"
-                if (result && result.status === "ERROR") {
-                    throw new Error("AI gagal membaca dokumen atau format tidak sesuai. Output mentah: " + (result.raw || "Kosong"));
-                }
+                // Mulai Timer Visual
+                waktuBerjalan = 0;
+                timerInterval = setInterval(() => {
+                    waktuBerjalan++;
+                    document.getElementById('timer-text').innerText = `Waktu berjalan: ${waktuBerjalan} detik`;
+                }, 1000);
 
-                // 3. Cek apakah properti utama (status_keseluruhan) benar-benar ada
-                if (!result || !result.status_keseluruhan) {
-                    throw new Error('Data JSON kosong atau AI gagal menyusun format hierarki kategori. Eksekusi ditolak.');
-                }
-
-                // 4. Render ke layar
-                renderHasil(result);
+                // TAHAP 2: Mulai Polling (Tanya n8n setiap 10 detik)
+                pollingInterval = setInterval(() => cekStatusAI(jobId), 10000);
 
             } catch (error) {
-                errorContainer.innerText = `Gagal memproses dokumen: ${error.message}`;
-                errorContainer.classList.remove('hidden');
-            } finally {
-                // Kembalikan UI ke state awal
-                btnSubmit.disabled = false;
-                btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
-                btnSubmit.innerText = 'JALANKAN VERIFIKASI EKSTRAKSI';
-                loading.classList.add('hidden');
+                tampilkanError(error.message);
             }
         }
 
-        // Fungsi untuk merender JSON Anomali ke HTML
+        async function cekStatusAI(jobId) {
+            try {
+                // GANTI URL INI DENGAN URL WEBHOOK POLLING ANDA DI N8N
+                const response = await fetch(`https://n8.waruna-group.co.id/webhook/check-audit-status`, {
+                    method: 'GET'
+                });
+
+                const data = await response.json();
+
+                // Logika: Jika n8n membalas ada data JSON, berarti AI sudah selesai
+                if (data && data.status_keseluruhan) {
+                    clearInterval(pollingInterval);
+                    clearInterval(timerInterval);
+                    selesaikanProses();
+                    renderHasil(data);
+                } 
+                // Jika n8n membalas {"status": "TUNGGU"} atau belum ada data, biarkan interval berjalan
+
+            } catch (error) {
+                // Jangan batalkan proses jika hanya gagal fetch 1 kali (mungkin kedip jaringan)
+                console.warn("Gagal mengecek status, akan mencoba lagi dalam 10 detik...", error);
+            }
+        }
+
+        function tampilkanError(pesan) {
+            clearInterval(pollingInterval);
+            clearInterval(timerInterval);
+            selesaikanProses();
+            const errDiv = document.getElementById('error-container');
+            errDiv.innerText = pesan;
+            errDiv.classList.remove('hidden');
+        }
+
+        function selesaikanProses() {
+            document.getElementById('loading').classList.add('hidden');
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.innerText = 'JALANKAN VERIFIKASI EKSTRAKSI';
+        }
+
         function renderHasil(result) {
             const container = document.getElementById('result-container');
             container.innerHTML = '';
 
-            // Render Status Keseluruhan & Expiry Date
             const isOk = result.status_keseluruhan === 'ALL_MATCH';
             const statusClass = isOk ? 'bg-green-100 text-green-800 border-green-500' : 'bg-red-100 text-red-800 border-red-500';
             const statusText = isOk ? 'SEMUA ITEM SESUAI' : 'DITEMUKAN SELISIH / ANOMALI';
@@ -180,7 +185,6 @@
                 </div>
             `;
 
-            // Jika semua sesuai atau array anomali kosong/tidak ada
             if (isOk || !result.temuan_anomali || result.temuan_anomali.length === 0) {
                 container.innerHTML += `
                     <div class="bg-white border border-green-200 rounded-xl p-8 text-center shadow-sm">
@@ -191,7 +195,6 @@
                 return;
             }
 
-            // Render Tabel Anomali jika ditemukan ketidaksesuaian
             let htmlAnomali = `
                 <div class="bg-white border border-red-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="bg-red-50 px-5 py-4 border-b border-red-200 flex justify-between items-center">
@@ -227,13 +230,7 @@
                 `;
             });
 
-            htmlAnomali += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
-            
+            htmlAnomali += `</tbody></table></div></div>`;
             container.innerHTML += htmlAnomali;
         }
     </script>
