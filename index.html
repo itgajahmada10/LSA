@@ -1,160 +1,114 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Verifikasi Dokumen</title>
+    <title>Waruna Group | Verifikasi Dokumen Keselamatan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary:       #3730a3;
-            --primary-dark:  #312e81;
-            --primary-hl:    #c7d2fe;
-            --primary-surf:  #e0e7ff;
-            --surface:       #f3f4f6;
-            --surface-2:     #ffffff;
-            --success:       #166534;
-            --success-surf:  #dcfce7;
-            --success-hl:    #86efac;
-            --error:         #991b1b;
-            --error-surf:    #fee2e2;
-            --error-hl:      #fca5a5;
-            --text:          #1f2937;
-            --text-muted:    #4b5563;
-            --text-faint:    #9ca3af;
-            --border:        #e5e7eb;
-            --radius-md:     0.5rem;
-            --radius-lg:     0.75rem;
-            --radius-xl:     1rem;
-            --radius-full:   9999px;
-            --shadow-sm:     0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md:     0 4px 6px -1px rgba(0,0,0,0.1);
-            --t:             0.2s ease;
-            --max-w:         80rem;
+            --primary: #1e3a8a; /* Navy Blue Waruna */
+            --primary-light: #eff6ff; 
+            --border-color: #e0e0e0;
+            --text-main: #333;
+            --text-muted: #666;
+            --success: #2e7d32;
+            --error: #c62828;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
         }
-        [data-theme="dark"] {
-            --surface: #111827; --surface-2: #1f2937; --text: #f9fafb;
-            --text-muted: #d1d5db; --text-faint: #6b7280; --border: #374151;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 13px; 
+            color: var(--text-main); 
+            background: #f4f6f8; 
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
         }
-        *, *::before, *::after { box-sizing: border-box; }
-        body { background:var(--surface); color:var(--text); font-family:system-ui,-apple-system,sans-serif; margin:0; min-height:100vh; display:flex; flex-direction:column; }
-
-        /* HEADER & MAIN */
-        .app-header { display:flex; justify-content:space-between; align-items:center; background:var(--surface-2); padding:1rem 1.5rem; box-shadow:var(--shadow-sm); border-bottom:1px solid var(--border); }
-        .brand { display:flex; align-items:center; gap:.75rem; }
-        .brand-logo { background:var(--primary); color:#fff; border-radius:var(--radius-md); padding:.25rem; display:flex; align-items:center; justify-content:center; }
-        .brand-name { font-weight:700; font-size:1.1rem; color:#ca8a04; }
-        .brand-name span { color:var(--text-faint); font-weight:400; }
-        main { padding:2.5rem 1rem; display:flex; flex-direction:column; align-items:center; flex-grow:1; gap:1.5rem; }
-        .page-title { text-align:center; }
-        .page-title h1 { font-size:1.5rem; font-weight:700; margin:0 0 .5rem; }
-        .page-title p { color:var(--text-muted); font-size:.875rem; margin:0; }
-
-        /* UPLOAD CARD */
-        .upload-card { background:var(--surface-2); border-radius:var(--radius-xl); padding:2rem; box-shadow:var(--shadow-md); width:100%; max-width:var(--max-w); border:1px solid var(--border); }
+        
+        /* UPLOAD SECTION (Tetap ada di atas) */
+        .app-header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:1rem 1.5rem; border-radius:12px; border:1px solid var(--border-color); margin-bottom: 20px; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        .brand-name { font-weight:700; font-size:1.1rem; color:var(--primary); }
+        .upload-card { background:#fff; border-radius:12px; padding:2rem; border:1px solid var(--border-color); max-width:1400px; margin: 0 auto 24px auto; }
         .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:1.5rem; }
-        .upload-zone { border:2px dashed var(--primary-hl); border-radius:var(--radius-lg); padding:1.5rem; text-align:center; transition:all var(--t); background:var(--surface-2); }
-        .upload-zone.has-file { border-color:var(--success-hl); background:var(--success-surf); border-style:solid; }
-        .uz-icon { display:flex; justify-content:center; margin-bottom:.75rem; color:var(--primary-hl); }
-        .upload-zone.has-file .uz-icon { color:var(--success); }
-        .uz-label { display:block; font-weight:700; color:#a16207; font-size:.8rem; text-transform:uppercase; margin-bottom:1rem; }
-        .file-input { display:block; width:100%; font-size:.875rem; color:var(--text-muted); cursor:pointer; }
-        .file-input::file-selector-button { display:block; width:100%; text-align:center; margin-bottom:.5rem; padding:.4rem 1rem; border-radius:var(--radius-md); border:none; font-weight:700; font-size:.75rem; background:var(--primary-surf); color:var(--primary); cursor:pointer; }
-        .file-badge { display:none; margin-top:.75rem; font-size:.8rem; background:var(--surface-2); border:1px solid var(--success-hl); border-radius:.25rem; padding:.35rem .6rem; word-break:break-all; }
+        .upload-zone { border:2px dashed #cbd5e1; border-radius:12px; padding:1.5rem; text-align:center; background:#f8fafc; }
+        .upload-zone.has-file { border-color:var(--success); background:#f0fdf4; border-style:solid; }
+        .uz-label { display:block; font-weight:700; color:var(--primary); font-size:12px; text-transform:uppercase; margin-bottom:10px; }
+        .file-input { display:block; width:100%; font-size:12px; color:var(--text-muted); cursor:pointer; }
+        .file-badge { display:none; margin-top:10px; font-size:12px; background:#fff; border:1px solid var(--success); border-radius:4px; padding:6px; word-break:break-all; }
         .file-badge.show { display:block; }
-        .file-badge strong { color:var(--success); }
-        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:.875rem; padding:1rem; border-radius:var(--radius-lg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem; text-transform:uppercase; box-shadow:var(--shadow-sm); }
-        .btn-run:disabled { opacity:.5; cursor:not-allowed; }
+        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:14px; padding:12px; border-radius:8px; border:none; cursor:pointer; text-transform:uppercase; transition: background 0.2s; }
+        .btn-run:disabled { opacity:0.5; cursor:not-allowed; }
+        .loading-box { display:none; text-align:center; padding:2rem; background:#fff; border-radius:12px; border:1px solid var(--border-color); max-width:1400px; margin: 0 auto; }
+        .loading-box.show { display:block; }
+        .error-box { display:none; background:#ffebee; border-left:4px solid var(--error); padding:1rem; color:var(--error); font-weight:600; border-radius:8px; margin-bottom:20px; max-width:1400px; margin: 0 auto 20px auto;}
+        .error-box.show { display:block; }
 
-        /* LOADING & ERRORS */
-        .loading-box, .error-box { display:none; background:var(--surface-2); border-radius:var(--radius-xl); padding:2rem; text-align:center; width:100%; max-width:var(--max-w); box-shadow:var(--shadow-sm); border:1px solid var(--border); }
-        .loading-box.show, .error-box.show { display:block; }
-        .error-box { background:var(--error-surf); border-color:var(--error-hl); color:var(--error); text-align:left; font-weight:500; border-left:4px solid var(--error); }
-        .spinner { width:48px; height:48px; margin:0 auto 1.25rem; border:3px solid var(--primary-hl); border-top-color:var(--primary); border-radius:var(--radius-full); animation:spin .9s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
+        /* TABEL LAPORAN AUDIT (Seperti format yang diminta) */
+        .card-container { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 32px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+        th { background-color: var(--primary-light); color: var(--primary); padding: 12px 10px; text-align: left; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--primary); border-right: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.3px; }
+        td { border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 10px 10px; vertical-align: top; }
+        th:last-child, td:last-child { border-right: none; }
+        tr:last-child td { border-bottom: none; }
 
-        /* RESULT & TABLE STYLES (EXCEL LOOK) */
-        #result { width:100%; max-width:var(--max-w); display:flex; flex-direction:column; gap:1rem; }
-        .status-banner { border-radius:var(--radius-xl); padding:1.25rem 1.5rem; text-align:center; }
-        .status-banner.ok { background:var(--success-surf); border:1px solid var(--success-hl); }
-        .status-banner.err { background:var(--error-surf); border:1px solid var(--error-hl); }
-        .status-banner .sb-label { font-size:.7rem; font-weight:700; text-transform:uppercase; margin-bottom:.4rem; color:var(--text-muted); }
-        .status-banner .sb-title { font-size:1.125rem; margin:0; font-weight:700; color:var(--text); }
+        .item-row td { border-bottom: none !important; } 
+        .explanation-row td { padding-top: 4px; padding-bottom: 16px; border-top: none; }
+
+        .ok-cell { background-color: #fcfdfc; text-align: center; vertical-align:middle; border-left:4px solid var(--success);}
+        .err-cell { background-color: #fffafb; text-align: center; vertical-align:middle; border-left:4px solid var(--error);}
+
+        .section-title td { background-color: var(--primary); color: white; font-weight: 600; border-bottom: none; padding: 10px 14px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 13px; }
         
-        .summary-bar { display:flex; align-items:center; gap:.75rem; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:.875rem 1.25rem; font-size:.875rem; flex-wrap:wrap; }
-        .filter-tabs { display:flex; gap:.5rem; margin-left:auto; }
-        .ftab { font-size:.75rem; font-weight:600; padding:.3rem .85rem; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; }
-        .ftab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+        .header-info { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 2px solid var(--primary-light); }
+        .header-info-left h2 { margin: 0 0 8px 0; color: var(--primary); font-size: 22px; text-transform: uppercase;}
+        .header-info-left p { margin: 4px 0; font-size: 14px; color: var(--text-muted);}
+        .header-info-right { text-align: right; font-size: 12px; color: var(--text-muted); background: var(--primary-light); padding: 12px 16px; border-radius: 8px; border: 1px solid #dbeafe;}
+        .header-info-right strong { color: var(--primary); }
 
-        .table-wrap { overflow-x: auto; background: var(--surface-2); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
-        .anomali-table { min-width: 1050px; width: 100%; border-collapse: collapse; }
-        .anomali-table th, .anomali-table td { padding: 0.6rem 1rem; text-align: left; font-size: 0.85rem; border: 1px solid var(--border); vertical-align: middle; }
-        .anomali-table thead tr { background: #e5e7eb; }
-        [data-theme="dark"] .anomali-table thead tr { background: #374151; }
-        
-        /* Group Header (Kuning Ala Excel) */
-        .group-header td { background: #fef08a !important; color: #854d0e !important; font-weight: 700; font-size: 0.95rem; }
-        [data-theme="dark"] .group-header td { background: #854d0e !important; color: #fef08a !important; }
+        .ai-box { background:#fff; border:1px solid #ebebeb; padding:10px 14px; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+        .doc-val { font-size: 12px; color: #444; background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; min-height: 20px;}
+        .doc-val-err { font-weight: 600; color: var(--error); background: #fef2f2; border-color: #fecaca; }
 
-        .item-row { transition: background var(--t); }
-        .item-row:nth-child(even) { background: var(--surface); }
-        
-        /* Anomali Row */
-        .tr-warn td.td-anomali { background: #fee2e2; color: #991b1b; font-weight: 600; }
-        [data-theme="dark"] .tr-warn td.td-anomali { background: #7f1d1d; color: #fca5a5; }
-
-        .center { text-align: center !important; }
-        .td-ai { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
-        
-        /* Teks Merah Untuk Detail Alat */
-        .txt-red { color: #dc2626 !important; font-weight: 500; }
-        [data-theme="dark"] .txt-red { color: #f87171 !important; }
-
-        @media (max-width:640px) { .upload-grid{grid-template-columns:1fr;} }
+        @media (max-width:768px) { .upload-grid { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
 
 <header class="app-header">
-    <div class="brand">
-        <div class="brand-logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg></div>
-        <span class="brand-name">Waruna Group <span>| Verifikasi Dokumen</span></span>
-    </div>
+    <div class="brand-name">WARUNA GROUP | Audit Dokumen AI</div>
 </header>
 
-<main>
-    <div class="page-title">
-        <h1>Audit &amp; Verifikasi Dokumen Vendor</h1>
-        <p>Upload Quotation, Sertifikat, dan DO/Surat Jalan untuk diverifikasi silang oleh AI secara otomatis.</p>
-    </div>
-
-    <div class="upload-card">
-        <div class="upload-grid">
-            <div class="upload-zone" id="zone-p">
-                <span class="uz-label">📄 Quotation / Invoice</span>
-                <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
-                <div class="file-badge" id="fbadge-p"><strong id="fname-p">—</strong></div>
-            </div>
-            <div class="upload-zone" id="zone-s">
-                <span class="uz-label">📄 Laporan Sertifikat</span>
-                <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
-                <div class="file-badge" id="fbadge-s"><strong id="fname-s">—</strong></div>
-            </div>
-            <div class="upload-zone" id="zone-d">
-                <span class="uz-label">📄 Surat Jalan / DO</span>
-                <input type="file" id="file-do" class="file-input" accept="application/pdf">
-                <div class="file-badge" id="fbadge-d"><strong id="fname-d">—</strong></div>
-            </div>
+<div class="upload-card">
+    <div class="upload-grid">
+        <div class="upload-zone" id="zone-p">
+            <span class="uz-label">📄 Quotation / Penawaran</span>
+            <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
+            <div class="file-badge" id="fbadge-p"><strong id="fname-p">—</strong></div>
         </div>
-        <button type="button" id="btn-run" class="btn-run">Jalankan Verifikasi Ekstraksi</button>
+        <div class="upload-zone" id="zone-s">
+            <span class="uz-label">📄 Laporan Sertifikat</span>
+            <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
+            <div class="file-badge" id="fbadge-s"><strong id="fname-s">—</strong></div>
+        </div>
+        <div class="upload-zone" id="zone-d">
+            <span class="uz-label">📄 Surat Jalan / DO</span>
+            <input type="file" id="file-do" class="file-input" accept="application/pdf">
+            <div class="file-badge" id="fbadge-d"><strong id="fname-d">—</strong></div>
+        </div>
     </div>
+    <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
+</div>
 
-    <div class="loading-box" id="loading">
-        <div class="spinner"></div>
-        <p class="loading-title" id="loading-txt">Mengunggah Dokumen...</p>
-    </div>
-    <div class="error-box" id="err-box"></div>
-    <div id="result"></div>
-</main>
+<div class="loading-box" id="loading">
+    <h3 style="margin-top:0; color:#1e3a8a;">Proses Audit AI Sedang Berjalan...</h3>
+    <p style="color:#666;" id="loading-txt">Mohon tunggu, dokumen sedang diekstraksi dan diverifikasi secara paralel.</p>
+</div>
+<div class="error-box" id="err-box"></div>
+
+<!-- HASIL AUDIT -->
+<div id="result"></div>
 
 <script>
 function bindFile(inId,zoneId,nameId,badgeId){
@@ -180,7 +134,7 @@ function lockUI(txt){
     document.getElementById("result").innerHTML="";
     document.getElementById("err-box").classList.remove("show");
     document.getElementById("loading").classList.add("show");
-    document.getElementById("loading-txt").textContent=txt;
+    if(txt) document.getElementById("loading-txt").textContent=txt;
 }
 function unlockUI(){
     document.getElementById("btn-run").disabled=false;
@@ -197,7 +151,7 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     var fd=new FormData();
     fd.append("penawaran",pI.files[0]); fd.append("sertifikat",sI.files[0]); fd.append("surat_jalan",dI.files[0]); fd.append("job_id",jobId);
     
-    lockUI("Sedang Mengirim & Memproses AI (Tunggu 1-3 Menit)...");
+    lockUI("Sedang Mengirim & Memproses AI (Estimasi 1-2 Menit)...");
     
     try {
         var res=await fetch(WH_SUBMIT,{method:"POST",body:fd});
@@ -223,101 +177,114 @@ async function poll(jobId){
         
         var parsed={};
         try{ parsed=JSON.parse(ourRow["Payload"]||"{}"); }catch(e){ return showErr("Gagal membaca hasil JSON."); }
-        render(parsed);
+        
+        // Panggil fungsi render HTML yang baru
+        renderAuditReport(parsed, jobId);
     } catch(e){}
 }
 
-function render(parsed){
-    var c=document.getElementById("result"); c.innerHTML="";
-    var isOk = parsed.status_keseluruhan==="ALL_MATCH";
+/* ============================================================
+   FUNGSI RENDER HTML (SESUAI CONTOH EXCEL & TABEL PROFESIONAL)
+============================================================ */
+function renderAuditReport(parsed, jobId){
+    var c = document.getElementById("result");
+    var isOk = parsed.status_keseluruhan === "ALL_MATCH";
+    var statusText = isOk ? "✅ SEMUA DOKUMEN SINKRON" : "⚠️ DITEMUKAN ANOMALI DATA";
+    var statusColor = isOk ? "var(--success)" : "var(--error)";
 
-    c.innerHTML += `
-        <div class="status-banner ${isOk ? 'ok' : 'err'}">
-            <h2 class="sb-title">${isOk ? '✅ Semua Dokumen Sesuai' : '⚠️ Ditemukan Ketidaksesuaian'}</h2>
-        </div>
-        <div class="summary-bar">
-            <div class="filter-tabs">
-                <button class="ftab active" data-filter="all">Tampilkan Semua</button>
-                <button class="ftab" data-filter="warn">⚠️ Hanya Anomali</button>
-                <button class="ftab" data-filter="ok">✅ Hanya Sesuai</button>
+    // Ekstrak nama kapal jika ada di data antar dokumen
+    let namaKapal = "TIDAK TERDETEKSI";
+    if(parsed.tabel_audit) {
+        let n = parsed.tabel_audit.find(r => r.keterangan && r.keterangan.toLowerCase().includes("kapal"));
+        if(n) namaKapal = n.di_penawaran || n.di_sertifikat || n.di_do;
+    }
+
+    var html = `
+    <div class="card-container">
+        <div class="header-info">
+            <div class="header-info-left">
+                <h2>Laporan Verifikasi Keselamatan</h2>
+                <p><b style="color:var(--text-main)">Vessel / Kapal:</b> ${esc(namaKapal)}</p>
+                <p><b style="color:var(--text-main)">Status Akhir:</b> <span style="color:${statusColor}; font-weight:800; font-size:15px;">${statusText}</span></p>
+            </div>
+            <div class="header-info-right">
+                <div style="margin-bottom:6px;"><strong>Job ID Referensi:</strong><br>${jobId}</div>
+                <div><strong>Waktu Selesai Audit:</strong><br>${new Date().toLocaleString('id-ID')}</div>
             </div>
         </div>
     `;
 
-    var tw = document.createElement("div"); tw.className="table-wrap";
-    var html = `<table class="anomali-table">
-        <thead>
-            <tr>
-                <th style="width:50px" class="center">No</th>
-                <th style="width:25%">Keterangan</th>
-                <th style="width:15%" class="center">Final Quotation / Invoice</th>
-                <th style="width:20%" class="center">Sertifikat</th>
-                <th style="width:15%" class="center">Delivery Order / BA</th>
-                <th style="width:20%">Hasil AI</th>
-            </tr>
-        </thead>
-        <tbody>`;
+    if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
+        // Kelompokkan data berdasarkan 'kategori'
+        var groups = {};
+        parsed.tabel_audit.forEach(row => {
+            var k = row.kategori || "Pemeriksaan Lainnya";
+            if (!groups[k]) groups[k] = [];
+            groups[k].push(row);
+        });
 
-    if(parsed.tabel_audit && parsed.tabel_audit.length > 0) {
-        var currCat = "";
-        var no = 1;
-        var rom = ['i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv','xv','xvi','xvii'];
-
-        parsed.tabel_audit.forEach(function(row){
-            if(row.kategori !== currCat) {
-                html += `<tr class="group-header"><td colspan="6">${esc(row.kategori)}</td></tr>`;
-                currCat = row.kategori;
-                no = 1;
-            }
-            var isWarn = row.hasil_ai && row.hasil_ai.indexOf('⚠') !== -1;
-            var cls = isWarn ? "tr-warn" : "tr-ok";
-            var tdAno = isWarn ? "td-anomali" : "";
-            
-            // Penomoran seperti Excel: Angka (1,2), Huruf (a,b), Romawi Merah (i,ii)
-            var isAntar = currCat.toLowerCase().indexOf("antar") !== -1;
-            var isCekLembar = currCat.toLowerCase().indexOf("semua") !== -1 || currCat.toLowerCase().indexOf("lembar") !== -1;
-            var noStr = isAntar ? no : (isCekLembar ? String.fromCharCode(96+no) : (rom[no-1]||no));
-            var redCls = (!isAntar && !isCekLembar) ? "txt-red" : "";
-            
-            html += `<tr class="item-row ${cls}">
-                <td class="center ${redCls}"><b>${noStr}</b></td>
-                <td class="${redCls}">${esc(row.keterangan)}</td>
-                <td class="${tdAno} center">${esc(row.di_penawaran)}</td>
-                <td class="${tdAno} center">${esc(row.di_sertifikat)}</td>
-                <td class="${tdAno} center">${esc(row.di_do)}</td>
-                <td class="td-ai">${esc(row.hasil_ai)}</td>
+        let tableCounter = 1;
+        for (var kat in groups) {
+            html += `<table>`;
+            html += `<tr class="section-title"><td colspan="6">TABEL ${tableCounter}: ${esc(kat)}</td></tr>`;
+            html += `<tr>
+                <th width="5%" class="center">NO</th>
+                <th width="20%">POIN PEMERIKSAAN</th>
+                <th width="20%">DI PENAWARAN</th>
+                <th width="20%">DI SERTIFIKAT</th>
+                <th width="20%">DI DELIVERY ORDER</th>
+                <th width="15%" class="center">STATUS</th>
             </tr>`;
-            no++;
-        });
-    }
-    html += `</tbody></table>`;
-    tw.innerHTML = html;
-    c.appendChild(tw);
 
-    // Filter Logic
-    document.querySelectorAll(".ftab").forEach(function(btn){
-        btn.addEventListener("click",function(){
-            document.querySelectorAll(".ftab").forEach(b => b.classList.remove("active"));
-            this.classList.add("active");
-            var f = this.dataset.filter;
-            
-            document.querySelectorAll('.item-row').forEach(function(row){
-                if(f === 'all') row.style.display = '';
-                else if(f === 'warn') row.style.display = row.classList.contains('tr-warn') ? '' : 'none';
-                else if(f === 'ok') row.style.display = row.classList.contains('tr-ok') ? '' : 'none';
-            });
-            
-            // Sembunyikan Header Kuning Jika isinya kosong
-            document.querySelectorAll('.group-header').forEach(function(hdr){
-                var show = false, next = hdr.nextElementSibling;
-                while(next && !next.classList.contains('group-header')) {
-                    if(next.style.display !== 'none') { show = true; break; }
-                    next = next.nextElementSibling;
+            groups[kat].forEach((row, idx) => {
+                var hasilAiStr = String(row.hasil_ai || "");
+                var isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.toLowerCase().includes('tidak ada');
+                
+                var statusIcon = isWarn ? '&#10008; BEDA' : '&#10004; MATCH';
+                var statusClass = isWarn ? 'err-cell' : 'ok-cell';
+                var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
+                var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
+
+                // Baris Utama
+                html += `<tr class="item-row">
+                    <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${idx + 1}</td>
+                    <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
+                    <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
+                    <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
+                    <td><div class="${valClass}">${esc(row.di_do)}</div></td>
+                    <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
+                </tr>`;
+
+                // Baris Penjelasan AI (Box di bawahnya)
+                // Hapus teks bawaan prompt seperti "✅ Sesuai" agar catatannya bersih
+                var cleanReason = hasilAiStr.replace(/✅ Sesuai|⚠️ BEDA \/ TIDAK ADA|⚠️ BEDA|⚠️ TIDAK ADA/gi, '').trim();
+                if(!cleanReason || cleanReason === '-' || cleanReason === '') {
+                     cleanReason = isWarn ? "Data tidak sinkron di antara dokumen yang ada atau hilang dari salah satu dokumen." : "Semua data tervalidasi sinkron 100% di semua dokumen.";
                 }
-                hdr.style.display = show ? '' : 'none';
+
+                var expBoxClass = isWarn ? 'border-left:4px solid #c62828;' : 'border-left:4px solid #2e7d32;';
+                var expTitleColor = isWarn ? '#c62828' : '#2e7d32';
+                var expIcon = isWarn ? '&#9888; Analisis AI (Ketidaksesuaian):' : '&#129302; Analisis AI (Valid):';
+
+                html += `<tr class="explanation-row">
+                    <td style="border-right:1px solid var(--border-color);"></td>
+                    <td colspan="5" style="background:#f8fafc;">
+                        <div class="ai-box" style="${expBoxClass}">
+                            <div style="color:${expTitleColor}; font-size:12px; margin-bottom:4px;"><b>${expIcon}</b></div>
+                            <div style="color:#444; font-size:12px; font-weight: 500;">${esc(cleanReason)}</div>
+                        </div>
+                    </td>
+                </tr>`;
             });
-        });
-    });
+            html += `</table>`;
+            tableCounter++;
+        }
+    } else {
+        html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong. AI tidak menemukan data yang relevan.</p>`;
+    }
+
+    html += `</div>`; // Close card-container
+    c.innerHTML = html;
 }
 </script>
 </body>
