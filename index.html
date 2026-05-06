@@ -88,10 +88,11 @@
     <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
 </div>
 
+<!-- CONTAINER LOADING BARU -->
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
     <h3 style="margin-top:20px; color:#1e3a8a;">Proses Audit AI Sedang Berjalan...</h3>
-    <p style="color:#666;" id="loading-txt">Mohon tunggu, dokumen sedang diekstraksi dan diverifikasi secara paralel.</p>
+    <div id="loading-txt" style="margin-top: 15px;"></div>
 </div>
 <div class="error-box" id="err-box"></div>
 
@@ -113,38 +114,72 @@ bindFile("file-penawaran","zone-p","fname-p","fbadge-p");
 bindFile("file-sertifikat","zone-s","fname-s","fbadge-s");
 bindFile("file-do","zone-d","fname-d","fbadge-d");
 
-var pollInt=null;
-var WH_SUBMIT="https://n8.waruna-group.co.id/webhook/audit-dokumen";
-var WH_POLL  ="https://n8.waruna-group.co.id/webhook/check-status-audit";
+var pollInt = null;
+var timerInt = null;
+var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
-function lockUI(txt){
-    document.getElementById("btn-run").disabled=true;
-    document.getElementById("result").innerHTML="";
+// FUNGSI LOCK UI DENGAN LIVE TIMER & ANIMASI
+function lockUI(){
+    document.getElementById("btn-run").disabled = true;
+    document.getElementById("result").innerHTML = "";
     document.getElementById("err-box").classList.remove("show");
     document.getElementById("loading").classList.add("show");
-    if(txt) document.getElementById("loading-txt").textContent=txt;
+    
+    var txtEl = document.getElementById("loading-txt");
+    var startMs = Date.now();
+    
+    clearInterval(timerInt);
+    timerInt = setInterval(function() {
+        var diff = Math.floor((Date.now() - startMs) / 1000);
+        var m = Math.floor(diff / 60).toString().padStart(2, "0");
+        var s = (diff % 60).toString().padStart(2, "0");
+        
+        // Animasi per detik yang diminta user
+        var animArray = ["0---", "-0--", "--0-", "---0"];
+        var anim = animArray[diff % 4]; 
+        
+        txtEl.innerHTML = 
+            "<span style='font-size:24px; font-weight:700; color:var(--primary);'>" + m + ":" + s + "</span><br><br>" +
+            "<span style='font-family:monospace; color:#888; font-size:16px; font-weight:bold;'>[" + anim + "] Mengekstrak & Menilai Data [" + anim + "]</span><br><br>" +
+            "<div style='background:#fef2f2; border:1px solid #fecaca; color:#c62828; padding:10px; border-radius:6px; max-width:400px; margin:0 auto; font-size:12px; font-weight:500;'>" +
+            "Sertifikat kapal berukuran besar bisa memakan waktu pemrosesan AI hingga 15 Menit.<br><br><b>MOHON JANGAN REFRESH HALAMAN INI</b></div>";
+    }, 1000);
 }
+
 function unlockUI(){
-    document.getElementById("btn-run").disabled=false;
+    clearInterval(timerInt);
+    document.getElementById("btn-run").disabled = false;
     document.getElementById("loading").classList.remove("show");
 }
-function showErr(msg){ clearInterval(pollInt); unlockUI(); var e=document.getElementById("err-box"); e.innerHTML="<strong>Kesalahan:</strong> "+msg; e.classList.add("show"); }
+
+function showErr(msg){ 
+    clearInterval(pollInt); 
+    unlockUI(); 
+    var e = document.getElementById("err-box"); 
+    e.innerHTML = "<strong>Kesalahan:</strong> " + msg; 
+    e.classList.add("show"); 
+}
+
 function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
     if(!pI.files.length || !sI.files.length || !dI.files.length) return showErr("Ketiga dokumen wajib diunggah.");
     
-    var jobId="JOB-"+Date.now();
-    var fd=new FormData();
-    fd.append("penawaran",pI.files[0]); fd.append("sertifikat",sI.files[0]); fd.append("surat_jalan",dI.files[0]); fd.append("job_id",jobId);
+    var jobId = "JOB-" + Date.now();
+    var fd = new FormData();
+    fd.append("penawaran", pI.files[0]); 
+    fd.append("sertifikat", sI.files[0]); 
+    fd.append("surat_jalan", dI.files[0]); 
+    fd.append("job_id", jobId);
     
-    lockUI("Sedang Mengirim & Memproses AI (Estimasi 1-2 Menit)...");
+    lockUI(); // Panggil lockUI tanpa parameter teks statis
     
     try {
-        var res=await fetch(WH_SUBMIT,{method:"POST",body:fd});
-        if(!res.ok) throw new Error("Server error HTTP "+res.status);
-        pollInt=setInterval(function(){ poll(jobId); }, 10000);
+        var res = await fetch(WH_SUBMIT, {method:"POST", body:fd});
+        if(!res.ok) throw new Error("Server error HTTP " + res.status);
+        pollInt = setInterval(function(){ poll(jobId); }, 10000);
     } catch(e){ showErr(e.message); }
 });
 
@@ -161,12 +196,12 @@ async function poll(jobId){
         var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
         if(!ourRow) return;
         
-        clearInterval(pollInt); unlockUI();
+        clearInterval(pollInt); 
+        unlockUI();
         
-        // PENTING: Menyambungkan (Concat) Payload 1 sampai 10
         var fullPayloadStr = "";
         if (ourRow["Payload"]) {
-             fullPayloadStr = ourRow["Payload"]; // Backward compatibility
+             fullPayloadStr = ourRow["Payload"];
         } else {
              for(let i=1; i<=10; i++) {
                  fullPayloadStr += (ourRow["Payload" + i] || "");
