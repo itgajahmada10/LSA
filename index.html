@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a; /* Navy Blue Waruna */
+            --primary: #1e3a8a;
             --primary-light: #eff6ff; 
             --border-color: #e0e0e0;
             --text-main: #333;
@@ -27,7 +27,6 @@
             line-height: 1.5;
         }
         
-        /* UPLOAD SECTION (Tetap ada di atas) */
         .app-header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:1rem 1.5rem; border-radius:12px; border:1px solid var(--border-color); margin-bottom: 20px; max-width: 1400px; margin-left: auto; margin-right: auto; }
         .brand-name { font-weight:700; font-size:1.1rem; color:var(--primary); }
         .upload-card { background:#fff; border-radius:12px; padding:2rem; border:1px solid var(--border-color); max-width:1400px; margin: 0 auto 24px auto; }
@@ -36,6 +35,7 @@
         .upload-zone.has-file { border-color:var(--success); background:#f0fdf4; border-style:solid; }
         .uz-label { display:block; font-weight:700; color:var(--primary); font-size:12px; text-transform:uppercase; margin-bottom:10px; }
         .file-input { display:block; width:100%; font-size:12px; color:var(--text-muted); cursor:pointer; }
+        .file-input::file-selector-button { display:block; width:100%; text-align:center; margin-bottom:.5rem; padding:.4rem 1rem; border-radius:var(--radius-md); border:none; font-weight:700; font-size:.75rem; background:var(--primary-light); color:var(--primary); cursor:pointer; }
         .file-badge { display:none; margin-top:10px; font-size:12px; background:#fff; border:1px solid var(--success); border-radius:4px; padding:6px; word-break:break-all; }
         .file-badge.show { display:block; }
         .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:14px; padding:12px; border-radius:8px; border:none; cursor:pointer; text-transform:uppercase; transition: background 0.2s; }
@@ -44,8 +44,10 @@
         .loading-box.show { display:block; }
         .error-box { display:none; background:#ffebee; border-left:4px solid var(--error); padding:1rem; color:var(--error); font-weight:600; border-radius:8px; margin-bottom:20px; max-width:1400px; margin: 0 auto 20px auto;}
         .error-box.show { display:block; }
+        .spinner { width:48px; height:48px; margin:0 auto 1.25rem; border:3px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* TABEL LAPORAN AUDIT (Seperti format yang diminta) */
+        /* TABEL LAPORAN AUDIT */
         .card-container { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px; max-width: 1400px; margin-left: auto; margin-right: auto; }
         table { border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 32px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
         th { background-color: var(--primary-light); color: var(--primary); padding: 12px 10px; text-align: left; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--primary); border-right: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.3px; }
@@ -102,7 +104,8 @@
 </div>
 
 <div class="loading-box" id="loading">
-    <h3 style="margin-top:0; color:#1e3a8a;">Proses Audit AI Sedang Berjalan...</h3>
+    <div class="spinner"></div>
+    <h3 style="margin-top:20px; color:#1e3a8a;">Proses Audit AI Sedang Berjalan...</h3>
     <p style="color:#666;" id="loading-txt">Mohon tunggu, dokumen sedang diekstraksi dan diverifikasi secara paralel.</p>
 </div>
 <div class="error-box" id="err-box"></div>
@@ -175,24 +178,26 @@ async function poll(jobId){
         
         clearInterval(pollInt); unlockUI();
         
-        var parsed={};
-        try{ parsed=JSON.parse(ourRow["Payload"]||"{}"); }catch(e){ return showErr("Gagal membaca hasil JSON."); }
+        // PENTING: Menyambungkan (Concat) bagian Chunk Payload 1, 2, 3 dari Google Sheets
+        var p1 = ourRow["Payload1"] || "";
+        var p2 = ourRow["Payload2"] || "";
+        var p3 = ourRow["Payload3"] || "";
+        var oldP = ourRow["Payload"] || ""; 
+        var fullPayloadStr = oldP ? oldP : (p1 + p2 + p3);
         
-        // Panggil fungsi render HTML yang baru
+        var parsed={};
+        try{ parsed=JSON.parse(fullPayloadStr); }catch(e){ return showErr("Gagal membaca hasil JSON dari AI. Format tidak valid."); }
+        
         renderAuditReport(parsed, jobId);
     } catch(e){}
 }
 
-/* ============================================================
-   FUNGSI RENDER HTML (SESUAI CONTOH EXCEL & TABEL PROFESIONAL)
-============================================================ */
 function renderAuditReport(parsed, jobId){
     var c = document.getElementById("result");
     var isOk = parsed.status_keseluruhan === "ALL_MATCH";
     var statusText = isOk ? "✅ SEMUA DOKUMEN SINKRON" : "⚠️ DITEMUKAN ANOMALI DATA";
     var statusColor = isOk ? "var(--success)" : "var(--error)";
 
-    // Ekstrak nama kapal jika ada di data antar dokumen
     let namaKapal = "TIDAK TERDETEKSI";
     if(parsed.tabel_audit) {
         let n = parsed.tabel_audit.find(r => r.keterangan && r.keterangan.toLowerCase().includes("kapal"));
@@ -215,7 +220,6 @@ function renderAuditReport(parsed, jobId){
     `;
 
     if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
-        // Kelompokkan data berdasarkan 'kategori'
         var groups = {};
         parsed.tabel_audit.forEach(row => {
             var k = row.kategori || "Pemeriksaan Lainnya";
@@ -245,7 +249,6 @@ function renderAuditReport(parsed, jobId){
                 var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
                 var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
 
-                // Baris Utama
                 html += `<tr class="item-row">
                     <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${idx + 1}</td>
                     <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
@@ -255,8 +258,6 @@ function renderAuditReport(parsed, jobId){
                     <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
                 </tr>`;
 
-                // Baris Penjelasan AI (Box di bawahnya)
-                // Hapus teks bawaan prompt seperti "✅ Sesuai" agar catatannya bersih
                 var cleanReason = hasilAiStr.replace(/✅ Sesuai|⚠️ BEDA \/ TIDAK ADA|⚠️ BEDA|⚠️ TIDAK ADA/gi, '').trim();
                 if(!cleanReason || cleanReason === '-' || cleanReason === '') {
                      cleanReason = isWarn ? "Data tidak sinkron di antara dokumen yang ada atau hilang dari salah satu dokumen." : "Semua data tervalidasi sinkron 100% di semua dokumen.";
@@ -283,7 +284,7 @@ function renderAuditReport(parsed, jobId){
         html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong. AI tidak menemukan data yang relevan.</p>`;
     }
 
-    html += `</div>`; // Close card-container
+    html += `</div>`; 
     c.innerHTML = html;
 }
 </script>
