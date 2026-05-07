@@ -275,7 +275,7 @@ function renderAuditReport(parsed, jobId){
                     <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
                     <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
                     <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
-                    <td><div class="${valClass}">${fmtVal(row.di_do)}</div></td>
+                    <td><div class="${valClass}">${esc(row.di_do)}</div></td>
                     <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
                 </tr>`;
 
