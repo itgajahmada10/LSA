@@ -42,7 +42,7 @@
         td { border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 10px 10px; vertical-align: top; }
         th:last-child, td:last-child { border-right: none; }
         tr:last-child td { border-bottom: none; }
-        .item-row td { border-bottom: none !important; } 
+        .item-row td { border-bottom: none !important; transition: opacity 0.2s; } 
         .explanation-row td { padding-top: 4px; padding-bottom: 16px; border-top: none; }
         .ok-cell { background-color: #fcfdfc; text-align: center; vertical-align:middle; border-left:4px solid var(--success);}
         .err-cell { background-color: #fffafb; text-align: center; vertical-align:middle; border-left:4px solid var(--error);}
@@ -222,7 +222,9 @@ function renderAuditReport(parsed, jobId){
             groups[k].push(row);
         });
 
-        // 1. TAMPILKAN TABEL 1 (SERVICE REPORT - SEMUA DITAMPILKAN)
+        // ========================================================
+        // 1. TAMPILKAN TABEL 1 (SERVICE REPORT)
+        // ========================================================
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("DAFTAR LAPORAN SERTIFIKAT") || k.toUpperCase().includes("KELENGKAPAN HEADER"));
         
         if (headerKey && groups[headerKey].length > 0) {
@@ -313,67 +315,78 @@ function renderAuditReport(parsed, jobId){
             html += `</table></div>`;
         }
 
-        // 2. TAMPILKAN TABEL 2 (PERMINTAAN DARI DOKUMEN QUOTATION)
+        // ========================================================
+        // 2. TAMPILKAN TABEL 2 (PENAWARAN - FULL LIST)
+        // ========================================================
+        let penawaranItems = [];
         for (var kat in groups) {
             if (kat === headerKey) continue; 
+            penawaranItems = penawaranItems.concat(groups[kat]);
+        }
 
+        if (penawaranItems.length > 0) {
             html += `<table>`;
             html += `<tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN DARI DOKUMEN QUOTATION / PENAWARAN</td></tr>`;
             html += `<tr>
-                <th width="5%" class="center">NO</th>
-                <th width="20%">POIN PEMERIKSAAN</th>
-                <th width="20%">DI PENAWARAN</th>
+                <th width="5%" class="center">NO URUT</th>
+                <th width="25%">POIN PEMERIKSAAN</th>
+                <th width="15%">DI PENAWARAN</th>
                 <th width="20%">DI SERTIFIKAT</th>
-                <th width="20%">DI DELIVERY ORDER</th>
-                <th width="15%" class="center">STATUS</th>
+                <th width="15%">DI DELIVERY ORDER</th>
+                <th width="20%" class="center">STATUS</th>
             </tr>`;
 
-            // Filter HANYA baris anomali
-            let anomalyRows = groups[kat].filter(row => {
-                let hStr = String(row.hasil_ai || "").toLowerCase();
-                return hStr.includes('⚠') || hStr.includes('anomali') || hStr.includes('beda') || hStr.includes('✘');
-            });
+            penawaranItems.forEach((row, idx) => {
+                var hasilAiStr = String(row.hasil_ai || "");
+                // Deteksi apakah ini error/anomali
+                var isWarn = hasilAiStr.includes('⚠️') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
+                
+                // Deteksi apakah ini Match khusus (Jasa Administrasi yang tidak butuh sertifikat)
+                var isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen') || hasilAiStr.toLowerCase().includes('jasa/administrasi');
+                
+                var statusIcon = isWarn ? '&#10008; ANOMALI' : '&#10004; MATCH';
+                var statusClass = isWarn ? 'err-cell' : 'ok-cell';
+                var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
+                var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
+                
+                // Redupkan opacity jika Match biasa, biarkan terang jika Anomali atau Match Khusus Jasa
+                var rowStyle = (isWarn) ? '' : 'opacity: 0.85;';
 
-            if (anomalyRows.length > 0) {
-                anomalyRows.forEach((row, idx) => {
-                    var hasilAiStr = String(row.hasil_ai || "");
-                    var statusIcon = '&#10008; ANOMALI';
-                    var statusClass = 'err-cell';
-                    var textClass = 'color:#c62828;';
-                    var valClass = 'doc-val doc-val-err';
+                html += `<tr class="item-row" style="${rowStyle}">
+                    <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary); background:#fffafb;">${idx + 1}</td>
+                    <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
+                    <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
+                    <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
+                    <td><div class="${valClass}">${esc(row.di_do)}</div></td>
+                    <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
+                </tr>`;
 
-                    html += `<tr class="item-row">
-                        <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${idx + 1}</td>
-                        <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
-                        <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
-                        <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
-                        <td><div class="${valClass}">${esc(row.di_do)}</div></td>
-                        <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
-                    </tr>`;
-
-                    var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA|✘ ANOMALI/gi, '').trim();
-                    if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') cleanReason = "Ditemukan ketidaksinkronan data atau data hilang antar dokumen.";
+                // Tampilkan Kotak Keterangan HANYA jika Anomali ATAU jika Jasa/Administrasi
+                if (isWarn || isJasa) {
+                    var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|✘ ANOMALI/gi, '').trim();
+                    if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') {
+                        cleanReason = isWarn ? "Ditemukan ketidaksinkronan data atau data hilang antar dokumen." : "Tervalidasi sesuai.";
+                    }
                     if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+
+                    var expBoxClass = isWarn ? 'border-left:4px solid #c62828;' : 'border-left:4px solid #2e7d32;';
+                    var expTitleColor = isWarn ? '#c62828' : '#2e7d32';
+                    var expIcon = isWarn ? '&#9888; Analisis AI (Ketidaksesuaian):' : '&#129302; Analisis AI (Valid):';
 
                     html += `<tr class="explanation-row">
                         <td style="border-right:1px solid var(--border-color);"></td>
-                        <td colspan="5" style="background:#f8fafc;">
-                            <div class="ai-box" style="border-left:4px solid #c62828;">
-                                <div style="color:#c62828; font-size:12px; margin-bottom:4px;"><b>&#9888; Analisis AI (Ketidaksesuaian):</b></div>
-                                <div style="color:#444; font-size:12px; font-weight: 500;">${esc(cleanReason)}</div>
+                        <td colspan=\"5\" style=\"background:#f8fafc;\">
+                            <div class=\"ai-box\" style=\"${expBoxClass}\">
+                                <div style=\"color:${expTitleColor}; font-size:11px; margin-bottom:2px;\"><b>${expIcon}</b></div>
+                                <div style=\"color:#444; font-size:12px; font-weight: 500;\">${esc(cleanReason)}</div>
                             </div>
                         </td>
                     </tr>`;
-                });
-            } else {
-                html += `<tr><td colspan="6" style="text-align:center; padding: 32px; background:#f0fdf4; border-bottom:none;">
-                    <div style="font-size:24px; margin-bottom:8px;">✅</div>
-                    <div style="color:#166534; font-weight:700; font-size:15px;">SEMUA PERMINTAAN MATCH (SESUAI)</div>
-                    <div style="color:#15803d; font-size:12px; margin-top:6px;">Item yang valid disembunyikan secara otomatis untuk mempercepat proses pengecekan.</div>
-                </td></tr>`;
-            }
+                }
+            });
             html += `</table>`;
         }
+
     } else {
         html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong.</p>`;
     }
