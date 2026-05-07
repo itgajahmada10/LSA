@@ -47,6 +47,11 @@
         .ok-cell { background-color: #fcfdfc; text-align: center; vertical-align:middle; border-left:4px solid var(--success);}
         .err-cell { background-color: #fffafb; text-align: center; vertical-align:middle; border-left:4px solid var(--error);}
         .section-title td { background-color: var(--primary); color: white; font-weight: 600; border-bottom: none; padding: 10px 14px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 13px; position: sticky; left: 0; }
+        
+        /* STYLE TAMBAHAN UNTUK GROUPING & PAGE REF */
+        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #0f172a; font-size: 12px; padding: 12px 14px; border-bottom: 1px solid #cbd5e1; }
+        .page-ref { font-size: 10px; color: #64748b; font-weight: 600; display: block; margin-top: 4px; font-style: italic; }
+        
         .header-info { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 2px solid var(--primary-light); }
         .header-info-left h2 { margin: 0 0 8px 0; color: var(--primary); font-size: 22px; text-transform: uppercase;}
         .header-info-left p { margin: 4px 0; font-size: 14px; color: var(--text-muted);}
@@ -189,7 +194,6 @@ function renderAuditReport(parsed, jobId){
     var statusText = isOk ? "✅ SEMUA DOKUMEN SINKRON" : "⚠️ DITEMUKAN ANOMALI DATA";
     var statusColor = isOk ? "var(--success)" : "var(--error)";
 
-    // Ambil nama kapal
     let namaKapal = "TIDAK TERDETEKSI";
     if(parsed.tabel_audit) {
         let n = parsed.tabel_audit.find(r => String(r.di_sertifikat).toLowerCase().includes("name:"));
@@ -223,18 +227,34 @@ function renderAuditReport(parsed, jobId){
         });
 
         // ========================================================
-        // 1. TAMPILKAN TABEL 1 (SERVICE REPORT)
+        // 1. TAMPILKAN TABEL 1 (GROUPING BERDASARKAN CERT NO)
         // ========================================================
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("DAFTAR LAPORAN SERTIFIKAT") || k.toUpperCase().includes("KELENGKAPAN HEADER"));
         
         if (headerKey && groups[headerKey].length > 0) {
+            
+            // Logika Grouping Sertifikat
+            let certGroups = {};
+            groups[headerKey].forEach(r => {
+                let certNo = "TanPA NOMOR SERTIFIKAT";
+                let parts = String(r.di_sertifikat).split('|');
+                parts.forEach(p => {
+                    let kv = p.split(':');
+                    if(kv.length >= 2 && kv[0].trim().toLowerCase().includes("certno")) {
+                        let val = kv.slice(1).join(':').trim();
+                        if(val && val !== "-") certNo = val;
+                    }
+                });
+                if(!certGroups[certNo]) certGroups[certNo] = [];
+                certGroups[certNo].push(r);
+            });
+
             html += `<div class="table-responsive">`;
             html += `<table style="min-width: 1600px;">`;
             html += `<tr class="section-title"><td colspan="14">TABEL 1: DAFTAR LAPORAN SERTIFIKAT (SERVICE REPORT)</td></tr>`;
             html += `<tr>
                 <th width="3%" class="center">NO</th>
-                <th width="8%">NAMA SERTIFIKAT</th>
-                <th width="8%">CERTIFICATE NO</th>
+                <th width="10%">NAMA SERTIFIKAT</th>
                 <th width="10%">NAME OF SHIP</th>
                 <th width="10%">OWNER</th>
                 <th width="7%">IMO NUMBER</th>
@@ -244,74 +264,86 @@ function renderAuditReport(parsed, jobId){
                 <th width="5%">CALL SIGN</th>
                 <th width="7%">MMSI NUMBER</th>
                 <th width="7%">DATE OF SERVICING</th>
-                <th width="12%">TANGGAL TANDA TANGAN</th>
+                <th width="10%">TANGGAL TANDA TANGAN</th>
                 <th width="4%" class="center">STATUS</th>
             </tr>`;
             
-            groups[headerKey].forEach((r, idx) => {
-                let certData = { certificate_no: "-", name_of_ship: "-", owner: "-", imo_number: "-", class: "-", gross_tonnage: "-", nationality: "-", call_sign: "-", mmsi_number: "-", date_of_servicing: "-", tanggal_tanda_tangan: "-" };
+            let globalIdx = 1;
+            
+            for (let certNo in certGroups) {
+                // Header Pemisah antar Nomor Sertifikat
+                html += `<tr class="group-header"><td colspan="14">NOMOR SERTIFIKAT: <span style="color:var(--primary);">${esc(certNo)}</span></td></tr>`;
                 
-                let parts = String(r.di_sertifikat).split('|');
-                parts.forEach(p => {
-                   let kv = p.split(':');
-                   if(kv.length >= 2) {
-                       let key = kv[0].trim().toLowerCase();
-                       let val = kv.slice(1).join(':').trim();
-                       if(key.includes("certno")) certData.certificate_no = val;
-                       if(key.includes("name")) certData.name_of_ship = val;
-                       if(key.includes("owner")) certData.owner = val;
-                       if(key.includes("imo")) certData.imo_number = val;
-                       if(key.includes("class")) certData.class = val;
-                       if(key.includes("gt")) certData.gross_tonnage = val;
-                       if(key.includes("nat")) certData.nationality = val;
-                       if(key.includes("call")) certData.call_sign = val;
-                       if(key.includes("mmsi")) certData.mmsi_number = val;
-                       if(key.includes("date")) certData.date_of_servicing = val;
-                       if(key.includes("sign")) certData.tanggal_tanda_tangan = val;
-                   }
-                });
+                certGroups[certNo].forEach((r) => {
+                    let certData = { certificate_no: "-", name_of_ship: "-", owner: "-", imo_number: "-", class: "-", gross_tonnage: "-", nationality: "-", call_sign: "-", mmsi_number: "-", date_of_servicing: "-", tanggal_tanda_tangan: "-", page: "" };
+                    
+                    let parts = String(r.di_sertifikat).split('|');
+                    parts.forEach(p => {
+                       let kv = p.split(':');
+                       if(kv.length >= 2) {
+                           let key = kv[0].trim().toLowerCase();
+                           let val = kv.slice(1).join(':').trim();
+                           if(key.includes("certno")) certData.certificate_no = val;
+                           if(key.includes("name")) certData.name_of_ship = val;
+                           if(key.includes("owner")) certData.owner = val;
+                           if(key.includes("imo")) certData.imo_number = val;
+                           if(key.includes("class")) certData.class = val;
+                           if(key.includes("gt")) certData.gross_tonnage = val;
+                           if(key.includes("nat")) certData.nationality = val;
+                           if(key.includes("call")) certData.call_sign = val;
+                           if(key.includes("mmsi")) certData.mmsi_number = val;
+                           if(key.includes("date")) certData.date_of_servicing = val;
+                           if(key.includes("sign")) certData.tanggal_tanda_tangan = val;
+                           if(key.includes("page")) certData.page = val;
+                       }
+                    });
 
-                const getV = (key) => certData[key] && certData[key] !== "TIDAK ADA" && certData[key] !== "-" ? certData[key] : "-";
-                
-                let hasilAiStr = String(r.hasil_ai || "");
-                let isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
-                let statusClassH = isWarn ? 'err-cell' : 'ok-cell';
-                let statusColorH = isWarn ? '#c62828' : '#2e7d32';
-                let statusText = isWarn ? '⚠️ ANOMALI' : '✅ MATCH';
+                    const getV = (key) => certData[key] && certData[key] !== "TIDAK ADA" && certData[key] !== "-" ? certData[key] : "-";
+                    
+                    let hasilAiStr = String(r.hasil_ai || "");
+                    let isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
+                    let statusClassH = isWarn ? 'err-cell' : 'ok-cell';
+                    let statusColorH = isWarn ? '#c62828' : '#2e7d32';
+                    let statusText = isWarn ? '⚠️ ANOMALI' : '✅ MATCH';
 
-                html += `<tr class="item-row">
-                    <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${idx + 1}</td>
-                    <td><div class="doc-val" style="font-weight:700; background:#eff6ff;">${esc(r.keterangan)}</div></td>
-                    <td><div class="doc-val">${esc(getV('certificate_no'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('name_of_ship'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('owner'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('imo_number'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('class'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('gross_tonnage'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('nationality'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('call_sign'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('mmsi_number'))}</div></td>
-                    <td><div class="doc-val">${esc(getV('date_of_servicing'))}</div></td>
-                    <td><div class="doc-val" style="font-size:10px;">${esc(getV('tanggal_tanda_tangan'))}</div></td>
-                    <td class="${statusClassH}"><span style="color:${statusColorH}; font-weight:900; font-size:12px;">${statusText}</span></td>
-                </tr>`;
-
-                if (isWarn) {
-                    let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA|✘ ANOMALI/gi, '').trim();
-                    if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') cleanReason = "Ditemukan ketidaksinkronan data.";
-                    if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-
-                    html += `<tr class="explanation-row">
-                        <td style="border-right:1px solid var(--border-color);"></td>
-                        <td colspan="13" style="background:#f8fafc;">
-                            <div class="ai-box" style="border-left:4px solid #c62828;">
-                                <div style="color:#c62828; font-size:12px; margin-bottom:4px;"><b>⚠️ Analisis AI (Ketidaksesuaian):</b></div>
-                                <div style="color:#444; font-size:12px; font-weight: 500;">${esc(cleanReason)}</div>
+                    html += `<tr class="item-row">
+                        <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${globalIdx++}</td>
+                        <td>
+                            <div class="doc-val" style="font-weight:700; background:#eff6ff;">
+                                ${esc(r.keterangan)}
+                                ${certData.page && certData.page !== "-" ? `<span class="page-ref">(Hal ${esc(certData.page)})</span>` : ""}
                             </div>
                         </td>
+                        <td><div class="doc-val">${esc(getV('name_of_ship'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('owner'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('imo_number'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('class'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('gross_tonnage'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('nationality'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('call_sign'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('mmsi_number'))}</div></td>
+                        <td><div class="doc-val">${esc(getV('date_of_servicing'))}</div></td>
+                        <td><div class="doc-val" style="font-size:10px;">${esc(getV('tanggal_tanda_tangan'))}</div></td>
+                        <td class="${statusClassH}"><span style="color:${statusColorH}; font-weight:900; font-size:12px;">${statusText}</span></td>
                     </tr>`;
-                }
-            });
+
+                    if (isWarn) {
+                        let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA|✘ ANOMALI/gi, '').trim();
+                        if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') cleanReason = "Ditemukan ketidaksinkronan data.";
+                        if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+
+                        html += `<tr class="explanation-row">
+                            <td style="border-right:1px solid var(--border-color);"></td>
+                            <td colspan="12" style="background:#f8fafc;">
+                                <div class="ai-box" style="border-left:4px solid #c62828;">
+                                    <div style="color:#c62828; font-size:12px; margin-bottom:4px;"><b>⚠️ Analisis AI (Ketidaksesuaian):</b></div>
+                                    <div style="color:#444; font-size:12px; font-weight: 500;">${esc(cleanReason)}</div>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }
+                });
+            }
             html += `</table></div>`;
         }
 
@@ -338,18 +370,13 @@ function renderAuditReport(parsed, jobId){
 
             penawaranItems.forEach((row, idx) => {
                 var hasilAiStr = String(row.hasil_ai || "");
-                // Deteksi apakah ini error/anomali
                 var isWarn = hasilAiStr.includes('⚠️') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
-                
-                // Deteksi apakah ini Match khusus (Jasa Administrasi yang tidak butuh sertifikat)
                 var isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen') || hasilAiStr.toLowerCase().includes('jasa/administrasi');
                 
                 var statusIcon = isWarn ? '&#10008; ANOMALI' : '&#10004; MATCH';
                 var statusClass = isWarn ? 'err-cell' : 'ok-cell';
                 var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
                 var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
-                
-                // Redupkan opacity jika Match biasa, biarkan terang jika Anomali atau Match Khusus Jasa
                 var rowStyle = (isWarn) ? '' : 'opacity: 0.85;';
 
                 html += `<tr class="item-row" style="${rowStyle}">
@@ -361,7 +388,6 @@ function renderAuditReport(parsed, jobId){
                     <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
                 </tr>`;
 
-                // Tampilkan Kotak Keterangan HANYA jika Anomali ATAU jika Jasa/Administrasi
                 if (isWarn || isJasa) {
                     var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|✘ ANOMALI/gi, '').trim();
                     if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') {
