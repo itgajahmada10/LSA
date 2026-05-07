@@ -38,10 +38,9 @@
         .spinner { width:48px; height:48px; margin:0 auto 1.25rem; border:3px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* TABEL LAPORAN AUDIT */
         .card-container { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px; max-width: 1400px; margin-left: auto; margin-right: auto; }
         table { border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 32px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-        th { background-color: var(--primary-light); color: var(--primary); padding: 12px 10px; text-align: left; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--primary); border-right: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.3px; }
+        th { background-color: var(--primary-light); color: var(--primary); padding: 12px 10px; text-align: left; font-size: 11px; font-weight: 700; border-bottom: 2px solid var(--primary); border-right: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.3px; }
         td { border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 10px 10px; vertical-align: top; }
         th:last-child, td:last-child { border-right: none; }
         tr:last-child td { border-bottom: none; }
@@ -56,7 +55,7 @@
         .header-info-right { text-align: right; font-size: 12px; color: var(--text-muted); background: var(--primary-light); padding: 12px 16px; border-radius: 8px; border: 1px solid #dbeafe;}
         .header-info-right strong { color: var(--primary); }
         .ai-box { background:#fff; border:1px solid #ebebeb; padding:10px 14px; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
-        .doc-val { font-size: 12px; color: #444; background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; min-height: 20px;}
+        .doc-val { font-size: 11px; color: #444; background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; min-height: 20px;}
         .doc-val-err { font-weight: 600; color: var(--error); background: #fef2f2; border-color: #fecaca; }
         @media (max-width:768px) { .upload-grid { grid-template-columns:1fr; } }
     </style>
@@ -136,8 +135,8 @@ function lockUI(){
         
         txtEl.innerHTML = 
             "<span style='font-size:24px; font-weight:700; color:var(--primary);'>" + m + ":" + s + "</span>" +
-            "<span style='font-family:monospace; color:#888; font-size:16px; font-weight:bold;'>[" + anim + "] Mengekstrak & Menilai Data [" + anim + "]</span>" +
-            "<div style='background:#fef2f2; border:1px solid #fecaca; color:#c62828; padding:10px; border-radius:6px; max-width:400px; margin:0 auto; font-size:12px; font-weight:500;'>" +
+            "<br><span style='font-family:monospace; color:#888; font-size:16px; font-weight:bold;'>[" + anim + "] Mengekstrak & Menilai Data [" + anim + "]</span>" +
+            "<div style='background:#fef2f2; border:1px solid #fecaca; color:#c62828; padding:10px; border-radius:6px; max-width:400px; margin:10px auto; font-size:12px; font-weight:500;'>" +
             "Proses Estafet AI Berjalan. Jangan tutup halaman ini.</div>";
     }, 1000);
 }
@@ -160,19 +159,16 @@ function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;"
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    
-    // Validasi DO DiHapus (Dibuat Opsional)
     if(!pI.files.length || !sI.files.length) return showErr("Dokumen Penawaran dan Sertifikat wajib diunggah.");
     
     var jobId = "JOB-" + Date.now();
     var fd = new FormData();
     fd.append("penawaran", pI.files[0]); 
     fd.append("sertifikat", sI.files[0]); 
-    if(dI.files.length > 0) fd.append("surat_jalan", dI.files[0]); // Lampirkan jika ada
+    if(dI.files.length > 0) fd.append("surat_jalan", dI.files[0]);
     fd.append("job_id", jobId);
     
     lockUI();
-    
     try {
         var res = await fetch(WH_SUBMIT, {method:"POST", body:fd});
         if(!res.ok) throw new Error("Server error HTTP " + res.status);
@@ -233,21 +229,69 @@ function renderAuditReport(parsed, jobId){
                 <p><b style="color:var(--text-main)">Status Akhir:</b> <span style="color:${statusColor}; font-weight:800; font-size:15px;">${statusText}</span></p>
             </div>
             <div class="header-info-right">
-                <div style="margin-bottom:6px;"><strong>Job ID Referensi:</strong>${jobId}</div>
-                <div><strong>Waktu Selesai Audit:</strong>${new Date().toLocaleString('id-ID')}</div>
+                <div style="margin-bottom:6px;"><strong>Job ID Referensi:</strong> ${jobId}</div>
+                <div><strong>Waktu Selesai Audit:</strong> ${new Date().toLocaleString('id-ID')}</div>
             </div>
         </div>
     `;
 
     if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
+        
+        // --- LOGIKA TABEL 1 (HORIZONTAL) ---
+        let headerData = {};
+        let headerStatus = "✅ MATCH";
+        let signData = "-";
+
+        parsed.tabel_audit.forEach(r => {
+            let kat = r.kategori || "";
+            if (kat.toUpperCase().includes("KELENGKAPAN HEADER")) {
+                headerData[r.keterangan.toUpperCase()] = r.di_sertifikat;
+                if (r.hasil_ai && r.hasil_ai.includes('⚠')) headerStatus = "⚠️ ANOMALI";
+            }
+            if (kat.toUpperCase().includes("VALIDASI TANGGAL")) {
+                signData = r.di_sertifikat;
+                if (r.hasil_ai && r.hasil_ai.includes('⚠')) headerStatus = "⚠️ ANOMALI";
+            }
+        });
+
+        const getV = (key) => headerData[key] && headerData[key] !== "TIDAK ADA" && headerData[key] !== "-" ? headerData[key] : "-";
+        let statusClassH = headerStatus.includes('⚠') ? 'err-cell' : 'ok-cell';
+        let statusColorH = headerStatus.includes('⚠') ? '#c62828' : '#2e7d32';
+
+        html += `<table>`;
+        html += `<tr class="section-title"><td colspan="8">TABEL 1: KELENGKAPAN SERTIFIKAT</td></tr>`;
+        html += `<tr>
+            <th width="5%" class="center">NO</th>
+            <th width="15%">NAMA SERTIFIKAT</th>
+            <th width="15%">NAME OF SHIP</th>
+            <th width="15%">OWNER</th>
+            <th width="10%">IMO NUMBER</th>
+            <th width="10%">DAN LAIN"</th>
+            <th width="20%">VALIDASI TANGGAL & TANDA TANGAN</th>
+            <th width="10%" class="center">STATUS</th>
+        </tr>`;
+        html += `<tr class="item-row">
+            <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">1</td>
+            <td><div class="doc-val" style="font-weight:700; background:#eff6ff;">Laporan LSA/FFA</div></td>
+            <td><div class="doc-val">${esc(getV('NAME OF SHIP'))}</div></td>
+            <td><div class="doc-val">${esc(getV('OWNER'))}</div></td>
+            <td><div class="doc-val">${esc(getV('IMO NUMBER'))}</div></td>
+            <td><div class="doc-val" style="font-size:10px;">Call Sign: ${esc(getV('CALL SIGN'))}<br>Class: ${esc(getV('CLASS'))}</div></td>
+            <td><div class="doc-val" style="font-size:10px;">${esc(signData)}</div></td>
+            <td class="${statusClassH}"><span style="color:${statusColorH}; font-weight:900; font-size:12px;">${headerStatus}</span></td>
+        </tr>`;
+        html += `</table>`;
+
+        // --- LOGIKA TABEL 2+ (VERTIKAL) ---
         var groups = {};
         parsed.tabel_audit.forEach(row => {
             var k = row.kategori || "Pemeriksaan Lainnya";
+            if (k.toUpperCase().includes("KELENGKAPAN HEADER") || k.toUpperCase().includes("VALIDASI TANGGAL")) return; 
             if (!groups[k]) groups[k] = [];
             groups[k].push(row);
         });
 
-        let tableCounter = 1;
+        let tableCounter = 2;
         for (var kat in groups) {
             html += `<table>`;
             html += `<tr class="section-title"><td colspan="6">TABEL ${tableCounter}: ${esc(kat)}</td></tr>`;
@@ -262,9 +306,7 @@ function renderAuditReport(parsed, jobId){
 
             groups[kat].forEach((row, idx) => {
                 var hasilAiStr = String(row.hasil_ai || "");
-                // Logika Pendeteksi ANOMALI baru
                 var isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali');
-                
                 var statusIcon = isWarn ? '&#10008; ANOMALI' : '&#10004; MATCH';
                 var statusClass = isWarn ? 'err-cell' : 'ok-cell';
                 var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
@@ -280,21 +322,16 @@ function renderAuditReport(parsed, jobId){
                 </tr>`;
 
                 var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA/gi, '').trim();
-                // Jika alasan bersih kosong/hanya titik
                 if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') {
                      cleanReason = isWarn ? "Ditemukan ketidaksinkronan data atau data hilang antar dokumen." : "Semua data tervalidasi sinkron 100%.";
                 }
                 if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
 
-                var expBoxClass = isWarn ? 'border-left:4px solid #c62828;' : 'border-left:4px solid #2e7d32;';
-                var expTitleColor = isWarn ? '#c62828' : '#2e7d32';
-                var expIcon = isWarn ? '&#9888; Analisis AI (Ketidaksesuaian):' : '&#129302; Analisis AI (Valid):';
-
                 html += `<tr class="explanation-row">
                     <td style="border-right:1px solid var(--border-color);"></td>
                     <td colspan="5" style="background:#f8fafc;">
-                        <div class="ai-box" style="${expBoxClass}">
-                            <div style="color:${expTitleColor}; font-size:12px; margin-bottom:4px;"><b>${expIcon}</b></div>
+                        <div class="ai-box" style="border-left:4px solid ${isWarn ? '#c62828' : '#2e7d32'};">
+                            <div style="color:${isWarn ? '#c62828' : '#2e7d32'}; font-size:12px; margin-bottom:4px;"><b>${isWarn ? '&#9888; Analisis AI (Ketidaksesuaian):' : '&#129302; Analisis AI (Valid):'}</b></div>
                             <div style="color:#444; font-size:12px; font-weight: 500;">${esc(cleanReason)}</div>
                         </div>
                     </td>
@@ -304,9 +341,8 @@ function renderAuditReport(parsed, jobId){
             tableCounter++;
         }
     } else {
-        html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong. AI tidak menemukan data yang relevan.</p>`;
+        html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong.</p>`;
     }
-
     html += `</div>`; 
     c.innerHTML = html;
 }
