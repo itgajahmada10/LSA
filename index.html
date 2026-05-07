@@ -189,6 +189,7 @@ function renderAuditReport(parsed, jobId){
     var statusText = isOk ? "✅ SEMUA DOKUMEN SINKRON" : "⚠️ DITEMUKAN ANOMALI DATA";
     var statusColor = isOk ? "var(--success)" : "var(--error)";
 
+    // Ambil nama kapal
     let namaKapal = "TIDAK TERDETEKSI";
     if(parsed.tabel_audit) {
         let n = parsed.tabel_audit.find(r => String(r.di_sertifikat).toLowerCase().includes("name:"));
@@ -221,7 +222,7 @@ function renderAuditReport(parsed, jobId){
             groups[k].push(row);
         });
 
-        // 1. TAMPILKAN TABEL 1 SECARA KESELURUHAN (TIDAK DI-HIDE)
+        // 1. TAMPILKAN TABEL 1 (SERVICE REPORT - SEMUA DITAMPILKAN)
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("DAFTAR LAPORAN SERTIFIKAT") || k.toUpperCase().includes("KELENGKAPAN HEADER"));
         
         if (headerKey && groups[headerKey].length > 0) {
@@ -312,13 +313,12 @@ function renderAuditReport(parsed, jobId){
             html += `</table></div>`;
         }
 
-        // 2. TAMPILKAN TABEL 2+ (VERTIKAL) - HANYA TAMPILKAN ANOMALI
-        let tableCounter = 2;
+        // 2. TAMPILKAN TABEL 2 (PERMINTAAN DARI DOKUMEN QUOTATION)
         for (var kat in groups) {
             if (kat === headerKey) continue; 
 
             html += `<table>`;
-            html += `<tr class="section-title"><td colspan="6">TABEL ${tableCounter}: ${esc(kat)}</td></tr>`;
+            html += `<tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN DARI DOKUMEN QUOTATION / PENAWARAN</td></tr>`;
             html += `<tr>
                 <th width="5%" class="center">NO</th>
                 <th width="20%">POIN PEMERIKSAAN</th>
@@ -328,14 +328,13 @@ function renderAuditReport(parsed, jobId){
                 <th width="15%" class="center">STATUS</th>
             </tr>`;
 
-            // Filter khusus untuk mengambil baris anomali saja
+            // Filter HANYA baris anomali
             let anomalyRows = groups[kat].filter(row => {
                 let hStr = String(row.hasil_ai || "").toLowerCase();
                 return hStr.includes('⚠') || hStr.includes('anomali') || hStr.includes('beda') || hStr.includes('✘');
             });
 
             if (anomalyRows.length > 0) {
-                // Gambar baris anomali
                 anomalyRows.forEach((row, idx) => {
                     var hasilAiStr = String(row.hasil_ai || "");
                     var statusIcon = '&#10008; ANOMALI';
@@ -367,16 +366,13 @@ function renderAuditReport(parsed, jobId){
                     </tr>`;
                 });
             } else {
-                // Jika tidak ada anomali sama sekali (semua match)
                 html += `<tr><td colspan="6" style="text-align:center; padding: 32px; background:#f0fdf4; border-bottom:none;">
                     <div style="font-size:24px; margin-bottom:8px;">✅</div>
-                    <div style="color:#166534; font-weight:700; font-size:15px;">SEMUA ITEM MATCH (SESUAI)</div>
-                    <div style="color:#15803d; font-size:12px; margin-top:6px;">Item yang valid disembunyikan secara otomatis untuk mempercepat proses pengecekan dokumen.</div>
+                    <div style="color:#166534; font-weight:700; font-size:15px;">SEMUA PERMINTAAN MATCH (SESUAI)</div>
+                    <div style="color:#15803d; font-size:12px; margin-top:6px;">Item yang valid disembunyikan secara otomatis untuk mempercepat proses pengecekan.</div>
                 </td></tr>`;
             }
-            
             html += `</table>`;
-            tableCounter++;
         }
     } else {
         html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong.</p>`;
