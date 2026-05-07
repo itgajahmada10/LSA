@@ -189,7 +189,6 @@ function renderAuditReport(parsed, jobId){
     var statusText = isOk ? "✅ SEMUA DOKUMEN SINKRON" : "⚠️ DITEMUKAN ANOMALI DATA";
     var statusColor = isOk ? "var(--success)" : "var(--error)";
 
-    // Ambil nama kapal dari baris mana saja jika tersedia
     let namaKapal = "TIDAK TERDETEKSI";
     if(parsed.tabel_audit) {
         let n = parsed.tabel_audit.find(r => String(r.di_sertifikat).toLowerCase().includes("name:"));
@@ -222,7 +221,7 @@ function renderAuditReport(parsed, jobId){
             groups[k].push(row);
         });
 
-        // Tampilkan Tabel 1 (Horizontal - Multi Baris Service Report)
+        // 1. TAMPILKAN TABEL 1 SECARA KESELURUHAN (TIDAK DI-HIDE)
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("DAFTAR LAPORAN SERTIFIKAT") || k.toUpperCase().includes("KELENGKAPAN HEADER"));
         
         if (headerKey && groups[headerKey].length > 0) {
@@ -249,7 +248,6 @@ function renderAuditReport(parsed, jobId){
             groups[headerKey].forEach((r, idx) => {
                 let certData = { certificate_no: "-", name_of_ship: "-", owner: "-", imo_number: "-", class: "-", gross_tonnage: "-", nationality: "-", call_sign: "-", mmsi_number: "-", date_of_servicing: "-", tanggal_tanda_tangan: "-" };
                 
-                // Parsing data string gabungan dari AI n8n
                 let parts = String(r.di_sertifikat).split('|');
                 parts.forEach(p => {
                    let kv = p.split(':');
@@ -273,7 +271,7 @@ function renderAuditReport(parsed, jobId){
                 const getV = (key) => certData[key] && certData[key] !== "TIDAK ADA" && certData[key] !== "-" ? certData[key] : "-";
                 
                 let hasilAiStr = String(r.hasil_ai || "");
-                let isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali');
+                let isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
                 let statusClassH = isWarn ? 'err-cell' : 'ok-cell';
                 let statusColorH = isWarn ? '#c62828' : '#2e7d32';
                 let statusText = isWarn ? '⚠️ ANOMALI' : '✅ MATCH';
@@ -295,9 +293,8 @@ function renderAuditReport(parsed, jobId){
                     <td class="${statusClassH}"><span style="color:${statusColorH}; font-weight:900; font-size:12px;">${statusText}</span></td>
                 </tr>`;
 
-                // HANYA TAMPILKAN ALASAN JIKA ANOMALI
                 if (isWarn) {
-                    let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA/gi, '').trim();
+                    let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA|✘ ANOMALI/gi, '').trim();
                     if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') cleanReason = "Ditemukan ketidaksinkronan data.";
                     if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
 
@@ -315,10 +312,10 @@ function renderAuditReport(parsed, jobId){
             html += `</table></div>`;
         }
 
-        // Tampilkan Tabel 2+ (Vertikal Standar)
-        let tableCounter = 2; // Mulai dari Tabel 2 karena Umum1 dihapus
+        // 2. TAMPILKAN TABEL 2+ (VERTIKAL) - HANYA TAMPILKAN ANOMALI
+        let tableCounter = 2;
         for (var kat in groups) {
-            if (kat === headerKey) continue; // Skip Tabel 1
+            if (kat === headerKey) continue; 
 
             html += `<table>`;
             html += `<tr class="section-title"><td colspan="6">TABEL ${tableCounter}: ${esc(kat)}</td></tr>`;
@@ -331,26 +328,31 @@ function renderAuditReport(parsed, jobId){
                 <th width="15%" class="center">STATUS</th>
             </tr>`;
 
-            groups[kat].forEach((row, idx) => {
-                var hasilAiStr = String(row.hasil_ai || "");
-                var isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali');
-                var statusIcon = isWarn ? '&#10008; ANOMALI' : '&#10004; MATCH';
-                var statusClass = isWarn ? 'err-cell' : 'ok-cell';
-                var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
-                var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
+            // Filter khusus untuk mengambil baris anomali saja
+            let anomalyRows = groups[kat].filter(row => {
+                let hStr = String(row.hasil_ai || "").toLowerCase();
+                return hStr.includes('⚠') || hStr.includes('anomali') || hStr.includes('beda') || hStr.includes('✘');
+            });
 
-                html += `<tr class="item-row">
-                    <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${idx + 1}</td>
-                    <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
-                    <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
-                    <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
-                    <td><div class="${valClass}">${esc(row.di_do)}</div></td>
-                    <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
-                </tr>`;
+            if (anomalyRows.length > 0) {
+                // Gambar baris anomali
+                anomalyRows.forEach((row, idx) => {
+                    var hasilAiStr = String(row.hasil_ai || "");
+                    var statusIcon = '&#10008; ANOMALI';
+                    var statusClass = 'err-cell';
+                    var textClass = 'color:#c62828;';
+                    var valClass = 'doc-val doc-val-err';
 
-                // HANYA TAMPILKAN ALASAN JIKA ANOMALI
-                if (isWarn) {
-                    var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA/gi, '').trim();
+                    html += `<tr class="item-row">
+                        <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${idx + 1}</td>
+                        <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
+                        <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
+                        <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
+                        <td><div class="${valClass}">${esc(row.di_do)}</div></td>
+                        <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
+                    </tr>`;
+
+                    var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA|✘ ANOMALI/gi, '').trim();
                     if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') cleanReason = "Ditemukan ketidaksinkronan data atau data hilang antar dokumen.";
                     if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
 
@@ -363,8 +365,16 @@ function renderAuditReport(parsed, jobId){
                             </div>
                         </td>
                     </tr>`;
-                }
-            });
+                });
+            } else {
+                // Jika tidak ada anomali sama sekali (semua match)
+                html += `<tr><td colspan="6" style="text-align:center; padding: 32px; background:#f0fdf4; border-bottom:none;">
+                    <div style="font-size:24px; margin-bottom:8px;">✅</div>
+                    <div style="color:#166534; font-weight:700; font-size:15px;">SEMUA ITEM MATCH (SESUAI)</div>
+                    <div style="color:#15803d; font-size:12px; margin-top:6px;">Item yang valid disembunyikan secara otomatis untuk mempercepat proses pengecekan dokumen.</div>
+                </td></tr>`;
+            }
+            
             html += `</table>`;
             tableCounter++;
         }
