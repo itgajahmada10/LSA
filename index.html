@@ -80,7 +80,7 @@
             <div class="file-badge" id="fbadge-s"><strong id="fname-s">—</strong></div>
         </div>
         <div class="upload-zone" id="zone-d">
-            <span class="uz-label">📄 Surat Jalan / DO</span>
+            <span class="uz-label">📄 Surat Jalan / DO (Opsional)</span>
             <input type="file" id="file-do" class="file-input" accept="application/pdf">
             <div class="file-badge" id="fbadge-d"><strong id="fname-d">—</strong></div>
         </div>
@@ -88,7 +88,6 @@
     <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
 </div>
 
-<!-- CONTAINER LOADING BARU -->
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
     <h3 style="margin-top:20px; color:#1e3a8a;">Proses Audit AI Sedang Berjalan...</h3>
@@ -96,7 +95,6 @@
 </div>
 <div class="error-box" id="err-box"></div>
 
-<!-- HASIL AUDIT -->
 <div id="result"></div>
 
 <script>
@@ -119,7 +117,6 @@ var timerInt = null;
 var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
 var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
-// FUNGSI LOCK UI DENGAN LIVE TIMER & ANIMASI
 function lockUI(){
     document.getElementById("btn-run").disabled = true;
     document.getElementById("result").innerHTML = "";
@@ -134,16 +131,14 @@ function lockUI(){
         var diff = Math.floor((Date.now() - startMs) / 1000);
         var m = Math.floor(diff / 60).toString().padStart(2, "0");
         var s = (diff % 60).toString().padStart(2, "0");
-        
-        // Animasi per detik yang diminta user
         var animArray = ["0---", "-0--", "--0-", "---0"];
         var anim = animArray[diff % 4]; 
         
         txtEl.innerHTML = 
-            "<span style='font-size:24px; font-weight:700; color:var(--primary);'>" + m + ":" + s + "</span><br><br>" +
-            "<span style='font-family:monospace; color:#888; font-size:16px; font-weight:bold;'>[" + anim + "] Mengekstrak & Menilai Data [" + anim + "]</span><br><br>" +
+            "<span style='font-size:24px; font-weight:700; color:var(--primary);'>" + m + ":" + s + "</span>" +
+            "<span style='font-family:monospace; color:#888; font-size:16px; font-weight:bold;'>[" + anim + "] Mengekstrak & Menilai Data [" + anim + "]</span>" +
             "<div style='background:#fef2f2; border:1px solid #fecaca; color:#c62828; padding:10px; border-radius:6px; max-width:400px; margin:0 auto; font-size:12px; font-weight:500;'>" +
-            "Sertifikat kapal berukuran besar bisa memakan waktu pemrosesan AI hingga 15 Menit.<br><br><b>MOHON JANGAN REFRESH HALAMAN INI</b></div>";
+            "Proses Estafet AI Berjalan. Jangan tutup halaman ini.</div>";
     }, 1000);
 }
 
@@ -165,16 +160,18 @@ function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;"
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    if(!pI.files.length || !sI.files.length || !dI.files.length) return showErr("Ketiga dokumen wajib diunggah.");
+    
+    // Validasi DO DiHapus (Dibuat Opsional)
+    if(!pI.files.length || !sI.files.length) return showErr("Dokumen Penawaran dan Sertifikat wajib diunggah.");
     
     var jobId = "JOB-" + Date.now();
     var fd = new FormData();
     fd.append("penawaran", pI.files[0]); 
     fd.append("sertifikat", sI.files[0]); 
-    fd.append("surat_jalan", dI.files[0]); 
+    if(dI.files.length > 0) fd.append("surat_jalan", dI.files[0]); // Lampirkan jika ada
     fd.append("job_id", jobId);
     
-    lockUI(); // Panggil lockUI tanpa parameter teks statis
+    lockUI();
     
     try {
         var res = await fetch(WH_SUBMIT, {method:"POST", body:fd});
@@ -236,8 +233,8 @@ function renderAuditReport(parsed, jobId){
                 <p><b style="color:var(--text-main)">Status Akhir:</b> <span style="color:${statusColor}; font-weight:800; font-size:15px;">${statusText}</span></p>
             </div>
             <div class="header-info-right">
-                <div style="margin-bottom:6px;"><strong>Job ID Referensi:</strong><br>${jobId}</div>
-                <div><strong>Waktu Selesai Audit:</strong><br>${new Date().toLocaleString('id-ID')}</div>
+                <div style="margin-bottom:6px;"><strong>Job ID Referensi:</strong>${jobId}</div>
+                <div><strong>Waktu Selesai Audit:</strong>${new Date().toLocaleString('id-ID')}</div>
             </div>
         </div>
     `;
@@ -265,9 +262,10 @@ function renderAuditReport(parsed, jobId){
 
             groups[kat].forEach((row, idx) => {
                 var hasilAiStr = String(row.hasil_ai || "");
-                var isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.toLowerCase().includes('tidak ada');
+                // Logika Pendeteksi ANOMALI baru
+                var isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali');
                 
-                var statusIcon = isWarn ? '&#10008; BEDA' : '&#10004; MATCH';
+                var statusIcon = isWarn ? '&#10008; ANOMALI' : '&#10004; MATCH';
                 var statusClass = isWarn ? 'err-cell' : 'ok-cell';
                 var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
                 var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
@@ -281,10 +279,12 @@ function renderAuditReport(parsed, jobId){
                     <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
                 </tr>`;
 
-                var cleanReason = hasilAiStr.replace(/✅ Sesuai|⚠️ BEDA \/ TIDAK ADA|⚠️ BEDA|⚠️ TIDAK ADA/gi, '').trim();
-                if(!cleanReason || cleanReason === '-' || cleanReason === '') {
-                     cleanReason = isWarn ? "Data tidak sinkron di antara dokumen yang ada atau hilang dari salah satu dokumen." : "Semua data tervalidasi sinkron 100% di semua dokumen.";
+                var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA/gi, '').trim();
+                // Jika alasan bersih kosong/hanya titik
+                if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') {
+                     cleanReason = isWarn ? "Ditemukan ketidaksinkronan data atau data hilang antar dokumen." : "Semua data tervalidasi sinkron 100%.";
                 }
+                if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
 
                 var expBoxClass = isWarn ? 'border-left:4px solid #c62828;' : 'border-left:4px solid #2e7d32;';
                 var expTitleColor = isWarn ? '#c62828' : '#2e7d32';
