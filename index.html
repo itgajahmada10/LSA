@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Verifikasi Dokumen Keselamatan</title>
+    <title>Waruna Group | Verifikasi Dokumen Keselamatan V7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -64,7 +64,7 @@
 <body>
 
 <header class="app-header">
-    <div class="brand-name">WARUNA GROUP | Audit Dokumen AI</div>
+    <div class="brand-name">WARUNA GROUP | Audit Dokumen AI V7</div>
 </header>
 
 <div class="upload-card">
@@ -275,7 +275,7 @@ function renderAuditReport(parsed, jobId){
                     <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
                     <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
                     <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
-                    <td><div class="${valClass}">${esc(row.di_do)}</div></td>
+                    <td><div class="${valClass}">${fmtVal(row.di_do)}</div></td>
                     <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
                 </tr>`;
 
