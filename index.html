@@ -3,130 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Audit Keselamatan V7</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Waruna Group | Smart Audit Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a; --primary-light: #eff6ff; 
-            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
-            --success: #15803d; --error: #b91c1c;
-            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; --border-system: #7dd3fc; 
-            --bg-code: #f0fdf4; --border-code: #86efac;     
+            --primary: #1d4ed8; --primary-hover: #1e40af; --primary-light: #eff6ff;
+            --bg-body: #f1f5f9; --bg-card: #ffffff;
+            --text-dark: #0f172a; --text-muted: #64748b; --text-light: #94a3b8;
+            --border: #e2e8f0;
+            --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+            --error: #dc2626; --error-bg: #fef2f2; --error-border: #fecaca;
+            --warn: #d97706; --warn-bg: #fffbeb; --warn-border: #fde68a;
         }
-        
-        body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f8fafc; margin: 0; padding: 10px; line-height: 1.3; }
-        
-        /* HEADER STICKY & NAMA KAPAL */
-        .app-header { 
-            display:flex; justify-content:space-between; align-items:center; 
-            background:#fff; padding:0.8rem 1rem; border-radius:8px; 
-            border:1px solid var(--border-color); margin-bottom: 10px; 
-            max-width: 1200px; margin-left: auto; margin-right: auto;
-            position: sticky; top: 10px; z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .brand-name { font-weight:800; font-size:1.1rem; color:var(--primary); text-transform: uppercase; }
-        .ship-name-badge { color: #d97706; font-weight: 800; border-left: 2px solid #cbd5e1; margin-left: 10px; padding-left: 10px; }
 
-        .upload-card { background:#fff; border-radius:8px; padding:1rem; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto 15px auto; }
-        .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1rem; }
-        .upload-zone { border:1px dashed #cbd5e1; border-radius:8px; padding:0.8rem; text-align:center; background:#f8fafc; }
-        .upload-zone.has-file { border-color:var(--success); background:#f0fdf4; border-style:solid; }
-        .uz-label { display:block; font-weight:700; color:var(--primary); font-size:10px; text-transform:uppercase; margin-bottom:5px; }
-        .file-input { width:100%; font-size:10px; cursor: pointer; }
-        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:800; font-size:13px; padding:12px; border-radius:6px; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; }
-        .btn-run:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .loading-box { display:none; text-align:center; padding:2rem; background:#fff; border-radius:8px; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto; }
-        .loading-box.show { display:block; }
-        .spinner { width:35px; height:35px; margin:0 auto 15px; border:4px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
+        body { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-dark); background: var(--bg-body); margin: 0; padding: 0; line-height: 1.5; }
+        * { box-sizing: border-box; }
 
-        /* ACTION BAR (FILTER & DOWNLOAD) */
-        .action-bar { display:flex; justify-content:space-between; align-items:center; background: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 1200px; margin: 0 auto 15px auto; }
-        .filter-group { display: flex; gap: 8px; }
-        .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: all 0.2s; }
-        .btn-action.active { background: var(--primary); color: #fff; }
-        .btn-action:hover { background: var(--primary-light); color: var(--primary); }
-        .btn-action.active:hover { background: var(--primary); color: #fff; }
-        .btn-download { border-color: var(--success); color: var(--success); }
-        .btn-download:hover { background: #f0fdf4; color: var(--success); }
+        /* UPLOAD SECTION (Hides after upload) */
+        #upload-section { max-width: 800px; margin: 50px auto; padding: 30px; background: var(--bg-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .app-title { text-align: center; color: var(--primary); font-size: 24px; font-weight: 800; margin-bottom: 30px; text-transform: uppercase; letter-spacing: -0.5px;}
+        .upload-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; transition: all 0.3s;}
+        .upload-zone.has-file { border-color: var(--success); background: var(--success-bg); }
+        .uz-label { font-weight: 700; color: var(--text-dark); font-size: 13px; margin-bottom: 10px; display: block;}
+        .file-input { width: 100%; font-size: 12px; }
+        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 700; font-size: 15px; padding: 15px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);}
+        .btn-run:hover { background: var(--primary-hover); }
+        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .card-container { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 1200px; margin: 0 auto 20px auto; }
-        .table-responsive { width: 100%; overflow: hidden; margin-bottom: 20px; }
-        
-        table { border-collapse: collapse; width: 100%; table-layout: fixed; border: 1px solid var(--border-color); }
-        th { background-color: var(--primary-light); color: var(--primary); padding: 5px 3px; font-size: 9px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; word-wrap: break-word; }
-        td { border: 1px solid var(--border-color); padding: 4px 3px; font-size: 9px; vertical-align: top; word-wrap: break-word; }
-        
-        .section-title td { background-color: var(--primary); color: white; font-weight: 700; padding: 6px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 10px; padding: 6px; }
-        .explanation-row td { padding: 4px 6px; border-top: none; background-color: #f8fafc; }
-        
-        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
-        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
-        
-        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
-        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 2px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 9px; }
-        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 2px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 9px; font-family: monospace; }
-        .doc-val { background: #fdfdfd; padding: 3px; border-radius: 2px; border: 1px solid #f1f5f9; min-height: 12px; line-height: 1.3; }
-        .page-ref { font-size: 8px; color: var(--text-muted); font-style: italic; display: block; margin-top: 2px; }
+        /* LOADING */
+        .loading-box { display: none; text-align: center; padding: 50px; background: var(--bg-card); border-radius: 16px; max-width: 800px; margin: 50px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.05);}
+        .loading-box.show { display: block; }
+        .spinner { width: 40px; height: 40px; margin: 0 auto 20px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* LOGIKA FILTER CSS */
-        body.filter-anomali .row-match { display: none !important; }
+        /* DASHBOARD LAYOUT (Matches Screenshot) */
+        #dashboard-section { display: none; padding: 20px; max-width: 1440px; margin: 0 auto; }
+        
+        /* TOP INFO BAR */
+        .top-info-bar { background: var(--bg-card); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px;}
+        .info-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+        .info-item { display: flex; flex-direction: column; }
+        .info-label { font-size: 11px; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;}
+        .info-value { font-size: 14px; font-weight: 700; color: var(--text-dark); word-break: break-word;}
+        .status-badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid;}
+        .badge-err { background: var(--error-bg); color: var(--error); border-color: var(--error-border); }
+        .badge-ok { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+        
+        .progress-container { display: flex; align-items: center; gap: 15px; border-top: 1px solid var(--border); padding-top: 15px;}
+        .progress-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .progress-track { flex-grow: 1; max-width: 300px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.5s ease;}
+        .progress-text { font-weight: 700; font-size: 13px; color: var(--text-dark);}
+        
+        .action-btns { margin-left: auto; display: flex; gap: 10px; }
+        .btn-outline { padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;}
+        .btn-outline:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        .btn-solid { padding: 8px 16px; border: none; background: var(--text-dark); color: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
+
+        /* THREE COLUMN LAYOUT */
+        .main-layout { display: grid; grid-template-columns: 220px 1fr 280px; gap: 20px; align-items: start;}
+        
+        /* SIDEBAR */
+        .sidebar { display: flex; flex-direction: column; gap: 8px; }
+        .nav-item { padding: 12px 16px; border-radius: 8px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; font-size: 13px;}
+        .nav-item:hover { background: var(--bg-card); color: var(--text-dark); }
+        .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.2); }
+        .nav-icon { font-size: 16px; }
+
+        /* CONTENT AREA */
+        .content-area { display: flex; flex-direction: column; gap: 20px; }
+        .content-card { display: none; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+        .content-card.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fafafa;}
+        .card-title { font-size: 15px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 8px;}
+        
+        /* CLEAN TABLE STYLES */
+        .clean-table { width: 100%; border-collapse: collapse; }
+        .clean-table th { padding: 12px 20px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); background: #fff; text-transform: uppercase;}
+        .clean-table td { padding: 14px 20px; font-size: 12px; border-bottom: 1px solid var(--border); color: var(--text-dark); vertical-align: top;}
+        .clean-table tr:last-child td { border-bottom: none; }
+        
+        .item-title { font-weight: 700; color: var(--primary); margin-bottom: 4px; font-size: 13px;}
+        .item-sub { font-size: 11px; color: var(--text-muted); }
+        .code-box { display: inline-block; background: var(--bg-body); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; color: #059669; border: 1px solid #d1fae5; margin-top: 4px;}
+        
+        .status-cell { text-align: right; }
+        .status-match { color: var(--success); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;}
+        .status-anomali { color: var(--error); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;}
+        
+        .reason-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 11px; color: var(--error); font-weight: 500;}
+
+        /* RIGHT PANEL (RULES) */
+        .rules-panel { background: var(--text-dark); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .rules-header { background: #1e293b; padding: 15px 20px; color: #fff; font-weight: 700; font-size: 14px; }
+        .rules-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #fff;}
+        .rule-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 8px; border: 1px solid var(--success-border); background: var(--success-bg); }
+        .rule-item.warn { border-color: var(--warn-border); background: var(--warn-bg); }
+        .rule-icon { font-size: 14px; }
+        .rule-text { font-size: 12px; font-weight: 600; color: var(--success); }
+        .rule-item.warn .rule-text { color: var(--warn); }
+        .rule-sub { font-size: 10px; color: #666; font-weight: 400; margin-top: 2px;}
 
         @media print {
-            body { padding: 0; background: none; }
-            .app-header { position: static; box-shadow: none; }
-            .upload-card, .action-bar { display: none !important; }
-            .card-container { border: none; padding: 0; }
+            body { background: #fff; }
+            #dashboard-section { max-width: 100%; display: block !important; padding: 0;}
+            .main-layout { display: block; }
+            .sidebar, .rules-panel, .action-btns { display: none !important; }
+            .content-card { display: block !important; margin-bottom: 20px; border: 1px solid #000; box-shadow: none;}
         }
     </style>
 </head>
 <body>
 
-<header class="app-header">
-    <div class="brand-name">WARUNA | Audit Keselamatan <span id="header-ship" class="ship-name-badge"></span></div>
-</header>
-
-<div class="upload-card">
+<div id="upload-section">
+    <div class="app-title">Waruna Smart Audit V7</div>
     <div class="upload-grid">
         <div class="upload-zone" id="zone-p">
-            <span class="uz-label">📄 Quotation / Penawaran</span>
+            <span class="uz-label">📄 Dokumen Quotation (Penawaran)</span>
             <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
         </div>
         <div class="upload-zone" id="zone-s">
-            <span class="uz-label">📄 Laporan Sertifikat</span>
+            <span class="uz-label">📄 Dokumen Sertifikat (Laporan)</span>
             <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
         </div>
         <div class="upload-zone" id="zone-d">
-            <span class="uz-label">📄 DO (Opsional)</span>
+            <span class="uz-label">📄 Delivery Order (Opsional)</span>
             <input type="file" id="file-do" class="file-input" accept="application/pdf">
         </div>
     </div>
-    <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
+    <button type="button" id="btn-run" class="btn-run">Jalankan Validasi AI</button>
 </div>
 
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
-    <div id="loading-txt" style="line-height: 1.5; color: #334155;"><b>AI sedang membaca dokumen &amp; memetakan kamus...</b><br><span style="color:var(--primary); font-size:16px; font-weight:800;">Waktu tunggu: 0 detik</span></div>
+    <h3 style="margin-top:0; color:var(--text-dark); font-size: 18px;">Memproses Analisis...</h3>
+    <div id="loading-txt" style="color: var(--text-muted); font-size: 13px;">Sedang membaca dokumen & mencocokkan data.</div>
 </div>
 
-<div id="action-container" style="display: none;">
-    <div class="action-bar">
-        <div class="filter-group">
-            <button class="btn-action active" id="btn-show-all" onclick="setFilter('all')">Tampilkan Semua</button>
-            <button class="btn-action" id="btn-show-anomali" onclick="setFilter('anomali')">Hanya Anomali/Beda</button>
+<div id="dashboard-section">
+    
+    <div class="top-info-bar">
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">Vessel Name</span><span class="info-value" id="val-vessel">-</span></div>
+            <div class="info-item"><span class="info-label">IMO Number</span><span class="info-value" id="val-imo">-</span></div>
+            <div class="info-item"><span class="info-label">Call Sign</span><span class="info-value" id="val-call">-</span></div>
+            <div class="info-item"><span class="info-label">Gross Tonnage</span><span class="info-value" id="val-gt">-</span></div>
+            <div class="info-item"><span class="info-label">Owner</span><span class="info-value" id="val-owner">-</span></div>
         </div>
-        <button class="btn-action btn-download" onclick="downloadHTML()">💾 Download File HTML</button>
+        <div class="progress-container">
+            <span class="progress-label">Overall Match Score:</span>
+            <div class="progress-track"><div class="progress-fill" id="val-progress-bar" style="width: 0%;"></div></div>
+            <span class="progress-text" id="val-progress-txt">0%</span>
+            
+            <div style="margin-left: 20px; border-left: 1px solid var(--border); padding-left: 20px;" class="info-item">
+                <span class="info-label">AI Check Status</span>
+                <span id="val-status-badge" class="status-badge badge-ok">Menunggu...</span>
+            </div>
+
+            <div class="action-btns">
+                <button class="btn-outline" onclick="window.print()">📥 Export Report</button>
+                <button class="btn-solid" onclick="location.reload()">🔄 New Audit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="nav-item active" onclick="switchTab('tab-penawaran', this)">
+                <span class="nav-icon">📋</span> Validation Penawaran
+            </div>
+            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">
+                <span class="nav-icon">🛡️</span> Data Sertifikat
+            </div>
+            <div class="nav-item" onclick="filterAnomali(this)" id="btn-filter" style="margin-top: 20px; border: 1px solid var(--border); justify-content: center;">
+                👁️ Tampilkan Hanya Error
+            </div>
+        </aside>
+
+        <main class="content-area">
+            
+            <div id="tab-penawaran" class="content-card active">
+                <div class="card-header">
+                    <div class="card-title"><span>📋</span> Validasi Item Penawaran & DO vs Sertifikat</div>
+                </div>
+                <table class="clean-table">
+                    <thead>
+                        <tr>
+                            <th width="45%">Item Description (Quotation | System)</th>
+                            <th width="15%">Quotation</th>
+                            <th width="15%">Certificate</th>
+                            <th width="10%">DO</th>
+                            <th width="15%" style="text-align: right;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-penawaran">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="tab-sertifikat" class="content-card">
+                <div class="card-header">
+                    <div class="card-title"><span>🛡️</span> Laporan Ekstraksi Sertifikat (Header)</div>
+                </div>
+                <table class="clean-table" style="font-size: 10px;">
+                    <thead>
+                        <tr>
+                            <th>No. Laporan / Certificate</th>
+                            <th>Date / Sign</th>
+                            <th>Ship Name / IMO / Call Sign</th>
+                            <th>Status AI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-sertifikat">
+                        </tbody>
+                </table>
+            </div>
+
+        </main>
+
+        <aside class="rules-panel">
+            <div class="rules-header">Mandatory Compliance Rules</div>
+            <div class="rules-body">
+                <div class="rule-item"><span class="rule-icon">✅</span><div><div class="rule-text">Sertifikat Valid</div><div class="rule-sub">Sesuai standar audit</div></div></div>
+                <div class="rule-item warn" id="rule-qty"><span class="rule-icon">⚠️</span><div><div class="rule-text">Kuantitas Anomali</div><div class="rule-sub">Menunggu hasil scan AI</div></div></div>
+                <div class="rule-item"><span class="rule-icon">✅</span><div><div class="rule-text">Vendor Tervalidasi</div><div class="rule-sub">Cek silang Database</div></div></div>
+            </div>
+        </aside>
+
     </div>
 </div>
 
-<div id="result"></div>
-
 <script>
-// UI Handling Script
+// --- UI INTERACTIONS ---
 function bindFile(inId,zoneId){
     var inp = document.getElementById(inId); if(!inp) return;
     inp.addEventListener("change", function(){
@@ -138,49 +250,30 @@ bindFile("file-penawaran","zone-p");
 bindFile("file-sertifikat","zone-s");
 bindFile("file-do","zone-d");
 
-function setFilter(mode) {
-    document.getElementById('btn-show-all').classList.remove('active');
-    document.getElementById('btn-show-anomali').classList.remove('active');
-    if (mode === 'all') {
-        document.body.classList.remove('filter-anomali');
-        document.getElementById('btn-show-all').classList.add('active');
+function switchTab(tabId, el) {
+    document.querySelectorAll('.nav-item').forEach(n => { if(!n.id) n.classList.remove('active'); });
+    el.classList.add('active');
+    document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
+
+let filterActive = false;
+function filterAnomali(el) {
+    filterActive = !filterActive;
+    if(filterActive) {
+        el.style.background = "var(--error-bg)"; el.style.color = "var(--error)"; el.style.borderColor = "var(--error-border)";
+        document.querySelectorAll('.row-match').forEach(r => r.style.display = 'none');
     } else {
-        document.body.classList.add('filter-anomali');
-        document.getElementById('btn-show-anomali').classList.add('active');
+        el.style.background = ""; el.style.color = ""; el.style.borderColor = "";
+        document.querySelectorAll('.row-match').forEach(r => r.style.display = '');
     }
 }
 
-// Download HTML File
-var currentShipName = "Laporan_Audit";
-function downloadHTML() {
-    // Clone body untuk dibersihkan
-    var clone = document.documentElement.cloneNode(true);
-    
-    // Hapus Elemen yang tidak perlu di file hasil download
-    var uploadCard = clone.querySelector('.upload-card');
-    if(uploadCard) uploadCard.parentNode.removeChild(uploadCard);
-    
-    var actionBar = clone.querySelector('#action-container');
-    if(actionBar) actionBar.parentNode.removeChild(actionBar);
-    
-    // Simpan ke file
-    var htmlContent = clone.outerHTML;
-    var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = currentShipName.replace(/[^a-z0-9]/gi, '_').toUpperCase() + ".html";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-// Webhook Logic
+// --- N8N LOGIC ---
 var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
 var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
-
-function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
@@ -191,20 +284,13 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
     if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
     
-    // Kunci UI
+    document.getElementById("upload-section").style.display = "none";
     document.getElementById("loading").classList.add("show");
-    document.getElementById("result").innerHTML = ""; 
-    document.getElementById("action-container").style.display = "none";
-    document.getElementById("btn-run").disabled = true;
-    document.getElementById("header-ship").innerText = "";
-    document.body.classList.remove('filter-anomali'); // Reset filter
-    document.getElementById('btn-show-all').classList.add('active');
-    document.getElementById('btn-show-anomali').classList.remove('active');
     
     var startMs = Date.now();
     var timerInt = setInterval(function() {
         var s = Math.floor((Date.now() - startMs) / 1000);
-        document.getElementById("loading-txt").innerHTML = `<b>AI sedang mengekstrak dokumen & memvalidasi data...</b><br><span style='color:var(--primary); font-size:16px; font-weight:800;'>Waktu tunggu: ${s} detik</span>`;
+        document.getElementById("loading-txt").innerHTML = `AI Processing... Elapsed time: <b>${s}s</b>`;
     }, 1000);
     
     try {
@@ -225,173 +311,154 @@ document.getElementById("btn-run").addEventListener("click", async function(){
                 clearInterval(poll);
                 clearInterval(timerInt);
                 document.getElementById("loading").classList.remove("show");
-                document.getElementById("action-container").style.display = "block";
-                document.getElementById("btn-run").disabled = false;
+                document.getElementById("dashboard-section").style.display = "block";
                 
                 var fullPayloadStr = "";
                 for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
                 
                 try {
-                    var parsed = JSON.parse(fullPayloadStr);
-                    renderAuditReport(parsed, jobId);
+                    renderDashboard(JSON.parse(fullPayloadStr));
                 } catch(err) {
-                    alert("Gagal mengurai hasil AI. Format data rusak. Error: " + err.message);
+                    alert("Gagal mengurai JSON AI: " + err.message);
                 }
                 
-            } catch(e) { console.log("Polling error:", e); }
+            } catch(e) { console.log(e); }
         }, 8000);
     } catch(e){ 
-        clearInterval(timerInt);
-        alert("Gagal mengirim dokumen: " + e.message); 
-        document.getElementById("loading").classList.remove("show");
-        document.getElementById("btn-run").disabled = false;
+        clearInterval(timerInt); alert("Error: " + e.message); location.reload();
     }
 });
 
-function renderAuditReport(parsed, jobId){
-    var c = document.getElementById("result");
-    var html = `<div class="card-container">
-        <h3 style="margin:0 0 10px 0; color:var(--primary); font-size:16px; text-transform:uppercase;">HASIL AUDIT DOKUMEN [${jobId}]</h3>`;
+// --- RENDER DASHBOARD ---
+function renderDashboard(parsed) {
+    if (!parsed.tabel_audit) return;
 
-    // Ambil Nama Kapal untuk Header
-    let namaKapal = "";
-    if (parsed.tabel_audit) {
-        for(let r of parsed.tabel_audit) {
-            if(r.di_sertifikat && String(r.di_sertifikat).toLowerCase().includes("name:")) {
-                let p = String(r.di_sertifikat).split('|').find(x => x.toLowerCase().includes("name:"));
-                if(p) { namaKapal = p.split(':')[1].trim(); break; }
-            }
+    let certDataRows = [];
+    let penawaranRows = [];
+    
+    // Split Data
+    parsed.tabel_audit.forEach(row => {
+        var k = String(row.kategori || "").toUpperCase();
+        if (k.includes("SERTIFIKAT") || k.includes("HEADER")) {
+            certDataRows.push(row);
+        } else {
+            penawaranRows.push(row);
+        }
+    });
+
+    // 1. POPULATE TOP BAR (Ambil dari Sertifikat pertama yang punya data)
+    let v_name="-", v_imo="-", v_call="-", v_gt="-", v_own="-";
+    for(let r of certDataRows) {
+        let p = String(r.di_sertifikat).toLowerCase();
+        if(p.includes("name") && v_name==="-") {
+            String(r.di_sertifikat).split('|').forEach(x => {
+                let kv = x.split(':'); if(kv.length<2) return;
+                let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                if(k.includes("name")) v_name=v;
+                if(k.includes("imo")) v_imo=v;
+                if(k.includes("call")) v_call=v;
+                if(k.includes("gt")) v_gt=v;
+                if(k.includes("owner")) v_own=v;
+            });
+            break;
         }
     }
-    if(namaKapal && namaKapal !== "-" && namaKapal !== "") {
-        document.getElementById("header-ship").innerText = "- " + namaKapal;
-        currentShipName = "Audit_" + namaKapal;
+    
+    document.getElementById("val-vessel").innerText = v_name.toUpperCase();
+    document.getElementById("val-imo").innerText = v_imo;
+    document.getElementById("val-call").innerText = v_call;
+    document.getElementById("val-gt").innerText = v_gt;
+    document.getElementById("val-owner").innerText = v_own;
+
+    // 2. CALCULATE PROGRESS & STATUS
+    let totalItems = penawaranRows.length;
+    let anomaliCount = 0;
+    penawaranRows.forEach(r => {
+        let h = String(r.hasil_ai).toLowerCase();
+        if(h.includes('⚠️') || h.includes('anomali') || h.includes('beda')) anomaliCount++;
+    });
+    
+    let matchPct = totalItems > 0 ? Math.round(((totalItems - anomaliCount) / totalItems) * 100) : 0;
+    document.getElementById("val-progress-bar").style.width = matchPct + "%";
+    document.getElementById("val-progress-txt").innerText = matchPct + "%";
+    
+    let badge = document.getElementById("val-status-badge");
+    let ruleQty = document.getElementById("rule-qty");
+    if(anomaliCount > 0) {
+        badge.className = "status-badge badge-err";
+        badge.innerText = "⚠️ " + anomaliCount + " ANOMALI DETECTED";
+        ruleQty.querySelector('.rule-sub').innerText = "Terdapat selisih/hilang dokumen.";
     } else {
-        currentShipName = "Audit_Report";
+        badge.className = "status-badge badge-ok";
+        badge.innerText = "✅ ALL CLEAR";
+        ruleQty.className = "rule-item"; // Make green
+        ruleQty.querySelector('.rule-icon').innerText = "✅";
+        ruleQty.querySelector('.rule-text').innerText = "Kuantitas Sinkron";
+        ruleQty.querySelector('.rule-sub').innerText = "Data Penawaran = Sertifikat";
     }
 
-    if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
-        var groups = {};
-        parsed.tabel_audit.forEach(row => {
-            var k = row.kategori || "Pemeriksaan Lainnya";
-            if (!groups[k]) groups[k] = [];
-            groups[k].push(row);
+    // 3. RENDER TABEL PENAWARAN (TAB 1)
+    let htmlPenawaran = "";
+    penawaranRows.forEach((r, i) => {
+        let aliasParts = String(r.alias_sistem || "-").split(" - ");
+        let code = aliasParts[0] || "-";
+        let sysName = aliasParts.slice(1).join(" - ") || "-";
+        
+        let h = String(r.hasil_ai);
+        let isWarn = h.includes('⚠️') || h.toLowerCase().includes('anomali');
+        let rowClass = isWarn ? 'row-anomali' : 'row-match';
+        let statHtml = isWarn ? `<span class="status-anomali">❗ ANOMALI</span>` : `<span class="status-match">✔ MATCH</span>`;
+        
+        htmlPenawaran += `<tr class="${rowClass}">
+            <td>
+                <div class="item-title">${i+1}. ${esc(r.keterangan)}</div>
+                <div class="item-sub">Sys: ${esc(sysName)}</div>
+                ${code !== '-' ? `<div class="code-box">${esc(code)}</div>` : ''}
+                ${isWarn ? `<div class="reason-box">🤖 AI Note: ${esc(h.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim())}</div>` : ''}
+            </td>
+            <td><b style="font-size:12px;">${esc(r.di_penawaran)}</b></td>
+            <td><b style="font-size:12px; color:${isWarn?'var(--error)':'var(--text-dark)'};">${esc(r.di_sertifikat)}</b></td>
+            <td>${esc(r.di_do)}</td>
+            <td class="status-cell">${statHtml}</td>
+        </tr>`;
+    });
+    document.getElementById("body-penawaran").innerHTML = htmlPenawaran;
+
+    // 4. RENDER TABEL SERTIFIKAT (TAB 2)
+    let htmlCert = "";
+    certDataRows.forEach((r) => {
+        let d = { cert: "-", ship: "-", imo: "-", call: "-", date: "-", sign: "-" };
+        String(r.di_sertifikat).split('|').forEach(p => {
+            let kv = p.split(':'); if(kv.length < 2) return;
+            let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+            if(k.includes("certno")) d.cert=v; if(k.includes("name")) d.ship=v;
+            if(k.includes("imo")) d.imo=v; if(k.includes("call")) d.call=v;
+            if(k.includes("date")) d.date=v; if(k.includes("sign")) d.sign=v;
         });
-
-        // TABEL 1 (SERVICE REPORT)
-        let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("SERTIFIKAT"));
-        if (headerKey) {
-            let certGroups = {};
-            groups[headerKey].forEach(r => {
-                let certNo = "-";
-                let parts = String(r.di_sertifikat).split('|');
-                parts.forEach(p => { if(p.includes("CertNo:")) certNo = p.split(':')[1].trim(); });
-                if(!certGroups[certNo]) certGroups[certNo] = [];
-                certGroups[certNo].push(r);
-            });
-
-            html += `<div class="table-responsive"><table>
-                <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT</td></tr>
-                <tr>
-                    <th width="20" style="text-align:center;">NO</th><th width="70">LAPORAN</th><th width="70">CERT NO</th><th width="70">SHIP</th>
-                    <th width="70">OWNER</th><th width="45">IMO</th><th width="35">CLS</th><th width="40">GT</th>
-                    <th width="50">NAT</th><th width="40">CALL</th><th width="50">DATE</th><th width="50">SIGN</th><th width="40" style="text-align:center;">STAT</th>
-                </tr>`;
-            
-            let gIdx = 1;
-            for (let certNo in certGroups) {
-                // Cek apakah seluruh grup ini statusnya MATCH
-                let groupHasAnomali = certGroups[certNo].some(r => {
-                    let h = String(r.hasil_ai).toLowerCase();
-                    return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
-                });
-                let groupClass = groupHasAnomali ? 'row-anomali' : 'row-match';
-
-                html += `<tr class="group-header ${groupClass}"><td colspan="13">CERT NO: ${esc(certNo)}</td></tr>`;
-                
-                certGroups[certNo].forEach(r => {
-                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-", page: "" };
-                    String(r.di_sertifikat).split('|').forEach(p => {
-                        let kv = p.split(':'); if(kv.length < 2) return;
-                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
-                        if(k.includes("certno")) d.cert=v; if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
-                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
-                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
-                        if(k.includes("sign")) d.sign=v; if(k.includes("page")) d.page=v;
-                    });
-                    
-                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali') || String(r.hasil_ai).toLowerCase().includes('beda');
-                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-                    html += `<tr class="${rowClass}">
-                        <td align="center">${gIdx++}</td>
-                        <td><b>${esc(r.keterangan)}</b><span class="page-ref">Hal: ${esc(d.page)}</span></td>
-                        <td>${esc(d.cert)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td>${esc(d.imo)}</td>
-                        <td>${esc(d.cls)}</td><td>${esc(d.gt)}</td><td>${esc(d.nat)}</td><td>${esc(d.call)}</td>
-                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
-                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'BEDA':'OK'}</td>
-                    </tr>`;
-                });
-            }
-            html += `</table></div>`;
-        }
-
-        // TABEL 2 (PENAWARAN)
-        let itemsKey = Object.keys(groups).find(k => !k.toUpperCase().includes("SERTIFIKAT"));
-        if (itemsKey) {
-            html += `<div class="table-responsive"><table>
-                <tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN PENAWARAN (ALIAS MAPPING)</td></tr>
-                <tr>
-                    <th width="30" style="text-align:center;">NO</th><th width="300">POIN PEMERIKSAAN (VENDOR | SISTEM | KODE)</th>
-                    <th width="70">PENAWARAN</th><th width="100">SERTIFIKAT</th><th width="60">DO</th><th width="80" style="text-align:center;">STATUS</th>
-                </tr>`;
-
-            groups[itemsKey].forEach((row, idx) => {
-                let aliasParts = String(row.alias_sistem || "-").split(" - ");
-                let itemCode = aliasParts[0] || "-";
-                let systemName = aliasParts.slice(1).join(" - ") || "-"; 
-                
-                let hasilAiStr = String(row.hasil_ai || "");
-                let isWarn = hasilAiStr.includes('⚠️') || hasilAiStr.toLowerCase().includes('anomali');
-                let rowClass = isWarn ? 'row-anomali' : 'row-match';
-                
-                html += `<tr class="${rowClass}">
-                    <td align="center">${idx + 1}</td>
-                    <td>
-                        <div class="box-vendor">${esc(row.keterangan)}</div>
-                        <div class="box-system">${esc(systemName)}</div>
-                        <div class="box-code">${esc(itemCode)}</div>
-                    </td>
-                    <td><div class="doc-val">${esc(row.di_penawaran)}</div></td>
-                    <td><div class="doc-val">${esc(row.di_sertifikat)}</div></td>
-                    <td><div class="doc-val">${esc(row.di_do)}</div></td>
-                    <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
-                </tr>`;
-
-                let isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen') || hasilAiStr.toLowerCase().includes('jasa');
-                if (isWarn || isJasa) {
-                    let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
-                    if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-                    let borderColor = isWarn ? 'var(--error)' : 'var(--success)';
-                    let iconText = isWarn ? '⚠️ Analisis AI (Anomali)' : '✅ Analisis AI (Valid)';
-                    
-                    html += `<tr class="explanation-row ${rowClass}">
-                        <td style="border-right:1px solid var(--border-color);"></td>
-                        <td colspan="5">
-                            <div style="border-left:3px solid ${borderColor}; padding-left:6px; font-size:9px; color:#444; margin-bottom: 4px;">
-                                <b>${iconText}:</b> ${esc(cleanReason)}
-                            </div>
-                        </td>
-                    </tr>`;
-                }
-            });
-            html += `</table></div>`;
-        }
-    } else {
-        html += `<p style="padding: 20px; color:#666; text-align:center;">Data hasil ekstraksi kosong.</p>`;
-    }
-    c.innerHTML = html + `</div>`;
+        
+        let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
+        let rowClass = isWarn ? 'row-anomali' : 'row-match';
+        let statHtml = isWarn ? `<span class="status-anomali">❗ BEDA</span>` : `<span class="status-match">✔ OK</span>`;
+        
+        htmlCert += `<tr class="${rowClass}">
+            <td>
+                <b style="color:var(--text-dark);">${esc(r.keterangan)}</b><br>
+                <span style="color:var(--primary); font-size:11px;">Ref: ${esc(d.cert)}</span>
+            </td>
+            <td>
+                <div>Serviced: <b>${esc(d.date)}</b></div>
+                <div style="color:var(--text-light); font-size:10px;">Signed: ${esc(d.sign)}</div>
+            </td>
+            <td>
+                <div>${esc(d.ship)}</div>
+                <div style="font-size:10px; color:var(--text-muted);">IMO: ${esc(d.imo)} | Call: ${esc(d.call)}</div>
+            </td>
+            <td class="status-cell">${statHtml}</td>
+        </tr>`;
+    });
+    document.getElementById("body-sertifikat").innerHTML = htmlCert;
 }
 </script>
+
 </body>
 </html>
