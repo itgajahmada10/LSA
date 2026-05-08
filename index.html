@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Audit Keselamatan V7 (A4 Compact)</title>
+    <title>Waruna Group | Audit Keselamatan V7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1e3a8a; --primary-light: #eff6ff; 
             --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
             --success: #15803d; --error: #b91c1c;
-            --bg-vendor: #fef9c3; --border-vendor: #facc15; /* Kuning - Bahasa Vendor */
-            --bg-system: #e0f2fe; --border-system: #7dd3fc; /* Biru - Bahasa Sistem */
-            --bg-code: #f0fdf4; --border-code: #86efac;     /* Hijau - Item Code */
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
+            --bg-system: #e0f2fe; --border-system: #7dd3fc; 
+            --bg-code: #f0fdf4; --border-code: #86efac;     
         }
         
-        /* Reset & Global - Ukuran Font Diperkecil Untuk A4 */
         body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f8fafc; margin: 0; padding: 10px; line-height: 1.3; }
         
-        .app-header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:0.5rem 1rem; border-radius:8px; border:1px solid var(--border-color); margin-bottom: 10px; max-width: 1200px; margin-left: auto; margin-right: auto; }
-        .brand-name { font-weight:700; font-size:1rem; color:var(--primary); text-transform: uppercase; }
+        /* HEADER STICKY & NAMA KAPAL */
+        .app-header { 
+            display:flex; justify-content:space-between; align-items:center; 
+            background:#fff; padding:0.8rem 1rem; border-radius:8px; 
+            border:1px solid var(--border-color); margin-bottom: 10px; 
+            max-width: 1200px; margin-left: auto; margin-right: auto;
+            position: sticky; top: 10px; z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .brand-name { font-weight:800; font-size:1.1rem; color:var(--primary); text-transform: uppercase; }
+        .ship-name-badge { color: #d97706; font-weight: 800; border-left: 2px solid #cbd5e1; margin-left: 10px; padding-left: 10px; }
 
         .upload-card { background:#fff; border-radius:8px; padding:1rem; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto 15px auto; }
         .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1rem; }
@@ -27,16 +35,24 @@
         .upload-zone.has-file { border-color:var(--success); background:#f0fdf4; border-style:solid; }
         .uz-label { display:block; font-weight:700; color:var(--primary); font-size:10px; text-transform:uppercase; margin-bottom:5px; }
         .file-input { width:100%; font-size:10px; cursor: pointer; }
-        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:12px; padding:10px; border-radius:6px; border:none; cursor:pointer; text-transform:uppercase; }
+        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:800; font-size:13px; padding:12px; border-radius:6px; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; }
         .btn-run:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        /* Loading Box Compact dengan Timer */
-        .loading-box { display:none; text-align:center; padding:1.5rem; background:#fff; border-radius:8px; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto; }
+        .loading-box { display:none; text-align:center; padding:2rem; background:#fff; border-radius:8px; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto; }
         .loading-box.show { display:block; }
-        .spinner { width:30px; height:30px; margin:0 auto 10px; border:3px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
+        .spinner { width:35px; height:35px; margin:0 auto 15px; border:4px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* TABEL LOGIC - A4 Fit No Scroll */
+        /* ACTION BAR (FILTER & DOWNLOAD) */
+        .action-bar { display:flex; justify-content:space-between; align-items:center; background: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 1200px; margin: 0 auto 15px auto; }
+        .filter-group { display: flex; gap: 8px; }
+        .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: all 0.2s; }
+        .btn-action.active { background: var(--primary); color: #fff; }
+        .btn-action:hover { background: var(--primary-light); color: var(--primary); }
+        .btn-action.active:hover { background: var(--primary); color: #fff; }
+        .btn-download { border-color: var(--success); color: var(--success); }
+        .btn-download:hover { background: #f0fdf4; color: var(--success); }
+
         .card-container { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 1200px; margin: 0 auto 20px auto; }
         .table-responsive { width: 100%; overflow: hidden; margin-bottom: 20px; }
         
@@ -48,21 +64,22 @@
         .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 10px; padding: 6px; }
         .explanation-row td { padding: 4px 6px; border-top: none; background-color: #f8fafc; }
         
-        /* Warna Status */
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
         
-        /* STYLE KHUSUS TABEL 2 (Sesuai Permintaan) */
         .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
         .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 2px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 9px; }
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 2px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 9px; font-family: monospace; }
-        
         .doc-val { background: #fdfdfd; padding: 3px; border-radius: 2px; border: 1px solid #f1f5f9; min-height: 12px; line-height: 1.3; }
         .page-ref { font-size: 8px; color: var(--text-muted); font-style: italic; display: block; margin-top: 2px; }
 
+        /* LOGIKA FILTER CSS */
+        body.filter-anomali .row-match { display: none !important; }
+
         @media print {
             body { padding: 0; background: none; }
-            .upload-card, .app-header { display: none; }
+            .app-header { position: static; box-shadow: none; }
+            .upload-card, .action-bar { display: none !important; }
             .card-container { border: none; padding: 0; }
         }
     </style>
@@ -70,7 +87,7 @@
 <body>
 
 <header class="app-header">
-    <div class="brand-name">WARUNA | Verifikasi Dokumen Keselamatan V7</div>
+    <div class="brand-name">WARUNA | Audit Keselamatan <span id="header-ship" class="ship-name-badge"></span></div>
 </header>
 
 <div class="upload-card">
@@ -88,18 +105,28 @@
             <input type="file" id="file-do" class="file-input" accept="application/pdf">
         </div>
     </div>
-    <button type="button" id="btn-run" class="btn-run">Mulai Analisis (A4 Optimized)</button>
+    <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
 </div>
 
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
-    <div id="loading-txt" style="line-height: 1.5; color: #334155;">Sedang Memproses...</div>
+    <div id="loading-txt" style="line-height: 1.5; color: #334155;"><b>AI sedang membaca dokumen &amp; memetakan kamus...</b><br><span style="color:var(--primary); font-size:16px; font-weight:800;">Waktu tunggu: 0 detik</span></div>
+</div>
+
+<div id="action-container" style="display: none;">
+    <div class="action-bar">
+        <div class="filter-group">
+            <button class="btn-action active" id="btn-show-all" onclick="setFilter('all')">Tampilkan Semua</button>
+            <button class="btn-action" id="btn-show-anomali" onclick="setFilter('anomali')">Hanya Anomali/Beda</button>
+        </div>
+        <button class="btn-action btn-download" onclick="downloadHTML()">💾 Download File HTML</button>
+    </div>
 </div>
 
 <div id="result"></div>
 
 <script>
-// Fungsi deteksi warna file upload
+// UI Handling Script
 function bindFile(inId,zoneId){
     var inp = document.getElementById(inId); if(!inp) return;
     inp.addEventListener("change", function(){
@@ -111,7 +138,45 @@ bindFile("file-penawaran","zone-p");
 bindFile("file-sertifikat","zone-s");
 bindFile("file-do","zone-d");
 
-// Konfigurasi API
+function setFilter(mode) {
+    document.getElementById('btn-show-all').classList.remove('active');
+    document.getElementById('btn-show-anomali').classList.remove('active');
+    if (mode === 'all') {
+        document.body.classList.remove('filter-anomali');
+        document.getElementById('btn-show-all').classList.add('active');
+    } else {
+        document.body.classList.add('filter-anomali');
+        document.getElementById('btn-show-anomali').classList.add('active');
+    }
+}
+
+// Download HTML File
+var currentShipName = "Laporan_Audit";
+function downloadHTML() {
+    // Clone body untuk dibersihkan
+    var clone = document.documentElement.cloneNode(true);
+    
+    // Hapus Elemen yang tidak perlu di file hasil download
+    var uploadCard = clone.querySelector('.upload-card');
+    if(uploadCard) uploadCard.parentNode.removeChild(uploadCard);
+    
+    var actionBar = clone.querySelector('#action-container');
+    if(actionBar) actionBar.parentNode.removeChild(actionBar);
+    
+    // Simpan ke file
+    var htmlContent = clone.outerHTML;
+    var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = currentShipName.replace(/[^a-z0-9]/gi, '_').toUpperCase() + ".html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Webhook Logic
 var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
 var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
@@ -126,15 +191,20 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
     if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
     
-    // Kunci UI dan Tampilkan Timer
+    // Kunci UI
     document.getElementById("loading").classList.add("show");
     document.getElementById("result").innerHTML = ""; 
+    document.getElementById("action-container").style.display = "none";
     document.getElementById("btn-run").disabled = true;
+    document.getElementById("header-ship").innerText = "";
+    document.body.classList.remove('filter-anomali'); // Reset filter
+    document.getElementById('btn-show-all').classList.add('active');
+    document.getElementById('btn-show-anomali').classList.remove('active');
     
     var startMs = Date.now();
     var timerInt = setInterval(function() {
         var s = Math.floor((Date.now() - startMs) / 1000);
-        document.getElementById("loading-txt").innerHTML = `<b>AI sedang membaca dokumen & memetakan kamus...</b><br><span style='color:var(--primary); font-size:14px; font-weight:700;'>Waktu tunggu: ${s} detik</span>`;
+        document.getElementById("loading-txt").innerHTML = `<b>AI sedang mengekstrak dokumen & memvalidasi data...</b><br><span style='color:var(--primary); font-size:16px; font-weight:800;'>Waktu tunggu: ${s} detik</span>`;
     }, 1000);
     
     try {
@@ -144,36 +214,28 @@ document.getElementById("btn-run").addEventListener("click", async function(){
             try {
                 var res = await fetch(WH_POLL+"?job_id="+jobId);
                 var text = await res.text();
-                if(!text || text.trim().charAt(0) === "<") return; // Abaikan jika response server error
+                if(!text || text.trim().charAt(0) === "<") return; 
                 
                 var data = JSON.parse(text);
                 var rows = Array.isArray(data) ? data : (data.data || [data]);
-                
-                // Cari data berdasarkan Job ID
                 var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
                 
-                // JIKA BELUM SELESAI, LANJUTKAN POLLING
-                if(data.status === "processing" || !ourRow) {
-                    return; 
-                }
+                if(data.status === "processing" || !ourRow) return; 
                 
-                // JIKA SUDAH SELESAI, HENTIKAN TIMER DAN RENDER
                 clearInterval(poll);
                 clearInterval(timerInt);
                 document.getElementById("loading").classList.remove("show");
+                document.getElementById("action-container").style.display = "block";
                 document.getElementById("btn-run").disabled = false;
                 
-                // GABUNGKAN PAYLOAD 1 HINGGA 10 (Agar JSON tidak terpotong)
                 var fullPayloadStr = "";
-                for(let i=1; i<=10; i++) {
-                    fullPayloadStr += (ourRow["Payload" + i] || "");
-                }
+                for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
                 
                 try {
                     var parsed = JSON.parse(fullPayloadStr);
                     renderAuditReport(parsed, jobId);
                 } catch(err) {
-                    alert("Gagal mengurai hasil AI. Format data mungkin terlalu panjang. Error: " + err.message);
+                    alert("Gagal mengurai hasil AI. Format data rusak. Error: " + err.message);
                 }
                 
             } catch(e) { console.log("Polling error:", e); }
@@ -189,7 +251,24 @@ document.getElementById("btn-run").addEventListener("click", async function(){
 function renderAuditReport(parsed, jobId){
     var c = document.getElementById("result");
     var html = `<div class="card-container">
-        <h3 style="margin:0 0 10px 0; color:var(--primary); font-size:16px;">HASIL VERIFIKASI DOKUMEN [${jobId}]</h3>`;
+        <h3 style="margin:0 0 10px 0; color:var(--primary); font-size:16px; text-transform:uppercase;">HASIL AUDIT DOKUMEN [${jobId}]</h3>`;
+
+    // Ambil Nama Kapal untuk Header
+    let namaKapal = "";
+    if (parsed.tabel_audit) {
+        for(let r of parsed.tabel_audit) {
+            if(r.di_sertifikat && String(r.di_sertifikat).toLowerCase().includes("name:")) {
+                let p = String(r.di_sertifikat).split('|').find(x => x.toLowerCase().includes("name:"));
+                if(p) { namaKapal = p.split(':')[1].trim(); break; }
+            }
+        }
+    }
+    if(namaKapal && namaKapal !== "-" && namaKapal !== "") {
+        document.getElementById("header-ship").innerText = "- " + namaKapal;
+        currentShipName = "Audit_" + namaKapal;
+    } else {
+        currentShipName = "Audit_Report";
+    }
 
     if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
         var groups = {};
@@ -199,9 +278,7 @@ function renderAuditReport(parsed, jobId){
             groups[k].push(row);
         });
 
-        // ========================================================
-        // TABEL 1 (SERVICE REPORT - GROUPED BY CERT NO)
-        // ========================================================
+        // TABEL 1 (SERVICE REPORT)
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("SERTIFIKAT"));
         if (headerKey) {
             let certGroups = {};
@@ -214,7 +291,7 @@ function renderAuditReport(parsed, jobId){
             });
 
             html += `<div class="table-responsive"><table>
-                <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT (A4 FIT)</td></tr>
+                <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT</td></tr>
                 <tr>
                     <th width="20" style="text-align:center;">NO</th><th width="70">LAPORAN</th><th width="70">CERT NO</th><th width="70">SHIP</th>
                     <th width="70">OWNER</th><th width="45">IMO</th><th width="35">CLS</th><th width="40">GT</th>
@@ -223,7 +300,15 @@ function renderAuditReport(parsed, jobId){
             
             let gIdx = 1;
             for (let certNo in certGroups) {
-                html += `<tr class="group-header"><td colspan="13">CERT NO: ${esc(certNo)}</td></tr>`;
+                // Cek apakah seluruh grup ini statusnya MATCH
+                let groupHasAnomali = certGroups[certNo].some(r => {
+                    let h = String(r.hasil_ai).toLowerCase();
+                    return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
+                });
+                let groupClass = groupHasAnomali ? 'row-anomali' : 'row-match';
+
+                html += `<tr class="group-header ${groupClass}"><td colspan="13">CERT NO: ${esc(certNo)}</td></tr>`;
+                
                 certGroups[certNo].forEach(r => {
                     let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-", page: "" };
                     String(r.di_sertifikat).split('|').forEach(p => {
@@ -235,9 +320,10 @@ function renderAuditReport(parsed, jobId){
                         if(k.includes("sign")) d.sign=v; if(k.includes("page")) d.page=v;
                     });
                     
-                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
-                    
-                    html += `<tr>
+                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali') || String(r.hasil_ai).toLowerCase().includes('beda');
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
+
+                    html += `<tr class="${rowClass}">
                         <td align="center">${gIdx++}</td>
                         <td><b>${esc(r.keterangan)}</b><span class="page-ref">Hal: ${esc(d.page)}</span></td>
                         <td>${esc(d.cert)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td>${esc(d.imo)}</td>
@@ -250,9 +336,7 @@ function renderAuditReport(parsed, jobId){
             html += `</table></div>`;
         }
 
-        // ========================================================
-        // TABEL 2 (PENAWARAN) - MULTI COLOR LAYOUT
-        // ========================================================
+        // TABEL 2 (PENAWARAN)
         let itemsKey = Object.keys(groups).find(k => !k.toUpperCase().includes("SERTIFIKAT"));
         if (itemsKey) {
             html += `<div class="table-responsive"><table>
@@ -265,14 +349,13 @@ function renderAuditReport(parsed, jobId){
             groups[itemsKey].forEach((row, idx) => {
                 let aliasParts = String(row.alias_sistem || "-").split(" - ");
                 let itemCode = aliasParts[0] || "-";
-                // Gabungkan sisa array untuk jaga-jaga nama sistem mengandung tanda "-"
                 let systemName = aliasParts.slice(1).join(" - ") || "-"; 
                 
                 let hasilAiStr = String(row.hasil_ai || "");
                 let isWarn = hasilAiStr.includes('⚠️') || hasilAiStr.toLowerCase().includes('anomali');
+                let rowClass = isWarn ? 'row-anomali' : 'row-match';
                 
-                // Baris Item Utama
-                html += `<tr>
+                html += `<tr class="${rowClass}">
                     <td align="center">${idx + 1}</td>
                     <td>
                         <div class="box-vendor">${esc(row.keterangan)}</div>
@@ -285,16 +368,14 @@ function renderAuditReport(parsed, jobId){
                     <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
                 </tr>`;
 
-                // Baris Penjelasan (Hanya muncul jika Anomali atau Match Khusus Jasa)
-                let isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen');
+                let isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen') || hasilAiStr.toLowerCase().includes('jasa');
                 if (isWarn || isJasa) {
                     let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
                     if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-                    
                     let borderColor = isWarn ? 'var(--error)' : 'var(--success)';
                     let iconText = isWarn ? '⚠️ Analisis AI (Anomali)' : '✅ Analisis AI (Valid)';
                     
-                    html += `<tr class="explanation-row">
+                    html += `<tr class="explanation-row ${rowClass}">
                         <td style="border-right:1px solid var(--border-color);"></td>
                         <td colspan="5">
                             <div style="border-left:3px solid ${borderColor}; padding-left:6px; font-size:9px; color:#444; margin-bottom: 4px;">
