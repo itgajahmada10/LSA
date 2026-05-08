@@ -97,7 +97,6 @@
 <div id="result"></div>
 
 <script>
-// Logic Webhook (Tetap sama seperti versi sebelumnya)
 var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
 var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
@@ -113,19 +112,50 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
     
     document.getElementById("loading").classList.add("show");
+    document.getElementById("result").innerHTML = ""; // Bersihkan layar sebelumnya
+    document.getElementById("btn-run").disabled = true;
+    
     try {
         await fetch(WH_SUBMIT, {method:"POST", body:fd});
+        
         var poll = setInterval(async function(){
-            var res = await fetch(WH_POLL+"?job_id="+jobId);
-            var data = await res.json();
-            if(data.status !== "processing") {
-                clearInterval(poll);
-                document.getElementById("loading").classList.remove("show");
-                var ourRow = (Array.isArray(data) ? data : data.data).find(r => r["Job ID"] === jobId);
-                renderAuditReport(JSON.parse(ourRow.Payload1 + (ourRow.Payload2||"")), jobId);
-            }
+            try {
+                var res = await fetch(WH_POLL+"?job_id="+jobId);
+                var text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return; // Abaikan jika server melempar error HTML
+                var data = JSON.parse(text);
+                
+                if(data.status !== "processing") {
+                    clearInterval(poll);
+                    document.getElementById("loading").classList.remove("show");
+                    document.getElementById("btn-run").disabled = false;
+                    
+                    var rows = Array.isArray(data) ? data : (data.data || [data]);
+                    var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
+                    
+                    if(!ourRow) return alert("Data tidak ditemukan dari sistem n8n.");
+                    
+                    // RAKIT KE-10 PAYLOAD SECARA UTUH
+                    var fullPayloadStr = "";
+                    for(let i=1; i<=10; i++) {
+                        fullPayloadStr += (ourRow["Payload" + i] || "");
+                    }
+                    
+                    // AMAN DARI CRASH JIKA JSON TERPOTONG
+                    try {
+                        var parsed = JSON.parse(fullPayloadStr);
+                        renderAuditReport(parsed, jobId);
+                    } catch(err) {
+                        alert("Gagal membaca hasil JSON dari AI. Format data mungkin terlalu panjang atau rusak.\nError: " + err.message);
+                    }
+                }
+            } catch(e) { console.log("Polling error:", e); }
         }, 8000);
-    } catch(e){ alert(e.message); }
+    } catch(e){ 
+        alert(e.message); 
+        document.getElementById("loading").classList.remove("show");
+        document.getElementById("btn-run").disabled = false;
+    }
 });
 
 function renderAuditReport(parsed, jobId){
@@ -142,7 +172,7 @@ function renderAuditReport(parsed, jobId){
         });
 
         // ========================================================
-        // TABEL 1 (SERVICE REPORT) - FORCE A4 WIDTH
+        // TABEL 1 (SERVICE REPORT)
         // ========================================================
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("SERTIFIKAT"));
         if (headerKey) {
@@ -223,6 +253,8 @@ function renderAuditReport(parsed, jobId){
             });
             html += `</table></div>`;
         }
+    } else {
+        html += `<p style="padding: 20px; color:#666;">Data hasil ekstraksi kosong.</p>`;
     }
     c.innerHTML = html + `</div>`;
 }
