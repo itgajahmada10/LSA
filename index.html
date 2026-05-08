@@ -3,220 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Verifikasi Dokumen Keselamatan V7</title>
+    <title>Waruna Group | Audit Keselamatan V7 (A4 Compact)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1e3a8a; --primary-light: #eff6ff; 
-            --border-color: #e0e0e0; --text-main: #333; --text-muted: #666;
-            --success: #2e7d32; --error: #c62828;
-            --radius-md: 0.5rem; --radius-lg: 0.75rem;
+            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #15803d; --error: #b91c1c;
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; /* Kuning */
+            --bg-system: #e0f2fe; --border-system: #7dd3fc; /* Biru */
+            --bg-code: #f0fdf4; --border-code: #86efac;     /* Hijau */
         }
-        body { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-main); background: #f4f6f8; margin: 0; padding: 20px; line-height: 1.5; }
-        .app-header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:1rem 1.5rem; border-radius:12px; border:1px solid var(--border-color); margin-bottom: 20px; max-width: 1400px; margin-left: auto; margin-right: auto; }
-        .brand-name { font-weight:700; font-size:1.1rem; color:var(--primary); }
-        .upload-card { background:#fff; border-radius:12px; padding:2rem; border:1px solid var(--border-color); max-width:1400px; margin: 0 auto 24px auto; }
-        .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:1.5rem; }
-        .upload-zone { border:2px dashed #cbd5e1; border-radius:12px; padding:1.5rem; text-align:center; background:#f8fafc; }
+        
+        /* Reset & Global - Ukuran Font Diperkecil */
+        body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f8fafc; margin: 0; padding: 10px; line-height: 1.3; }
+        
+        .app-header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:0.5rem 1rem; border-radius:8px; border:1px solid var(--border-color); margin-bottom: 10px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        .brand-name { font-weight:700; font-size:1rem; color:var(--primary); text-transform: uppercase; }
+
+        .upload-card { background:#fff; border-radius:8px; padding:1rem; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto 15px auto; }
+        .upload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1rem; }
+        .upload-zone { border:1px dashed #cbd5e1; border-radius:8px; padding:0.8rem; text-align:center; background:#f8fafc; }
         .upload-zone.has-file { border-color:var(--success); background:#f0fdf4; border-style:solid; }
-        .uz-label { display:block; font-weight:700; color:var(--primary); font-size:12px; text-transform:uppercase; margin-bottom:10px; }
-        .file-input { display:block; width:100%; font-size:12px; color:var(--text-muted); cursor:pointer; }
-        .file-input::file-selector-button { display:block; width:100%; text-align:center; margin-bottom:.5rem; padding:.4rem 1rem; border-radius:var(--radius-md); border:none; font-weight:700; font-size:.75rem; background:var(--primary-light); color:var(--primary); cursor:pointer; }
-        .file-badge { display:none; margin-top:10px; font-size:12px; background:#fff; border:1px solid var(--success); border-radius:4px; padding:6px; word-break:break-all; }
-        .file-badge.show { display:block; }
-        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:14px; padding:12px; border-radius:8px; border:none; cursor:pointer; text-transform:uppercase; transition: background 0.2s; }
-        .btn-run:disabled { opacity:0.5; cursor:not-allowed; }
-        .loading-box { display:none; text-align:center; padding:2rem; background:#fff; border-radius:12px; border:1px solid var(--border-color); max-width:1400px; margin: 0 auto; }
+        .uz-label { display:block; font-weight:700; color:var(--primary); font-size:10px; text-transform:uppercase; margin-bottom:5px; }
+        .file-input { width:100%; font-size:10px; }
+        .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:12px; padding:10px; border-radius:6px; border:none; cursor:pointer; text-transform:uppercase; }
+        
+        /* Loading Box Compact */
+        .loading-box { display:none; text-align:center; padding:1.5rem; background:#fff; border-radius:8px; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto; }
         .loading-box.show { display:block; }
-        .error-box { display:none; background:#ffebee; border-left:4px solid var(--error); padding:1rem; color:var(--error); font-weight:600; border-radius:8px; margin-bottom:20px; max-width:1400px; margin: 0 auto 20px auto;}
-        .error-box.show { display:block; }
-        .spinner { width:48px; height:48px; margin:0 auto 1.25rem; border:3px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
+        .spinner { width:30px; height:30px; margin:0 auto 10px; border:3px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* TABEL LAPORAN AUDIT */
-        .card-container { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 24px; max-width: 1400px; margin-left: auto; margin-right: auto; }
-        .table-responsive { overflow-x: auto; margin-bottom: 32px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .table-responsive table { margin-bottom: 0; border: none; }
-        table { border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 32px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-        th { background-color: var(--primary-light); color: var(--primary); padding: 12px 10px; text-align: left; font-size: 11px; font-weight: 700; border-bottom: 2px solid var(--primary); border-right: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
-        td { border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 10px 10px; vertical-align: top; }
-        th:last-child, td:last-child { border-right: none; }
-        tr:last-child td { border-bottom: none; }
-        .item-row td { border-bottom: none !important; transition: opacity 0.2s; } 
-        .explanation-row td { padding-top: 4px; padding-bottom: 16px; border-top: none; }
-        .ok-cell { background-color: #fcfdfc; text-align: center; vertical-align:middle; border-left:4px solid var(--success);}
-        .err-cell { background-color: #fffafb; text-align: center; vertical-align:middle; border-left:4px solid var(--error);}
-        .section-title td { background-color: var(--primary); color: white; font-weight: 600; border-bottom: none; padding: 10px 14px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 13px; position: sticky; left: 0; }
+        /* TABEL LOGIC - A4 Fit No Scroll */
+        .card-container { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); max-width: 1200px; margin: 0 auto 20px auto; }
+        .table-responsive { width: 100%; overflow: hidden; margin-bottom: 20px; }
         
-        /* STYLE TAMBAHAN UNTUK GROUPING & PAGE REF */
-        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #0f172a; font-size: 12px; padding: 12px 14px; border-bottom: 1px solid #cbd5e1; }
-        .page-ref { font-size: 10px; color: #64748b; font-weight: 600; display: block; margin-top: 4px; font-style: italic; }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; border: 1px solid var(--border-color); }
+        th { background-color: var(--primary-light); color: var(--primary); padding: 5px 3px; font-size: 9px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; word-wrap: break-word; }
+        td { border: 1px solid var(--border-color); padding: 4px 3px; font-size: 9px; vertical-align: top; word-wrap: break-word; }
         
-        .header-info { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 2px solid var(--primary-light); }
-        .header-info-left h2 { margin: 0 0 8px 0; color: var(--primary); font-size: 22px; text-transform: uppercase;}
-        .header-info-left p { margin: 4px 0; font-size: 14px; color: var(--text-muted);}
-        .header-info-right { text-align: right; font-size: 12px; color: var(--text-muted); background: var(--primary-light); padding: 12px 16px; border-radius: 8px; border: 1px solid #dbeafe;}
-        .header-info-right strong { color: var(--primary); }
-        .ai-box { background:#fff; border:1px solid #ebebeb; padding:10px 14px; border-radius:6px; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
-        .doc-val { font-size: 11px; color: #444; background: #f8fafc; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; min-height: 20px;}
-        .doc-val-err { font-weight: 600; color: var(--error); background: #fef2f2; border-color: #fecaca; }
-        @media (max-width:768px) { .upload-grid { grid-template-columns:1fr; } }
+        .section-title td { background-color: var(--primary); color: white; font-weight: 700; padding: 6px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 10px; padding: 6px; }
+        
+        /* Warna Status */
+        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; }
+        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; }
+        
+        /* STYLE KHUSUS TABEL 2 (Sesuai Gambar User) */
+        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
+        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 2px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 9px; }
+        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 2px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 9px; font-family: monospace; }
+        
+        .doc-val { background: #fdfdfd; padding: 3px; border-radius: 2px; border: 1px solid #f1f5f9; min-height: 12px; line-height: 1.2; }
+        .page-ref { font-size: 8px; color: var(--text-muted); font-style: italic; display: block; margin-top: 2px; }
+
+        @media print {
+            body { padding: 0; background: none; }
+            .upload-card, .app-header { display: none; }
+            .card-container { border: none; padding: 0; }
+        }
     </style>
 </head>
 <body>
 
 <header class="app-header">
-    <div class="brand-name">WARUNA GROUP | Audit Dokumen AI V7</div>
+    <div class="brand-name">WARUNA | Verifikasi Dokumen Keselamatan V7</div>
 </header>
 
 <div class="upload-card">
     <div class="upload-grid">
         <div class="upload-zone" id="zone-p">
-            <span class="uz-label">📄 Quotation / Penawaran</span>
+            <span class="uz-label">📄 Quotation</span>
             <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
-            <div class="file-badge" id="fbadge-p"><strong id="fname-p">—</strong></div>
         </div>
         <div class="upload-zone" id="zone-s">
-            <span class="uz-label">📄 Laporan Sertifikat</span>
+            <span class="uz-label">📄 Sertifikat</span>
             <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
-            <div class="file-badge" id="fbadge-s"><strong id="fname-s">—</strong></div>
         </div>
         <div class="upload-zone" id="zone-d">
-            <span class="uz-label">📄 Surat Jalan / DO (Opsional)</span>
+            <span class="uz-label">📄 DO (Opsional)</span>
             <input type="file" id="file-do" class="file-input" accept="application/pdf">
-            <div class="file-badge" id="fbadge-d"><strong id="fname-d">—</strong></div>
         </div>
     </div>
-    <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
+    <button type="button" id="btn-run" class="btn-run">Mulai Analisis (A4 Optimized)</button>
 </div>
 
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
-    <h3 style="margin-top:20px; color:#1e3a8a;">Proses Audit AI Sedang Berjalan...</h3>
-    <div id="loading-txt" style="margin-top: 15px;"></div>
+    <div id="loading-txt">Sedang Memproses...</div>
 </div>
-<div class="error-box" id="err-box"></div>
+
 <div id="result"></div>
 
 <script>
-function bindFile(inId,zoneId,nameId,badgeId){
-    var inp=document.getElementById(inId); if(!inp) return;
-    inp.addEventListener("change",function(){
-        if(this.files.length){
-            document.getElementById(nameId).textContent=this.files[0].name;
-            document.getElementById(badgeId).classList.add("show");
-            document.getElementById(zoneId).classList.add("has-file");
-        }
-    });
-}
-bindFile("file-penawaran","zone-p","fname-p","fbadge-p");
-bindFile("file-sertifikat","zone-s","fname-s","fbadge-s");
-bindFile("file-do","zone-d","fname-d","fbadge-d");
-
-var pollInt = null, timerInt = null;
+// Logic Webhook (Tetap sama seperti versi sebelumnya)
 var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
 var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
-function lockUI(){
-    document.getElementById("btn-run").disabled = true;
-    document.getElementById("result").innerHTML = "";
-    document.getElementById("err-box").classList.remove("show");
-    document.getElementById("loading").classList.add("show");
-    
-    var txtEl = document.getElementById("loading-txt"), startMs = Date.now();
-    clearInterval(timerInt);
-    timerInt = setInterval(function() {
-        var diff = Math.floor((Date.now() - startMs) / 1000);
-        var m = Math.floor(diff / 60).toString().padStart(2, "0");
-        var s = (diff % 60).toString().padStart(2, "0");
-        var animArray = ["0---", "-0--", "--0-", "---0"];
-        var anim = animArray[diff % 4]; 
-        
-        txtEl.innerHTML = 
-            "<span style='font-size:24px; font-weight:700; color:var(--primary);'>" + m + ":" + s + "</span>" +
-            "<br><span style='font-family:monospace; color:#888; font-size:16px; font-weight:bold;'>[" + anim + "] Mengekstrak & Menilai Data [" + anim + "]</span>" +
-            "<div style='background:#fef2f2; border:1px solid #fecaca; color:#c62828; padding:10px; border-radius:6px; max-width:400px; margin:10px auto; font-size:12px; font-weight:500;'>" +
-            "Proses Estafet AI Berjalan. Jangan tutup halaman ini.</div>";
-    }, 1000);
-}
-
-function unlockUI(){ clearInterval(timerInt); document.getElementById("btn-run").disabled = false; document.getElementById("loading").classList.remove("show"); }
-function showErr(msg){ clearInterval(pollInt); unlockUI(); var e = document.getElementById("err-box"); e.innerHTML = "<strong>Kesalahan:</strong> " + msg; e.classList.add("show"); }
 function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    if(!pI.files.length || !sI.files.length) return showErr("Dokumen Penawaran dan Sertifikat wajib diunggah.");
+    if(!pI.files.length || !sI.files.length) return alert("Penawaran & Sertifikat wajib diunggah.");
     
     var jobId = "JOB-" + Date.now();
     var fd = new FormData();
-    fd.append("penawaran", pI.files[0]); 
-    fd.append("sertifikat", sI.files[0]); 
-    if(dI.files.length > 0) fd.append("surat_jalan", dI.files[0]);
-    fd.append("job_id", jobId);
+    fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
+    if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
     
-    lockUI();
+    document.getElementById("loading").classList.add("show");
     try {
-        var res = await fetch(WH_SUBMIT, {method:"POST", body:fd});
-        if(!res.ok) throw new Error("Server error HTTP " + res.status);
-        pollInt = setInterval(function(){ poll(jobId); }, 10000);
-    } catch(e){ showErr(e.message); }
+        await fetch(WH_SUBMIT, {method:"POST", body:fd});
+        var poll = setInterval(async function(){
+            var res = await fetch(WH_POLL+"?job_id="+jobId);
+            var data = await res.json();
+            if(data.status !== "processing") {
+                clearInterval(poll);
+                document.getElementById("loading").classList.remove("show");
+                var ourRow = (Array.isArray(data) ? data : data.data).find(r => r["Job ID"] === jobId);
+                renderAuditReport(JSON.parse(ourRow.Payload1 + (ourRow.Payload2||"")), jobId);
+            }
+        }, 8000);
+    } catch(e){ alert(e.message); }
 });
-
-async function poll(jobId){
-    try {
-        var res=await fetch(WH_POLL+"?job_id="+jobId);
-        if(!res.ok) return;
-        var txt=await res.text();
-        if(!txt || txt.trim().charAt(0)==="<") return;
-        var data=JSON.parse(txt);
-        if(data.status==="processing") return;
-        
-        var rows = Array.isArray(data) ? data : (data.data || [data]);
-        var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-        if(!ourRow) return;
-        
-        clearInterval(pollInt); unlockUI();
-        
-        var fullPayloadStr = "";
-        if (ourRow["Payload"]) fullPayloadStr = ourRow["Payload"];
-        else for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
-        
-        var parsed={};
-        try{ parsed=JSON.parse(fullPayloadStr); }catch(e){ return showErr("Gagal membaca hasil JSON dari AI."); }
-        renderAuditReport(parsed, jobId);
-    } catch(e){}
-}
 
 function renderAuditReport(parsed, jobId){
     var c = document.getElementById("result");
-    var isOk = parsed.status_keseluruhan === "ALL_MATCH";
-    var statusText = isOk ? "✅ SEMUA DOKUMEN SINKRON" : "⚠️ DITEMUKAN ANOMALI DATA";
-    var statusColor = isOk ? "var(--success)" : "var(--error)";
-
-    let namaKapal = "TIDAK TERDETEKSI";
-    if(parsed.tabel_audit) {
-        let n = parsed.tabel_audit.find(r => String(r.di_sertifikat).toLowerCase().includes("name:"));
-        if(n) {
-            let part = String(n.di_sertifikat).split('|').find(p => p.toLowerCase().includes('name:'));
-            if(part) namaKapal = part.split(':')[1].trim();
-        }
-    }
-
-    var html = `
-    <div class="card-container">
-        <div class="header-info">
-            <div class="header-info-left">
-                <h2>Laporan Verifikasi Keselamatan</h2>
-                <p><b style="color:var(--text-main)">Vessel / Kapal:</b> ${esc(namaKapal)}</p>
-                <p><b style="color:var(--text-main)">Status Akhir:</b> <span style="color:${statusColor}; font-weight:800; font-size:15px;">${statusText}</span></p>
-            </div>
-            <div class="header-info-right">
-                <div style="margin-bottom:6px;"><strong>Job ID Referensi:</strong> ${jobId}</div>
-                <div><strong>Waktu Selesai Audit:</strong> ${new Date().toLocaleString('id-ID')}</div>
-            </div>
-        </div>
-    `;
+    var html = `<div class="card-container">
+        <h3 style="margin:0 0 10px 0; color:var(--primary);">HASIL VERIFIKASI DOKUMEN [${jobId}]</h3>`;
 
     if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
         var groups = {};
@@ -227,197 +142,89 @@ function renderAuditReport(parsed, jobId){
         });
 
         // ========================================================
-        // 1. TAMPILKAN TABEL 1 (GROUPING BERDASARKAN CERT NO)
+        // TABEL 1 (SERVICE REPORT) - FORCE A4 WIDTH
         // ========================================================
-        let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("DAFTAR LAPORAN SERTIFIKAT") || k.toUpperCase().includes("KELENGKAPAN HEADER"));
-        
-        if (headerKey && groups[headerKey].length > 0) {
-            
-            // Logika Grouping Sertifikat
+        let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("SERTIFIKAT"));
+        if (headerKey) {
             let certGroups = {};
             groups[headerKey].forEach(r => {
-                let certNo = "TanPA NOMOR SERTIFIKAT";
+                let certNo = "-";
                 let parts = String(r.di_sertifikat).split('|');
-                parts.forEach(p => {
-                    let kv = p.split(':');
-                    if(kv.length >= 2 && kv[0].trim().toLowerCase().includes("certno")) {
-                        let val = kv.slice(1).join(':').trim();
-                        if(val && val !== "-") certNo = val;
-                    }
-                });
+                parts.forEach(p => { if(p.includes("CertNo:")) certNo = p.split(':')[1].trim(); });
                 if(!certGroups[certNo]) certGroups[certNo] = [];
                 certGroups[certNo].push(r);
             });
 
-            html += `<div class="table-responsive">`;
-            html += `<table style="min-width: 1600px;">`;
-            html += `<tr class="section-title"><td colspan="14">TABEL 1: DAFTAR LAPORAN SERTIFIKAT (SERVICE REPORT)</td></tr>`;
-            html += `<tr>
-                <th width="3%" class="center">NO</th>
-                <th width="10%">NAMA SERTIFIKAT</th>
-                <th width="10%">NAME OF SHIP</th>
-                <th width="10%">OWNER</th>
-                <th width="7%">IMO NUMBER</th>
-                <th width="5%">CLASS</th>
-                <th width="7%">GROSS TONNAGE</th>
-                <th width="7%">NATIONALITY</th>
-                <th width="5%">CALL SIGN</th>
-                <th width="7%">MMSI NUMBER</th>
-                <th width="7%">DATE OF SERVICING</th>
-                <th width="10%">TANGGAL TANDA TANGAN</th>
-                <th width="4%" class="center">STATUS</th>
-            </tr>`;
+            html += `<div class="table-responsive"><table>
+                <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT (A4 FIT)</td></tr>
+                <tr>
+                    <th width="20">NO</th><th width="70">LAPORAN</th><th width="70">CERT NO</th><th width="70">SHIP</th>
+                    <th width="70">OWNER</th><th width="45">IMO</th><th width="35">CLS</th><th width="40">GT</th>
+                    <th width="50">NAT</th><th width="40">CALL</th><th width="50">DATE</th><th width="50">SIGN</th><th width="40">STAT</th>
+                </tr>`;
             
-            let globalIdx = 1;
-            
+            let gIdx = 1;
             for (let certNo in certGroups) {
-                // Header Pemisah antar Nomor Sertifikat
-                html += `<tr class="group-header"><td colspan="14">NOMOR SERTIFIKAT: <span style="color:var(--primary);">${esc(certNo)}</span></td></tr>`;
-                
-                certGroups[certNo].forEach((r) => {
-                    let certData = { certificate_no: "-", name_of_ship: "-", owner: "-", imo_number: "-", class: "-", gross_tonnage: "-", nationality: "-", call_sign: "-", mmsi_number: "-", date_of_servicing: "-", tanggal_tanda_tangan: "-", page: "" };
-                    
-                    let parts = String(r.di_sertifikat).split('|');
-                    parts.forEach(p => {
-                       let kv = p.split(':');
-                       if(kv.length >= 2) {
-                           let key = kv[0].trim().toLowerCase();
-                           let val = kv.slice(1).join(':').trim();
-                           if(key.includes("certno")) certData.certificate_no = val;
-                           if(key.includes("name")) certData.name_of_ship = val;
-                           if(key.includes("owner")) certData.owner = val;
-                           if(key.includes("imo")) certData.imo_number = val;
-                           if(key.includes("class")) certData.class = val;
-                           if(key.includes("gt")) certData.gross_tonnage = val;
-                           if(key.includes("nat")) certData.nationality = val;
-                           if(key.includes("call")) certData.call_sign = val;
-                           if(key.includes("mmsi")) certData.mmsi_number = val;
-                           if(key.includes("date")) certData.date_of_servicing = val;
-                           if(key.includes("sign")) certData.tanggal_tanda_tangan = val;
-                           if(key.includes("page")) certData.page = val;
-                       }
+                html += `<tr class="group-header"><td colspan="13">CERT NO: ${esc(certNo)}</td></tr>`;
+                certGroups[certNo].forEach(r => {
+                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-", page: "" };
+                    String(r.di_sertifikat).split('|').forEach(p => {
+                        let kv = p.split(':'); if(kv.length < 2) return;
+                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+                        if(k.includes("certno")) d.cert=v; if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
+                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
+                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
+                        if(k.includes("sign")) d.sign=v; if(k.includes("page")) d.page=v;
                     });
-
-                    const getV = (key) => certData[key] && certData[key] !== "TIDAK ADA" && certData[key] !== "-" ? certData[key] : "-";
-                    
-                    let hasilAiStr = String(r.hasil_ai || "");
-                    let isWarn = hasilAiStr.includes('⚠') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
-                    let statusClassH = isWarn ? 'err-cell' : 'ok-cell';
-                    let statusColorH = isWarn ? '#c62828' : '#2e7d32';
-                    let statusText = isWarn ? '⚠️ ANOMALI' : '✅ MATCH';
-
-                    html += `<tr class="item-row">
-                        <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary);">${globalIdx++}</td>
-                        <td>
-                            <div class="doc-val" style="font-weight:700; background:#eff6ff;">
-                                ${esc(r.keterangan)}
-                                ${certData.page && certData.page !== "-" ? `<span class="page-ref">(Hal ${esc(certData.page)})</span>` : ""}
-                            </div>
-                        </td>
-                        <td><div class="doc-val">${esc(getV('name_of_ship'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('owner'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('imo_number'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('class'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('gross_tonnage'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('nationality'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('call_sign'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('mmsi_number'))}</div></td>
-                        <td><div class="doc-val">${esc(getV('date_of_servicing'))}</div></td>
-                        <td><div class="doc-val" style="font-size:10px;">${esc(getV('tanggal_tanda_tangan'))}</div></td>
-                        <td class="${statusClassH}"><span style="color:${statusColorH}; font-weight:900; font-size:12px;">${statusText}</span></td>
+                    let isWarn = String(r.hasil_ai).includes('⚠️');
+                    html += `<tr>
+                        <td align="center">${gIdx++}</td>
+                        <td><b>${esc(r.keterangan)}</b><span class="page-ref">Hal: ${esc(d.page)}</span></td>
+                        <td>${esc(d.cert)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td>${esc(d.imo)}</td>
+                        <td>${esc(d.cls)}</td><td>${esc(d.gt)}</td><td>${esc(d.nat)}</td><td>${esc(d.call)}</td>
+                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
+                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'BEDA':'OK'}</td>
                     </tr>`;
-
-                    if (isWarn) {
-                        let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|⚠️ BEDA \/ TIDAK ADA|✘ ANOMALI/gi, '').trim();
-                        if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') cleanReason = "Ditemukan ketidaksinkronan data.";
-                        if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-
-                        html += `<tr class="explanation-row">
-                            <td style="border-right:1px solid var(--border-color);"></td>
-                            <td colspan="12" style="background:#f8fafc;">
-                                <div class="ai-box" style="border-left:4px solid #c62828;">
-                                    <div style="color:#c62828; font-size:12px; margin-bottom:4px;"><b>⚠️ Analisis AI (Ketidaksesuaian):</b></div>
-                                    <div style="color:#444; font-size:12px; font-weight: 500;">${esc(cleanReason)}</div>
-                                </div>
-                            </td>
-                        </tr>`;
-                    }
                 });
             }
             html += `</table></div>`;
         }
 
         // ========================================================
-        // 2. TAMPILKAN TABEL 2 (PENAWARAN - FULL LIST)
+        // TABEL 2 (PENAWARAN) - MULTI COLOR LAYOUT
         // ========================================================
-        let penawaranItems = [];
-        for (var kat in groups) {
-            if (kat === headerKey) continue; 
-            penawaranItems = penawaranItems.concat(groups[kat]);
-        }
-
-        if (penawaranItems.length > 0) {
-            html += `<table>`;
-            html += `<tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN DARI DOKUMEN QUOTATION / PENAWARAN</td></tr>`;
-            html += `<tr>
-                <th width="5%" class="center">NO URUT</th>
-                <th width="25%">POIN PEMERIKSAAN</th>
-                <th width="15%">DI PENAWARAN</th>
-                <th width="20%">DI SERTIFIKAT</th>
-                <th width="15%">DI DELIVERY ORDER</th>
-                <th width="20%" class="center">STATUS</th>
-            </tr>`;
-
-            penawaranItems.forEach((row, idx) => {
-                var hasilAiStr = String(row.hasil_ai || "");
-                var isWarn = hasilAiStr.includes('⚠️') || hasilAiStr.toLowerCase().includes('anomali') || hasilAiStr.toLowerCase().includes('beda') || hasilAiStr.includes('✘');
-                var isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen') || hasilAiStr.toLowerCase().includes('jasa/administrasi');
-                
-                var statusIcon = isWarn ? '&#10008; ANOMALI' : '&#10004; MATCH';
-                var statusClass = isWarn ? 'err-cell' : 'ok-cell';
-                var textClass = isWarn ? 'color:#c62828;' : 'color:#2e7d32;';
-                var valClass = isWarn ? 'doc-val doc-val-err' : 'doc-val';
-                var rowStyle = (isWarn) ? '' : 'opacity: 0.85;';
-
-                html += `<tr class="item-row" style="${rowStyle}">
-                    <td align="center" style="font-weight:bold; font-size:14px; color:var(--primary); background:#fffafb;">${idx + 1}</td>
-                    <td style="background-color:#f8fafc; font-weight:700; color:#333;">${esc(row.keterangan)}</td>
-                    <td><div class="${valClass}">${esc(row.di_penawaran)}</div></td>
-                    <td><div class="${valClass}">${esc(row.di_sertifikat)}</div></td>
-                    <td><div class="${valClass}">${esc(row.di_do)}</div></td>
-                    <td class="${statusClass}"><span style="${textClass} font-weight:900; font-size:13px; letter-spacing: 0.5px;">${statusIcon}</span></td>
+        let itemsKey = Object.keys(groups).find(k => !k.toUpperCase().includes("SERTIFIKAT"));
+        if (itemsKey) {
+            html += `<div class="table-responsive"><table>
+                <tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN PENAWARAN (ALIAS MAPPING)</td></tr>
+                <tr>
+                    <th width="30">NO</th><th width="300">POIN PEMERIKSAAN (VENDOR | SISTEM | KODE)</th>
+                    <th width="70">PENAWARAN</th><th width="100">SERTIFIKAT</th><th width="60">DO</th><th width="80">STATUS</th>
                 </tr>`;
 
-                if (isWarn || isJasa) {
-                    var cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI|✅ SESUAI|✘ ANOMALI/gi, '').trim();
-                    if(!cleanReason || cleanReason === '-' || cleanReason === '.' || cleanReason === '') {
-                        cleanReason = isWarn ? "Ditemukan ketidaksinkronan data atau data hilang antar dokumen." : "Tervalidasi sesuai.";
-                    }
-                    if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+            groups[itemsKey].forEach((row, idx) => {
+                let aliasParts = String(row.alias_sistem || "-").split(" - ");
+                let itemCode = aliasParts[0] || "-";
+                let systemName = aliasParts.slice(1).join(" - ") || "-";
+                let isWarn = String(row.hasil_ai).includes('⚠️');
 
-                    var expBoxClass = isWarn ? 'border-left:4px solid #c62828;' : 'border-left:4px solid #2e7d32;';
-                    var expTitleColor = isWarn ? '#c62828' : '#2e7d32';
-                    var expIcon = isWarn ? '&#9888; Analisis AI (Ketidaksesuaian):' : '&#129302; Analisis AI (Valid):';
-
-                    html += `<tr class="explanation-row">
-                        <td style="border-right:1px solid var(--border-color);"></td>
-                        <td colspan=\"5\" style=\"background:#f8fafc;\">
-                            <div class=\"ai-box\" style=\"${expBoxClass}\">
-                                <div style=\"color:${expTitleColor}; font-size:11px; margin-bottom:2px;\"><b>${expIcon}</b></div>
-                                <div style=\"color:#444; font-size:12px; font-weight: 500;\">${esc(cleanReason)}</div>
-                            </div>
-                        </td>
-                    </tr>`;
-                }
+                html += `<tr>
+                    <td align="center">${idx + 1}</td>
+                    <td>
+                        <div class="box-vendor">${esc(row.keterangan)}</div>
+                        <div class="box-system">${esc(systemName)}</div>
+                        <div class="box-code">${esc(itemCode)}</div>
+                    </td>
+                    <td><div class="doc-val">${esc(row.di_penawaran)}</div></td>
+                    <td><div class="doc-val">${esc(row.di_sertifikat)}</div></td>
+                    <td><div class="doc-val">${esc(row.di_do)}</div></td>
+                    <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
+                </tr>`;
             });
-            html += `</table>`;
+            html += `</table></div>`;
         }
-
-    } else {
-        html += `<p style="text-align:center; padding: 20px; color:#666;">Data hasil ekstraksi kosong.</p>`;
     }
-    html += `</div>`; 
-    c.innerHTML = html;
+    c.innerHTML = html + `</div>`;
 }
 </script>
 </body>
