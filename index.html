@@ -10,12 +10,12 @@
             --primary: #1e3a8a; --primary-light: #eff6ff; 
             --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
             --success: #15803d; --error: #b91c1c;
-            --bg-vendor: #fef9c3; --border-vendor: #facc15; /* Kuning */
-            --bg-system: #e0f2fe; --border-system: #7dd3fc; /* Biru */
-            --bg-code: #f0fdf4; --border-code: #86efac;     /* Hijau */
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; /* Kuning - Bahasa Vendor */
+            --bg-system: #e0f2fe; --border-system: #7dd3fc; /* Biru - Bahasa Sistem */
+            --bg-code: #f0fdf4; --border-code: #86efac;     /* Hijau - Item Code */
         }
         
-        /* Reset & Global - Ukuran Font Diperkecil */
+        /* Reset & Global - Ukuran Font Diperkecil Untuk A4 */
         body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f8fafc; margin: 0; padding: 10px; line-height: 1.3; }
         
         .app-header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:0.5rem 1rem; border-radius:8px; border:1px solid var(--border-color); margin-bottom: 10px; max-width: 1200px; margin-left: auto; margin-right: auto; }
@@ -26,10 +26,11 @@
         .upload-zone { border:1px dashed #cbd5e1; border-radius:8px; padding:0.8rem; text-align:center; background:#f8fafc; }
         .upload-zone.has-file { border-color:var(--success); background:#f0fdf4; border-style:solid; }
         .uz-label { display:block; font-weight:700; color:var(--primary); font-size:10px; text-transform:uppercase; margin-bottom:5px; }
-        .file-input { width:100%; font-size:10px; }
+        .file-input { width:100%; font-size:10px; cursor: pointer; }
         .btn-run { width:100%; background:var(--primary); color:#fff; font-weight:700; font-size:12px; padding:10px; border-radius:6px; border:none; cursor:pointer; text-transform:uppercase; }
+        .btn-run:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        /* Loading Box Compact */
+        /* Loading Box Compact dengan Timer */
         .loading-box { display:none; text-align:center; padding:1.5rem; background:#fff; border-radius:8px; border:1px solid var(--border-color); max-width:1200px; margin: 0 auto; }
         .loading-box.show { display:block; }
         .spinner { width:30px; height:30px; margin:0 auto 10px; border:3px solid var(--primary-light); border-top-color:var(--primary); border-radius:50%; animation:spin .9s linear infinite; }
@@ -45,17 +46,18 @@
         
         .section-title td { background-color: var(--primary); color: white; font-weight: 700; padding: 6px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
         .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 10px; padding: 6px; }
+        .explanation-row td { padding: 4px 6px; border-top: none; background-color: #f8fafc; }
         
         /* Warna Status */
-        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; }
-        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; }
+        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
+        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
         
-        /* STYLE KHUSUS TABEL 2 (Sesuai Gambar User) */
+        /* STYLE KHUSUS TABEL 2 (Sesuai Permintaan) */
         .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
         .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 2px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 9px; }
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 2px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 9px; font-family: monospace; }
         
-        .doc-val { background: #fdfdfd; padding: 3px; border-radius: 2px; border: 1px solid #f1f5f9; min-height: 12px; line-height: 1.2; }
+        .doc-val { background: #fdfdfd; padding: 3px; border-radius: 2px; border: 1px solid #f1f5f9; min-height: 12px; line-height: 1.3; }
         .page-ref { font-size: 8px; color: var(--text-muted); font-style: italic; display: block; margin-top: 2px; }
 
         @media print {
@@ -74,11 +76,11 @@
 <div class="upload-card">
     <div class="upload-grid">
         <div class="upload-zone" id="zone-p">
-            <span class="uz-label">📄 Quotation</span>
+            <span class="uz-label">📄 Quotation / Penawaran</span>
             <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
         </div>
         <div class="upload-zone" id="zone-s">
-            <span class="uz-label">📄 Sertifikat</span>
+            <span class="uz-label">📄 Laporan Sertifikat</span>
             <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
         </div>
         <div class="upload-zone" id="zone-d">
@@ -91,12 +93,25 @@
 
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
-    <div id="loading-txt">Sedang Memproses...</div>
+    <div id="loading-txt" style="line-height: 1.5; color: #334155;">Sedang Memproses...</div>
 </div>
 
 <div id="result"></div>
 
 <script>
+// Fungsi deteksi warna file upload
+function bindFile(inId,zoneId){
+    var inp = document.getElementById(inId); if(!inp) return;
+    inp.addEventListener("change", function(){
+        if(this.files.length) document.getElementById(zoneId).classList.add("has-file");
+        else document.getElementById(zoneId).classList.remove("has-file");
+    });
+}
+bindFile("file-penawaran","zone-p");
+bindFile("file-sertifikat","zone-s");
+bindFile("file-do","zone-d");
+
+// Konfigurasi API
 var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
 var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
@@ -104,16 +119,23 @@ function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;"
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    if(!pI.files.length || !sI.files.length) return alert("Penawaran & Sertifikat wajib diunggah.");
+    if(!pI.files.length || !sI.files.length) return alert("Dokumen Penawaran & Sertifikat wajib diunggah.");
     
     var jobId = "JOB-" + Date.now();
     var fd = new FormData();
     fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
     if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
     
+    // Kunci UI dan Tampilkan Timer
     document.getElementById("loading").classList.add("show");
-    document.getElementById("result").innerHTML = ""; // Bersihkan layar sebelumnya
+    document.getElementById("result").innerHTML = ""; 
     document.getElementById("btn-run").disabled = true;
+    
+    var startMs = Date.now();
+    var timerInt = setInterval(function() {
+        var s = Math.floor((Date.now() - startMs) / 1000);
+        document.getElementById("loading-txt").innerHTML = `<b>AI sedang membaca dokumen & memetakan kamus...</b><br><span style='color:var(--primary); font-size:14px; font-weight:700;'>Waktu tunggu: ${s} detik</span>`;
+    }, 1000);
     
     try {
         await fetch(WH_SUBMIT, {method:"POST", body:fd});
@@ -122,37 +144,43 @@ document.getElementById("btn-run").addEventListener("click", async function(){
             try {
                 var res = await fetch(WH_POLL+"?job_id="+jobId);
                 var text = await res.text();
-                if(!text || text.trim().charAt(0) === "<") return; // Abaikan jika server melempar error HTML
-                var data = JSON.parse(text);
+                if(!text || text.trim().charAt(0) === "<") return; // Abaikan jika response server error
                 
-                if(data.status !== "processing") {
-                    clearInterval(poll);
-                    document.getElementById("loading").classList.remove("show");
-                    document.getElementById("btn-run").disabled = false;
-                    
-                    var rows = Array.isArray(data) ? data : (data.data || [data]);
-                    var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-                    
-                    if(!ourRow) return alert("Data tidak ditemukan dari sistem n8n.");
-                    
-                    // RAKIT KE-10 PAYLOAD SECARA UTUH
-                    var fullPayloadStr = "";
-                    for(let i=1; i<=10; i++) {
-                        fullPayloadStr += (ourRow["Payload" + i] || "");
-                    }
-                    
-                    // AMAN DARI CRASH JIKA JSON TERPOTONG
-                    try {
-                        var parsed = JSON.parse(fullPayloadStr);
-                        renderAuditReport(parsed, jobId);
-                    } catch(err) {
-                        alert("Gagal membaca hasil JSON dari AI. Format data mungkin terlalu panjang atau rusak.\nError: " + err.message);
-                    }
+                var data = JSON.parse(text);
+                var rows = Array.isArray(data) ? data : (data.data || [data]);
+                
+                // Cari data berdasarkan Job ID
+                var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
+                
+                // JIKA BELUM SELESAI, LANJUTKAN POLLING
+                if(data.status === "processing" || !ourRow) {
+                    return; 
                 }
+                
+                // JIKA SUDAH SELESAI, HENTIKAN TIMER DAN RENDER
+                clearInterval(poll);
+                clearInterval(timerInt);
+                document.getElementById("loading").classList.remove("show");
+                document.getElementById("btn-run").disabled = false;
+                
+                // GABUNGKAN PAYLOAD 1 HINGGA 10 (Agar JSON tidak terpotong)
+                var fullPayloadStr = "";
+                for(let i=1; i<=10; i++) {
+                    fullPayloadStr += (ourRow["Payload" + i] || "");
+                }
+                
+                try {
+                    var parsed = JSON.parse(fullPayloadStr);
+                    renderAuditReport(parsed, jobId);
+                } catch(err) {
+                    alert("Gagal mengurai hasil AI. Format data mungkin terlalu panjang. Error: " + err.message);
+                }
+                
             } catch(e) { console.log("Polling error:", e); }
         }, 8000);
     } catch(e){ 
-        alert(e.message); 
+        clearInterval(timerInt);
+        alert("Gagal mengirim dokumen: " + e.message); 
         document.getElementById("loading").classList.remove("show");
         document.getElementById("btn-run").disabled = false;
     }
@@ -161,7 +189,7 @@ document.getElementById("btn-run").addEventListener("click", async function(){
 function renderAuditReport(parsed, jobId){
     var c = document.getElementById("result");
     var html = `<div class="card-container">
-        <h3 style="margin:0 0 10px 0; color:var(--primary);">HASIL VERIFIKASI DOKUMEN [${jobId}]</h3>`;
+        <h3 style="margin:0 0 10px 0; color:var(--primary); font-size:16px;">HASIL VERIFIKASI DOKUMEN [${jobId}]</h3>`;
 
     if (parsed.tabel_audit && parsed.tabel_audit.length > 0) {
         var groups = {};
@@ -172,7 +200,7 @@ function renderAuditReport(parsed, jobId){
         });
 
         // ========================================================
-        // TABEL 1 (SERVICE REPORT)
+        // TABEL 1 (SERVICE REPORT - GROUPED BY CERT NO)
         // ========================================================
         let headerKey = Object.keys(groups).find(k => k.toUpperCase().includes("SERTIFIKAT"));
         if (headerKey) {
@@ -188,9 +216,9 @@ function renderAuditReport(parsed, jobId){
             html += `<div class="table-responsive"><table>
                 <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT (A4 FIT)</td></tr>
                 <tr>
-                    <th width="20">NO</th><th width="70">LAPORAN</th><th width="70">CERT NO</th><th width="70">SHIP</th>
+                    <th width="20" style="text-align:center;">NO</th><th width="70">LAPORAN</th><th width="70">CERT NO</th><th width="70">SHIP</th>
                     <th width="70">OWNER</th><th width="45">IMO</th><th width="35">CLS</th><th width="40">GT</th>
-                    <th width="50">NAT</th><th width="40">CALL</th><th width="50">DATE</th><th width="50">SIGN</th><th width="40">STAT</th>
+                    <th width="50">NAT</th><th width="40">CALL</th><th width="50">DATE</th><th width="50">SIGN</th><th width="40" style="text-align:center;">STAT</th>
                 </tr>`;
             
             let gIdx = 1;
@@ -206,7 +234,9 @@ function renderAuditReport(parsed, jobId){
                         if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
                         if(k.includes("sign")) d.sign=v; if(k.includes("page")) d.page=v;
                     });
-                    let isWarn = String(r.hasil_ai).includes('⚠️');
+                    
+                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
+                    
                     html += `<tr>
                         <td align="center">${gIdx++}</td>
                         <td><b>${esc(r.keterangan)}</b><span class="page-ref">Hal: ${esc(d.page)}</span></td>
@@ -228,16 +258,20 @@ function renderAuditReport(parsed, jobId){
             html += `<div class="table-responsive"><table>
                 <tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN PENAWARAN (ALIAS MAPPING)</td></tr>
                 <tr>
-                    <th width="30">NO</th><th width="300">POIN PEMERIKSAAN (VENDOR | SISTEM | KODE)</th>
-                    <th width="70">PENAWARAN</th><th width="100">SERTIFIKAT</th><th width="60">DO</th><th width="80">STATUS</th>
+                    <th width="30" style="text-align:center;">NO</th><th width="300">POIN PEMERIKSAAN (VENDOR | SISTEM | KODE)</th>
+                    <th width="70">PENAWARAN</th><th width="100">SERTIFIKAT</th><th width="60">DO</th><th width="80" style="text-align:center;">STATUS</th>
                 </tr>`;
 
             groups[itemsKey].forEach((row, idx) => {
                 let aliasParts = String(row.alias_sistem || "-").split(" - ");
                 let itemCode = aliasParts[0] || "-";
-                let systemName = aliasParts.slice(1).join(" - ") || "-";
-                let isWarn = String(row.hasil_ai).includes('⚠️');
-
+                // Gabungkan sisa array untuk jaga-jaga nama sistem mengandung tanda "-"
+                let systemName = aliasParts.slice(1).join(" - ") || "-"; 
+                
+                let hasilAiStr = String(row.hasil_ai || "");
+                let isWarn = hasilAiStr.includes('⚠️') || hasilAiStr.toLowerCase().includes('anomali');
+                
+                // Baris Item Utama
                 html += `<tr>
                     <td align="center">${idx + 1}</td>
                     <td>
@@ -250,11 +284,30 @@ function renderAuditReport(parsed, jobId){
                     <td><div class="doc-val">${esc(row.di_do)}</div></td>
                     <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
                 </tr>`;
+
+                // Baris Penjelasan (Hanya muncul jika Anomali atau Match Khusus Jasa)
+                let isJasa = hasilAiStr.toLowerCase().includes('tidak memerlukan dokumen');
+                if (isWarn || isJasa) {
+                    let cleanReason = hasilAiStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+                    if (cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+                    
+                    let borderColor = isWarn ? 'var(--error)' : 'var(--success)';
+                    let iconText = isWarn ? '⚠️ Analisis AI (Anomali)' : '✅ Analisis AI (Valid)';
+                    
+                    html += `<tr class="explanation-row">
+                        <td style="border-right:1px solid var(--border-color);"></td>
+                        <td colspan="5">
+                            <div style="border-left:3px solid ${borderColor}; padding-left:6px; font-size:9px; color:#444; margin-bottom: 4px;">
+                                <b>${iconText}:</b> ${esc(cleanReason)}
+                            </div>
+                        </td>
+                    </tr>`;
+                }
             });
             html += `</table></div>`;
         }
     } else {
-        html += `<p style="padding: 20px; color:#666;">Data hasil ekstraksi kosong.</p>`;
+        html += `<p style="padding: 20px; color:#666; text-align:center;">Data hasil ekstraksi kosong.</p>`;
     }
     c.innerHTML = html + `</div>`;
 }
