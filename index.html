@@ -3,497 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Smart Audit Dashboard</title>
+    <title>Waruna Smart Audit | Professional Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1d4ed8; --primary-hover: #1e40af; --primary-light: #eff6ff;
-            --bg-body: #f1f5f9; --bg-card: #ffffff;
-            --text-dark: #0f172a; --text-muted: #64748b; --text-light: #94a3b8;
+            --primary: #1d4ed8; --primary-light: #eff6ff;
+            --bg-body: #f8fafc; --bg-card: #ffffff;
+            --text-dark: #0f172a; --text-muted: #64748b;
             --border: #e2e8f0;
-            --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
-            --error: #dc2626; --error-bg: #fef2f2; --error-border: #fecaca;
-            --warn: #d97706; --warn-bg: #fffbeb; --warn-border: #fde68a;
+            --success: #16a34a; --success-bg: #f0fdf4;
+            --error: #dc2626; --error-bg: #fef2f2;
+            --warn: #d97706; --warn-bg: #fffbeb;
         }
 
-        body { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-dark); background: var(--bg-body); margin: 0; padding: 0; line-height: 1.5; }
-        * { box-sizing: border-box; }
-
-        /* UPLOAD SECTION (Hides after upload) */
-        #upload-section { max-width: 800px; margin: 50px auto; padding: 30px; background: var(--bg-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .app-title { text-align: center; color: var(--primary); font-size: 24px; font-weight: 800; margin-bottom: 30px; text-transform: uppercase; letter-spacing: -0.5px;}
-        .upload-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
-        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; transition: all 0.3s;}
-        .upload-zone.has-file { border-color: var(--success); background: var(--success-bg); }
-        .uz-label { font-weight: 700; color: var(--text-dark); font-size: 13px; margin-bottom: 10px; display: block;}
-        .file-input { width: 100%; font-size: 12px; }
-        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 700; font-size: 15px; padding: 15px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);}
-        .btn-run:hover { background: var(--primary-hover); }
-        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* LOADING */
-        .loading-box { display: none; text-align: center; padding: 50px; background: var(--bg-card); border-radius: 16px; max-width: 800px; margin: 50px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.05);}
-        .loading-box.show { display: block; }
-        .spinner { width: 40px; height: 40px; margin: 0 auto 20px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* DASHBOARD LAYOUT */
-        #dashboard-section { display: none; padding: 20px; max-width: 1440px; margin: 0 auto; }
+        body { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-dark); background: var(--bg-body); margin: 0; padding: 0; }
         
-        /* TOP INFO BAR (STICKY DI ATAS) */
+        /* 1. STICKY TOP BAR */
         .top-info-bar { 
-            background: var(--bg-card); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; 
-            border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
-            position: sticky; top: 15px; z-index: 100; 
+            background: var(--bg-card); padding: 15px 25px; border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        
-        .info-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
-        .info-item { display: flex; flex-direction: column; }
-        .info-label { font-size: 11px; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;}
-        .info-value { font-size: 14px; font-weight: 700; color: var(--text-dark); word-break: break-word;}
-        .status-badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid;}
-        .badge-err { background: var(--error-bg); color: var(--error); border-color: var(--error-border); }
-        .badge-ok { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
-        
-        .progress-container { display: flex; align-items: center; gap: 15px; border-top: 1px solid var(--border); padding-top: 15px;}
-        .progress-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-        .progress-track { flex-grow: 1; max-width: 300px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.5s ease;}
-        .progress-text { font-weight: 700; font-size: 13px; color: var(--text-dark);}
-        
-        .action-btns { margin-left: auto; display: flex; gap: 10px; }
-        .btn-outline { padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;}
-        .btn-outline:hover { background: var(--bg-body); border-color: var(--text-muted); }
-        .btn-solid { padding: 8px 16px; border: none; background: var(--text-dark); color: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
+        .ship-brand { display: flex; align-items: center; gap: 15px; }
+        .ship-logo { background: var(--primary); color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 14px; }
+        .ship-details { display: flex; gap: 20px; }
+        .info-box { display: flex; flex-direction: column; }
+        .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .info-val { font-weight: 700; font-size: 13px; color: var(--primary); }
 
-        /* THREE COLUMN LAYOUT */
-        .main-layout { display: grid; grid-template-columns: 220px 1fr 280px; gap: 20px; align-items: start;}
-        
-        /* SIDEBAR (STICKY DI BAWAH TOP BAR) */
-        .sidebar { 
-            display: flex; flex-direction: column; gap: 8px; 
-            position: sticky; top: 200px; 
-        }
-        
-        .nav-item { padding: 12px 16px; border-radius: 8px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; font-size: 13px;}
-        .nav-item:hover { background: var(--bg-card); color: var(--text-dark); }
-        .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.2); }
-        .nav-icon { font-size: 16px; }
+        /* 2. LAYOUT 3 COLUMN */
+        .dashboard-main { display: grid; grid-template-columns: 240px 1fr 300px; gap: 20px; padding: 20px; max-width: 1600px; margin: 0 auto; align-items: start; }
 
-        /* CONTENT AREA */
-        .content-area { display: flex; flex-direction: column; gap: 20px; }
-        .content-card { display: none; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
-        .content-card.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fafafa;}
-        .card-title { font-size: 15px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 8px;}
-        
-        /* CLEAN TABLE STYLES */
-        .clean-table { width: 100%; border-collapse: collapse; }
-        .clean-table th { padding: 12px 20px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); background: #fff; text-transform: uppercase;}
-        .clean-table td { padding: 14px 20px; font-size: 12px; border-bottom: 1px solid var(--border); color: var(--text-dark); vertical-align: top;}
-        .clean-table tr:last-child td { border-bottom: none; }
-        
-        .item-title { font-weight: 700; color: var(--primary); margin-bottom: 4px; font-size: 13px;}
-        .item-sub { font-size: 11px; color: var(--text-muted); }
-        .code-box { display: inline-block; background: var(--bg-body); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; color: #059669; border: 1px solid #d1fae5; margin-top: 4px;}
-        
-        .status-cell { text-align: right; }
-        .status-match { color: var(--success); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;}
-        .status-anomali { color: var(--error); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;}
-        
-        .reason-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 11px; color: var(--error); font-weight: 500;}
+        /* SIDEBAR STICKY */
+        .sidebar { position: sticky; top: 85px; display: flex; flex-direction: column; gap: 10px; }
+        .nav-pill { padding: 12px 15px; background: #fff; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; transition: 0.2s; }
+        .nav-pill:hover { border-color: var(--primary); background: var(--primary-light); }
+        .nav-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .count-badge { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 10px; font-size: 10px; }
 
-        /* RIGHT PANEL (RULES - STICKY DI BAWAH TOP BAR) */
-        .rules-panel { 
-            background: var(--text-dark); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            position: sticky; top: 200px; 
-        }
-        
-        .rules-header { background: #1e293b; padding: 15px 20px; color: #fff; font-weight: 700; font-size: 14px; }
-        .rules-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #fff;}
-        .rule-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 8px; border: 1px solid var(--success-border); background: var(--success-bg); }
-        .rule-item.warn { border-color: var(--warn-border); background: var(--warn-bg); }
-        .rule-icon { font-size: 14px; }
-        .rule-text { font-size: 12px; font-weight: 600; color: var(--success); }
-        .rule-item.warn .rule-text { color: var(--warn); }
-        .rule-sub { font-size: 10px; color: #666; font-weight: 400; margin-top: 2px;}
+        /* CONTENT CARDS */
+        .audit-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+        .card-header { padding: 15px 20px; background: #fafafa; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-weight: 800; font-size: 14px; text-transform: uppercase; color: var(--text-dark); }
 
-        @media print {
-            body { background: #fff; }
-            #dashboard-section { max-width: 100%; display: block !important; padding: 0;}
-            .top-info-bar, .sidebar, .rules-panel { position: static; box-shadow: none; }
-            .main-layout { display: block; }
-            .sidebar, .rules-panel, .action-btns { display: none !important; }
-            .content-card { display: block !important; margin-bottom: 20px; border: 1px solid #000; box-shadow: none;}
-        }
+        /* --- NEW TABLE STRUCTURE (MATRIX) --- */
+        .matrix-table { width: 100%; border-collapse: collapse; }
+        .matrix-table th { padding: 12px 15px; background: #f1f5f9; text-align: left; font-size: 10px; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+        .matrix-table td { padding: 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        
+        .item-identity { display: flex; flex-direction: column; gap: 5px; }
+        .vendor-name { font-weight: 700; color: var(--primary); font-size: 13px; }
+        .system-mapping { font-size: 11px; color: var(--text-muted); font-style: italic; }
+        .item-code { font-family: monospace; color: var(--success); font-weight: 700; font-size: 11px; }
+
+        /* COMPLIANCE INDICATORS (THE NEW CHECKLIST) */
+        .compliance-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+        .c-tag { padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid; }
+        .c-ok { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+        .c-err { background: var(--error-bg); color: var(--error); border-color: var(--error-border); }
+        .c-null { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+
+        .qty-badge { display: block; font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+        .qty-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+
+        .ai-reason { background: #f8fafc; border-radius: 8px; padding: 10px; margin-top: 10px; border-left: 4px solid var(--primary); font-size: 11px; line-height: 1.4; }
+        .ai-reason.anomali { border-left-color: var(--error); background: var(--error-bg); color: var(--error); }
+
+        /* RULES PANEL STICKY */
+        .rules-panel { position: sticky; top: 85px; background: #1e293b; border-radius: 12px; padding: 20px; color: #fff; }
+        .rule-item { display: flex; gap: 10px; margin-bottom: 15px; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .rule-icon { font-size: 16px; }
+
+        @media print { .top-info-bar, .sidebar, .rules-panel { position: static; box-shadow: none; display: none; } .dashboard-main { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-<div id="upload-section">
-    <div class="app-title">Waruna Smart Audit V7</div>
-    <div class="upload-grid">
-        <div class="upload-zone" id="zone-p">
-            <span class="uz-label">📄 Dokumen Quotation (Penawaran)</span>
-            <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
-        </div>
-        <div class="upload-zone" id="zone-s">
-            <span class="uz-label">📄 Dokumen Sertifikat (Laporan)</span>
-            <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
-        </div>
-        <div class="upload-zone" id="zone-d">
-            <span class="uz-label">📄 Delivery Order (Opsional)</span>
-            <input type="file" id="file-do" class="file-input" accept="application/pdf">
-        </div>
+<div id="upload-section" style="padding: 50px; text-align: center; background: #fff; margin: 50px auto; max-width: 600px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    <h2 style="color:var(--primary); margin-bottom: 30px;">WARUNA SMART AUDIT V7</h2>
+    <div style="display: grid; gap: 15px; text-align: left; margin-bottom: 30px;">
+        <div><label class="info-label">1. Dokumen Penawaran</label><input type="file" id="file-penawaran" style="width: 100%;"></div>
+        <div><label class="info-label">2. Laporan Sertifikat</label><input type="file" id="file-sertifikat" style="width: 100%;"></div>
     </div>
-    <button type="button" id="btn-run" class="btn-run">Jalankan Validasi AI</button>
+    <button id="btn-run" style="background:var(--primary); color:#fff; border:none; padding:15px 40px; border-radius:10px; font-weight:800; cursor:pointer; width:100%;">JALANKAN AUDIT KOMPREHENSIF</button>
 </div>
 
-<div class="loading-box" id="loading">
-    <div class="spinner"></div>
-    <h3 style="margin-top:0; color:var(--text-dark); font-size: 18px;">Memproses Analisis...</h3>
-    <div id="loading-txt" style="color: var(--text-muted); font-size: 13px;">Sedang membaca dokumen & mencocokkan data.</div>
+<div id="loading" style="display:none; text-align:center; padding:100px;">
+    <div style="font-size: 40px;">⏳</div>
+    <h3 id="loading-txt">0---0---0---0 ini proses nya..</h3>
 </div>
 
-<div id="dashboard-section">
-    
-    <div class="top-info-bar">
-        <div class="info-grid">
-            <div class="info-item"><span class="info-label">Vessel Name</span><span class="info-value" id="val-vessel">-</span></div>
-            <div class="info-item"><span class="info-label">IMO Number</span><span class="info-value" id="val-imo">-</span></div>
-            <div class="info-item"><span class="info-label">Call Sign</span><span class="info-value" id="val-call">-</span></div>
-            <div class="info-item"><span class="info-label">Gross Tonnage</span><span class="info-value" id="val-gt">-</span></div>
-            <div class="info-item"><span class="info-label">Owner</span><span class="info-value" id="val-owner">-</span></div>
+<div id="dashboard" style="display:none;">
+    <header class="top-info-bar">
+        <div class="ship-brand">
+            <div class="ship-logo">W</div>
+            <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="head-vessel">-</span></div>
         </div>
-        <div class="progress-container">
-            <span class="progress-label">Overall Match Score:</span>
-            <div class="progress-track"><div class="progress-fill" id="val-progress-bar" style="width: 0%;"></div></div>
-            <span class="progress-text" id="val-progress-txt">0%</span>
-            
-            <div style="margin-left: 20px; border-left: 1px solid var(--border); padding-left: 20px;" class="info-item">
-                <span class="info-label">AI Check Status</span>
-                <span id="val-status-badge" class="status-badge badge-ok">Menunggu...</span>
-            </div>
-
-            <div class="action-btns">
-                <button class="btn-outline" onclick="downloadHTML()">📥 Download File HTML</button>
-                <button class="btn-outline" onclick="window.print()">🖨️ Print Report</button>
-                <button class="btn-solid" onclick="location.reload()">🔄 New Audit</button>
-            </div>
+        <div class="ship-details">
+            <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="head-imo">-</span></div>
+            <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="head-call">-</span></div>
+            <div class="info-box"><span class="info-label">GT</span><span class="info-val" id="head-gt">-</span></div>
         </div>
-    </div>
+        <button onclick="window.print()" style="background:var(--text-dark); color:#fff; border:none; padding:8px 20px; border-radius:6px; font-weight:700; cursor:pointer;">DOWNLOAD PDF</button>
+    </header>
 
-    <div class="main-layout">
-        
+    <div class="dashboard-main">
         <aside class="sidebar">
-            <div class="nav-item active" onclick="switchTab('tab-penawaran', this)">
-                <span class="nav-icon">📋</span> Validation Penawaran
-            </div>
-            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">
-                <span class="nav-icon">🛡️</span> Data Sertifikat
-            </div>
-            <div class="nav-item" onclick="filterAnomali(this)" id="btn-filter" style="margin-top: 20px; border: 1px solid var(--border); justify-content: center;">
-                👁️ Tampilkan Hanya Error
-            </div>
+            <div class="nav-pill active"><span>📋 Validation Summary</span><span class="count-badge" id="count-total">0</span></div>
+            <div class="nav-pill" onclick="filterOnlyError()"><span>⚠️ Only Anomalies</span><span class="count-badge" id="count-error" style="background:var(--error); color:#fff;">0</span></div>
+            <div style="margin-top: 20px; padding: 10px; font-size: 10px; color: var(--text-muted); font-weight: 700;">QUICK NAVIGATION</div>
+            <div id="quick-nav-list" style="display: flex; flex-direction: column; gap: 5px;"></div>
         </aside>
 
-        <main class="content-area">
-            
-            <div id="tab-penawaran" class="content-card active">
-                <div class="card-header">
-                    <div class="card-title"><span>📋</span> Validasi Item Penawaran & DO vs Sertifikat</div>
-                </div>
-                <table class="clean-table">
-                    <thead>
-                        <tr>
-                            <th width="45%">Item Description (Quotation | System)</th>
-                            <th width="15%">Quotation</th>
-                            <th width="15%">Certificate</th>
-                            <th width="10%">DO</th>
-                            <th width="15%" style="text-align: right;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="body-penawaran">
-                        </tbody>
-                </table>
-            </div>
-
-            <div id="tab-sertifikat" class="content-card">
-                <div class="card-header">
-                    <div class="card-title"><span>🛡️</span> Laporan Ekstraksi Sertifikat (Header)</div>
-                </div>
-                <table class="clean-table" style="font-size: 10px;">
-                    <thead>
-                        <tr>
-                            <th>No. Laporan / Certificate</th>
-                            <th>Date / Sign</th>
-                            <th>Ship Name / IMO / Call Sign</th>
-                            <th>Status AI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="body-sertifikat">
-                        </tbody>
-                </table>
-            </div>
-
-        </main>
+        <main id="audit-content">
+            </main>
 
         <aside class="rules-panel">
-            <div class="rules-header">Mandatory Compliance Rules</div>
-            <div class="rules-body">
-                <div class="rule-item"><span class="rule-icon">✅</span><div><div class="rule-text">Sertifikat Valid</div><div class="rule-sub">Sesuai standar audit</div></div></div>
-                <div class="rule-item warn" id="rule-qty"><span class="rule-icon">⚠️</span><div><div class="rule-text">Kuantitas Anomali</div><div class="rule-sub">Menunggu hasil scan AI</div></div></div>
-                <div class="rule-item"><span class="rule-icon">✅</span><div><div class="rule-text">Vendor Tervalidasi</div><div class="rule-sub">Cek silang Database</div></div></div>
+            <h3 style="margin-top:0; font-size: 14px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px;">LSA REQ COMPLIANCE</h3>
+            <div class="rule-item">
+                <span class="rule-icon">⚓</span>
+                <div><b>Cap Syahbandar</b><br>Wajib untuk Liferaft, CO2, Lifeboat, & FE.</div>
+            </div>
+            <div class="rule-item">
+                <span class="rule-icon">📅</span>
+                <div><b>Expired HRU</b><br>Harus 2 Tahun. Serial Number wajib unik.</div>
+            </div>
+            <div class="rule-item">
+                <span class="rule-icon">🌬️</span>
+                <div><b>BA Compressor</b><br>Status Air Quality wajib PASS.</div>
+            </div>
+            <div class="rule-item">
+                <span class="rule-icon">📜</span>
+                <div><b>BTKP Sertifikat</b><br>Wajib terlampir untuk item mandatory.</div>
             </div>
         </aside>
-
     </div>
 </div>
 
 <script>
-// --- UI INTERACTIONS ---
-function bindFile(inId,zoneId){
-    var inp = document.getElementById(inId); if(!inp) return;
-    inp.addEventListener("change", function(){
-        if(this.files.length) document.getElementById(zoneId).classList.add("has-file");
-        else document.getElementById(zoneId).classList.remove("has-file");
-    });
-}
-bindFile("file-penawaran","zone-p");
-bindFile("file-sertifikat","zone-s");
-bindFile("file-do","zone-d");
-
-function switchTab(tabId, el) {
-    document.querySelectorAll('.nav-item').forEach(n => { if(!n.id) n.classList.remove('active'); });
-    el.classList.add('active');
-    document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-}
-
-let filterActive = false;
-function filterAnomali(el) {
-    filterActive = !filterActive;
-    if(filterActive) {
-        el.style.background = "var(--error-bg)"; el.style.color = "var(--error)"; el.style.borderColor = "var(--error-border)";
-        document.querySelectorAll('.row-match').forEach(r => r.style.display = 'none');
-    } else {
-        el.style.background = ""; el.style.color = ""; el.style.borderColor = "";
-        document.querySelectorAll('.row-match').forEach(r => r.style.display = '');
-    }
-}
+const WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+const WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
 function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-var currentShipName = "Audit_Report";
-function downloadHTML() {
-    var clone = document.documentElement.cloneNode(true);
-    var uploadCard = clone.querySelector('#upload-section');
-    if(uploadCard) uploadCard.parentNode.removeChild(uploadCard);
-    
-    // Hapus tombol-tombol action di hasil download biar rapi
-    var actionBtns = clone.querySelector('.action-btns');
-    if(actionBtns) actionBtns.parentNode.removeChild(actionBtns);
-    
-    var htmlContent = clone.outerHTML;
-    var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = currentShipName.replace(/[^a-z0-9]/gi, '_').toUpperCase() + ".html";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+document.getElementById("btn-run").addEventListener("click", async () => {
+    const p = document.getElementById("file-penawaran").files[0];
+    const s = document.getElementById("file-sertifikat").files[0];
+    if(!p || !s) return alert("Upload kedua dokumen!");
 
-// --- N8N LOGIC ---
-var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
-var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
-
-document.getElementById("btn-run").addEventListener("click", async function(){
-    var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    if(!pI.files.length || !sI.files.length) return alert("Dokumen Penawaran & Sertifikat wajib diunggah.");
-    
-    var jobId = "JOB-" + Date.now();
-    var fd = new FormData();
-    fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
-    if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
-    
     document.getElementById("upload-section").style.display = "none";
-    document.getElementById("loading").classList.add("show");
-    
-    var startMs = Date.now();
-    var timerInt = setInterval(function() {
-        var s = Math.floor((Date.now() - startMs) / 1000);
-        document.getElementById("loading-txt").innerHTML = `AI Processing... Elapsed time: <b>${s}s</b>`;
+    document.getElementById("loading").style.display = "block";
+
+    let sec = 0;
+    const timer = setInterval(() => {
+        sec++;
+        document.getElementById("loading-txt").innerHTML = `0---0---0---0 ini proses nya.. (Waktu tunggu: <b>${sec}</b> detik)`;
     }, 1000);
-    
+
+    const jobId = "JOB-" + Date.now();
+    const fd = new FormData();
+    fd.append("penawaran", p); fd.append("sertifikat", s); fd.append("job_id", jobId);
+
     try {
         await fetch(WH_SUBMIT, {method:"POST", body:fd});
-        
-        var poll = setInterval(async function(){
-            try {
-                var res = await fetch(WH_POLL+"?job_id="+jobId);
-                var text = await res.text();
-                if(!text || text.trim().charAt(0) === "<") return; 
-                
-                var data = JSON.parse(text);
-                var rows = Array.isArray(data) ? data : (data.data || [data]);
-                var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-                
-                if(data.status === "processing" || !ourRow) return; 
-                
-                clearInterval(poll);
-                clearInterval(timerInt);
-                document.getElementById("loading").classList.remove("show");
-                document.getElementById("dashboard-section").style.display = "block";
-                
-                var fullPayloadStr = "";
-                for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
-                
-                try {
-                    renderDashboard(JSON.parse(fullPayloadStr));
-                } catch(err) {
-                    alert("Gagal mengurai JSON AI: " + err.message);
-                }
-                
-            } catch(e) { console.log(e); }
+        const poll = setInterval(async () => {
+            const res = await fetch(WH_POLL+"?job_id="+jobId);
+            const data = await res.json();
+            const ourRow = (Array.isArray(data) ? data : data.data).find(r => r["Job ID"] === jobId);
+
+            if(ourRow && data.status !== "processing") {
+                clearInterval(poll); clearInterval(timer);
+                let full = ""; for(let i=1; i<=10; i++) full += (ourRow["Payload"+i] || "");
+                renderAudit(JSON.parse(full));
+            }
         }, 8000);
-    } catch(e){ 
-        clearInterval(timerInt); alert("Error: " + e.message); location.reload();
-    }
+    } catch(e) { alert(e.message); location.reload(); }
 });
 
-// --- RENDER DASHBOARD ---
-function renderDashboard(parsed) {
-    if (!parsed.tabel_audit) return;
+function renderAudit(parsed) {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
 
-    let certDataRows = [];
-    let penawaranRows = [];
+    const content = document.getElementById("audit-content");
+    let html = "";
     
-    parsed.tabel_audit.forEach(row => {
-        var k = String(row.kategori || "").toUpperCase();
-        if (k.includes("SERTIFIKAT") || k.includes("HEADER")) {
-            certDataRows.push(row);
-        } else {
-            penawaranRows.push(row);
-        }
-    });
-
-    let v_name="-", v_imo="-", v_call="-", v_gt="-", v_own="-";
-    for(let r of certDataRows) {
-        let p = String(r.di_sertifikat).toLowerCase();
-        if(p.includes("name") && v_name==="-") {
-            String(r.di_sertifikat).split('|').forEach(x => {
-                let kv = x.split(':'); if(kv.length<2) return;
-                let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
-                if(k.includes("name")) v_name=v;
-                if(k.includes("imo")) v_imo=v;
-                if(k.includes("call")) v_call=v;
-                if(k.includes("gt")) v_gt=v;
-                if(k.includes("owner")) v_own=v;
-            });
-            break;
-        }
-    }
-    
-    document.getElementById("val-vessel").innerText = v_name.toUpperCase();
-    document.getElementById("val-imo").innerText = v_imo;
-    document.getElementById("val-call").innerText = v_call;
-    document.getElementById("val-gt").innerText = v_gt;
-    document.getElementById("val-owner").innerText = v_own;
-    
-    if(v_name !== "-") currentShipName = "Audit_" + v_name;
-
-    let totalItems = penawaranRows.length;
-    let anomaliCount = 0;
-    penawaranRows.forEach(r => {
-        let h = String(r.hasil_ai).toLowerCase();
-        if(h.includes('⚠️') || h.includes('anomali') || h.includes('beda')) anomaliCount++;
-    });
-    
-    let matchPct = totalItems > 0 ? Math.round(((totalItems - anomaliCount) / totalItems) * 100) : 0;
-    document.getElementById("val-progress-bar").style.width = matchPct + "%";
-    document.getElementById("val-progress-txt").innerText = matchPct + "%";
-    
-    let badge = document.getElementById("val-status-badge");
-    let ruleQty = document.getElementById("rule-qty");
-    if(anomaliCount > 0) {
-        badge.className = "status-badge badge-err";
-        badge.innerText = "⚠️ " + anomaliCount + " ANOMALI DETECTED";
-        ruleQty.querySelector('.rule-sub').innerText = "Terdapat selisih/hilang dokumen.";
-    } else {
-        badge.className = "status-badge badge-ok";
-        badge.innerText = "✅ ALL CLEAR";
-        ruleQty.className = "rule-item"; 
-        ruleQty.querySelector('.rule-icon').innerText = "✅";
-        ruleQty.querySelector('.rule-text').innerText = "Kuantitas Sinkron";
-        ruleQty.querySelector('.rule-sub').innerText = "Data Penawaran = Sertifikat";
-    }
-
-    let htmlPenawaran = "";
-    penawaranRows.forEach((r, i) => {
-        let aliasParts = String(r.alias_sistem || "-").split(" - ");
-        let code = aliasParts[0] || "-";
-        let sysName = aliasParts.slice(1).join(" - ") || "-";
-        
-        let h = String(r.hasil_ai);
-        let isWarn = h.includes('⚠️') || h.toLowerCase().includes('anomali');
-        let rowClass = isWarn ? 'row-anomali' : 'row-match';
-        let statHtml = isWarn ? `<span class="status-anomali">❗ ANOMALI</span>` : `<span class="status-match">✔ MATCH</span>`;
-        
-        htmlPenawaran += `<tr class="${rowClass}">
-            <td>
-                <div class="item-title">${i+1}. ${esc(r.keterangan)}</div>
-                <div class="item-sub">Sys: ${esc(sysName)}</div>
-                ${code !== '-' ? `<div class="code-box">${esc(code)}</div>` : ''}
-                ${isWarn ? `<div class="reason-box">🤖 AI Note: ${esc(h.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim())}</div>` : ''}
-            </td>
-            <td><b style="font-size:12px;">${esc(r.di_penawaran)}</b></td>
-            <td><b style="font-size:12px; color:${isWarn?'var(--error)':'var(--text-dark)'};">${esc(r.di_sertifikat)}</b></td>
-            <td>${esc(r.di_do)}</td>
-            <td class="status-cell">${statHtml}</td>
-        </tr>`;
-    });
-    document.getElementById("body-penawaran").innerHTML = htmlPenawaran;
-
-    let htmlCert = "";
-    certDataRows.forEach((r) => {
-        let d = { cert: "-", ship: "-", imo: "-", call: "-", date: "-", sign: "-" };
-        String(r.di_sertifikat).split('|').forEach(p => {
-            let kv = p.split(':'); if(kv.length < 2) return;
-            let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
-            if(k.includes("certno")) d.cert=v; if(k.includes("name")) d.ship=v;
-            if(k.includes("imo")) d.imo=v; if(k.includes("call")) d.call=v;
-            if(k.includes("date")) d.date=v; if(k.includes("sign")) d.sign=v;
+    // Header Data
+    const headerRow = parsed.tabel_audit.find(r => r.di_sertifikat && r.di_sertifikat.includes("Name:"));
+    if(headerRow) {
+        const parts = headerRow.di_sertifikat.split('|');
+        parts.forEach(p => {
+            const kv = p.split(':'); if(kv.length<2) return;
+            const k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+            if(k.includes("name")) document.getElementById("head-vessel").innerText = v;
+            if(k.includes("imo")) document.getElementById("head-imo").innerText = v;
+            if(k.includes("call")) document.getElementById("head-call").innerText = v;
+            if(k.includes("gt")) document.getElementById("head-gt").innerText = v;
         });
-        
-        let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
-        let rowClass = isWarn ? 'row-anomali' : 'row-match';
-        let statHtml = isWarn ? `<span class="status-anomali">❗ BEDA</span>` : `<span class="status-match">✔ OK</span>`;
-        
-        htmlCert += `<tr class="${rowClass}">
-            <td>
-                <b style="color:var(--text-dark);">${esc(r.keterangan)}</b><br>
-                <span style="color:var(--primary); font-size:11px;">Ref: ${esc(d.cert)}</span>
-            </td>
-            <td>
-                <div>Serviced: <b>${esc(d.date)}</b></div>
-                <div style="color:var(--text-light); font-size:10px;">Signed: ${esc(d.sign)}</div>
-            </td>
-            <td>
-                <div>${esc(d.ship)}</div>
-                <div style="font-size:10px; color:var(--text-muted);">IMO: ${esc(d.imo)} | Call: ${esc(d.call)}</div>
-            </td>
-            <td class="status-cell">${statHtml}</td>
-        </tr>`;
+    }
+
+    const groups = {};
+    parsed.tabel_audit.forEach(row => {
+        const cat = row.kategori || "Other Verification";
+        if(!groups[cat]) groups[cat] = [];
+        groups[cat].push(row);
     });
-    document.getElementById("body-sertifikat").innerHTML = htmlCert;
+
+    let totalAnomali = 0;
+    Object.keys(groups).forEach(cat => {
+        html += `
+        <div class="audit-card">
+            <div class="card-header"><div class="card-title">${cat}</div></div>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th width="50%">Poin Pemeriksaan & Kepatuhan LSA</th>
+                        <th width="15%">Penawaran</th>
+                        <th width="15%">Sertifikat</th>
+                        <th width="20%">Status Analisis AI</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        groups[cat].forEach(row => {
+            const h = String(row.hasil_ai);
+            const isWarn = h.includes('⚠️') || h.toLowerCase().includes('anomali');
+            if(isWarn) totalAnomali++;
+
+            // Smart Logic untuk Deteksi Kepatuhan (Compliance Tags)
+            let tags = "";
+            const text = h.toLowerCase();
+            tags += `<span class="c-tag ${text.includes('cap syahbandar') ? (text.includes('tidak ada cap syahbandar') ? 'c-err' : 'c-ok') : 'c-null'}">Syahbandar</span> `;
+            tags += `<span class="c-tag ${text.includes('btkp') ? (text.includes('tidak ada btkp') ? 'c-err' : 'c-ok') : 'c-null'}">BTKP</span> `;
+            tags += `<span class="c-tag ${text.includes('expired') ? (text.includes('expired kurang') ? 'c-err' : 'c-ok') : 'c-null'}">Expiry</span> `;
+            tags += `<span class="c-tag ${text.includes('air quality') ? (text.includes('fail') ? 'c-err' : 'c-ok') : 'c-null'}">Air Quality</span> `;
+
+            const alias = String(row.alias_sistem || "-").split(" - ");
+            
+            html += `
+            <tr class="${isWarn ? 'row-warn' : 'row-ok'}">
+                <td>
+                    <div class="item-identity">
+                        <div class="vendor-name">${esc(row.keterangan)}</div>
+                        <div class="system-mapping">${esc(alias[1] || "-")}</div>
+                        <div class="item-code">${esc(alias[0] || "-")}</div>
+                    </div>
+                    <div class="compliance-grid">${tags}</div>
+                </td>
+                <td><span class="qty-badge">${esc(row.di_penawaran)}</span><span class="qty-label">Qty Billed</span></td>
+                <td><span class="qty-badge">${esc(row.di_sertifikat)}</span><span class="qty-label">Qty Actual</span></td>
+                <td>
+                    <div style="font-weight:800; color:${isWarn?'var(--error)':'var(--success)'}; font-size:11px;">
+                        ${isWarn ? '⚠️ ANOMALI' : '✅ MATCH'}
+                    </div>
+                    <div class="ai-reason ${isWarn?'anomali':''}">${esc(h.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim())}</div>
+                </td>
+            </tr>`;
+        });
+        html += `</tbody></table></div>`;
+    });
+
+    content.innerHTML = html;
+    document.getElementById("count-total").innerText = parsed.tabel_audit.length;
+    document.getElementById("count-error").innerText = totalAnomali;
+}
+
+function filterOnlyError() {
+    const rows = document.querySelectorAll('.row-ok');
+    rows.forEach(r => r.style.display = r.style.display === 'none' ? '' : 'none');
 }
 </script>
-
 </body>
 </html>
