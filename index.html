@@ -63,16 +63,17 @@
 
         /* CONTENT TABS */
         .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-        .content-card.active { display: block; }
+        .content-card.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         /* RINGKASAN KRITIS (EXECUTIVE SUMMARY) */
-        .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px; margin: 15px; border-left: 4px solid var(--error); }
-        .critical-title { color: var(--error); font-size: 14px; font-weight: 800; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
-        .critical-subtitle { font-size: 11px; color: #991b1b; margin-top: 0; margin-bottom: 12px; font-style: italic; }
-        .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 11.5px; line-height: 1.5; }
-        .critical-list li { margin-bottom: 6px; }
+        .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--error); }
+        .critical-title { color: var(--error); font-size: 16px; font-weight: 800; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .critical-subtitle { font-size: 12px; color: #991b1b; margin-top: 0; margin-bottom: 15px; font-style: italic; }
+        .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 12px; line-height: 1.6; font-weight: 500; }
+        .critical-list li { margin-bottom: 8px; }
         
-        .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px 20px; margin: 15px; border-left: 4px solid var(--success); }
+        .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--success); }
 
         /* KLASIK TABEL V7 */
         .table-responsive { width: 100%; overflow-x: auto; }
@@ -104,6 +105,7 @@
             .top-info-bar, .sidebar { display: none !important; }
             .main-layout { display: block; }
             #dashboard-section { padding: 0; max-width: 100%; }
+            /* Memaksa semua tab terbuka agar ikut tercetak */
             .content-card { display: block !important; margin-bottom: 20px; border: none; }
         }
     </style>
@@ -114,11 +116,11 @@
     <div class="app-title">Waruna LSA Audit - V7 Pro</div>
     <div class="upload-grid">
         <div class="upload-zone" id="zone-p">
-            <span class="uz-label">📄 Dokumen Penawaran</span>
+            <span class="uz-label">📄 Quotation Document</span>
             <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
         </div>
         <div class="upload-zone" id="zone-s">
-            <span class="uz-label">📄 Laporan Sertifikat</span>
+            <span class="uz-label">📄 Certificate Report</span>
             <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
         </div>
         <div class="upload-zone" id="zone-d">
@@ -126,12 +128,12 @@
             <input type="file" id="file-do" class="file-input" accept="application/pdf">
         </div>
     </div>
-    <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
+    <button type="button" id="btn-run" class="btn-run">RUN COMPREHENSIVE AUDIT</button>
 </div>
 
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
-    <h3 style="margin-top:0; color:var(--text-main);">Memproses Audit Keselamatan...</h3>
+    <h3 style="margin-top:0; color:var(--text-main);">AI is processing document...</h3>
     <div id="loading-txt" style="color: var(--text-muted); font-size: 13px; font-weight: 600;">0---0---0---0 ini proses nya..</div>
 </div>
 
@@ -151,24 +153,45 @@
 
     <div class="main-layout">
         <aside class="sidebar">
-            <div class="nav-item active" onclick="switchTab('tab-penawaran', this)">📋 Validasi Penawaran</div>
-            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">🛡️ Data Sertifikat (Tabel 1)</div>
-            <div class="nav-item filter-btn" onclick="toggleFilter(this)" style="margin-top: 15px; justify-content: center;">👁️ Hanya Anomali</div>
+            <div class="nav-item active" onclick="switchTab('tab-summary', this)">📊 Summary</div>
+            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">🛡️ Certificate</div>
+            <div class="nav-item" onclick="switchTab('tab-penawaran', this)">📋 Quotation</div>
+            <div class="nav-item filter-btn" onclick="toggleFilter(this)" style="margin-top: 15px; justify-content: center;">👁️ Only Anomalies</div>
         </aside>
 
         <main class="content-area">
-            <div id="tab-penawaran" class="content-card active">
-                
-                <div id="critical-summary-container"></div>
+            
+            <div id="tab-summary" class="content-card active">
+                <div id="critical-summary-container">
+                    <div style="padding: 30px; text-align: center; color: #666; font-style: italic;">
+                        Data ringkasan akan muncul di sini setelah AI selesai menganalisis.
+                    </div>
+                </div>
+            </div>
 
+            <div id="tab-sertifikat" class="content-card">
                 <div class="table-responsive">
                     <table>
-                        <tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN PENAWARAN (ALIAS MAPPING & COMPLIANCE CHECK)</td></tr>
+                        <tr class="section-title"><td colspan="13">CERTIFICATE LIST</td></tr>
+                        <tr>
+                            <th width="3%">NO</th><th width="15%">REPORT</th><th width="12%">CERT NO</th><th width="12%">SHIP</th>
+                            <th width="12%">OWNER</th><th width="8%">IMO</th><th width="5%">CLS</th><th width="5%">GT</th>
+                            <th width="8%">NAT</th><th width="5%">CALL</th><th width="8%">DATE</th><th width="8%">SIGN</th><th width="7%">STAT</th>
+                        </tr>
+                        <tbody id="body-sertifikat"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-penawaran" class="content-card">
+                <div class="table-responsive">
+                    <table>
+                        <tr class="section-title"><td colspan="6">QUOTATION (ALIAS MAPPING & COMPLIANCE CHECK)</td></tr>
                         <tr>
                             <th width="4%">NO</th>
-                            <th width="45%">POIN PEMERIKSAAN (VENDOR | SISTEM | KODE)</th>
-                            <th width="15%">PENAWARAN (QTY)</th>
-                            <th width="15%">SERTIFIKAT (QTY)</th>
+                            <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
+                            <th width="15%">QUOTATION (QTY)</th>
+                            <th width="15%">CERTIFICATE (QTY)</th>
                             <th width="8%">DO</th>
                             <th width="13%">STATUS</th>
                         </tr>
@@ -177,19 +200,6 @@
                 </div>
             </div>
 
-            <div id="tab-sertifikat" class="content-card">
-                <div class="table-responsive">
-                    <table>
-                        <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT</td></tr>
-                        <tr>
-                            <th width="3%">NO</th><th width="15%">LAPORAN</th><th width="12%">CERT NO</th><th width="12%">SHIP</th>
-                            <th width="12%">OWNER</th><th width="8%">IMO</th><th width="5%">CLS</th><th width="5%">GT</th>
-                            <th width="8%">NAT</th><th width="5%">CALL</th><th width="8%">DATE</th><th width="8%">SIGN</th><th width="7%">STAT</th>
-                        </tr>
-                        <tbody id="body-sertifikat"></tbody>
-                    </table>
-                </div>
-            </div>
         </main>
     </div>
 </div>
@@ -241,7 +251,7 @@ var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    if(!pI.files.length || !sI.files.length) return alert("Penawaran & Sertifikat wajib diunggah.");
+    if(!pI.files.length || !sI.files.length) return alert("Quotation & Certificate documents are required.");
     
     var jobId = "JOB-" + Date.now();
     var fd = new FormData();
@@ -361,13 +371,13 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // Render Ringkasan Kritis
+    // Render Ringkasan Kritis ke dalam TAB SUMMARY
     let criticalContainer = document.getElementById("critical-summary-container");
     if (anomalyList.length > 0) {
         let listHtml = anomalyList.map(issue => `<li>${issue}</li>`).join('');
         criticalContainer.innerHTML = `
             <div class="critical-summary">
-                <h4 class="critical-title">⚠️ Perhatian Pembeli Diperlukan</h4>
+                <h4 class="critical-title">⚠️ Buyer Attention Required</h4>
                 <p class="critical-subtitle">Ringkasan masalah kritis yang dihasilkan AI berdasarkan SOP LSA:</p>
                 <ol class="critical-list">${listHtml}</ol>
             </div>
@@ -375,8 +385,8 @@ function renderAuditReport(parsed) {
     } else {
         criticalContainer.innerHTML = `
             <div class="success-summary">
-                <h4 class="critical-title" style="color: var(--success);">✅ Audit Selesai: Tidak Ditemukan Anomali</h4>
-                <p style="margin:0; font-size:11.5px; color:#166534;">Semua item penawaran sesuai dengan dokumen sertifikat berdasarkan bukti pengecekan komponen.</p>
+                <h4 class="critical-title" style="color: var(--success);">✅ Audit Completed: No Anomalies Detected</h4>
+                <p style="margin:0; font-size:12px; color:#166534; font-weight:500;">Semua item penawaran sesuai dengan dokumen sertifikat berdasarkan bukti pengecekan komponen.</p>
             </div>
         `;
     }
