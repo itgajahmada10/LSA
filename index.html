@@ -3,274 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Smart Audit | Professional Dashboard</title>
+    <title>Waruna Group | Smart Audit LSA V7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1d4ed8; --primary-light: #eff6ff;
-            --bg-body: #f8fafc; --bg-card: #ffffff;
-            --text-dark: #0f172a; --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #16a34a; --success-bg: #f0fdf4;
-            --error: #dc2626; --error-bg: #fef2f2;
-            --warn: #d97706; --warn-bg: #fffbeb;
+            --primary: #1e3a8a; --primary-light: #eff6ff; 
+            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #15803d; --error: #b91c1c;
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; /* Kuning */
+            --bg-system: #e0f2fe; --border-system: #7dd3fc; /* Biru */
+            --bg-code: #f0fdf4; --border-code: #86efac;     /* Hijau */
         }
-
-        body { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-dark); background: var(--bg-body); margin: 0; padding: 0; }
         
-        /* 1. STICKY TOP BAR */
+        body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f1f5f9; margin: 0; padding: 0; line-height: 1.3; }
+        * { box-sizing: border-box; }
+
+        /* UPLOAD SECTION */
+        #upload-section { max-width: 900px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .app-title { text-align: center; color: var(--primary); font-size: 20px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; }
+        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; background: #f8fafc; }
+        .upload-zone.has-file { border-color: var(--success); background: #f0fdf4; border-style: solid; }
+        .uz-label { display: block; font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+        .file-input { width: 100%; font-size: 10px; cursor: pointer; }
+        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
+
+        /* LOADING */
+        .loading-box { display: none; text-align: center; padding: 40px; background: #fff; border-radius: 12px; max-width: 900px; margin: 40px auto; border: 1px solid var(--border-color); }
+        .loading-box.show { display: block; }
+        .spinner { width: 40px; height: 40px; margin: 0 auto 15px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* DASHBOARD LAYOUT */
+        #dashboard-section { display: none; padding: 15px; max-width: 1300px; margin: 0 auto; }
+        
+        /* TOP INFO BAR (STICKY) */
         .top-info-bar { 
-            background: var(--bg-card); padding: 15px 25px; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; 
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 10px; z-index: 1000;
         }
-        .ship-brand { display: flex; align-items: center; gap: 15px; }
-        .ship-logo { background: var(--primary); color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 14px; }
-        .ship-details { display: flex; gap: 20px; }
+        .ship-info { display: flex; gap: 20px; align-items: center; }
         .info-box { display: flex; flex-direction: column; }
         .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
-        .info-val { font-weight: 700; font-size: 13px; color: var(--primary); }
+        .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
+        .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .btn-action:hover { background: var(--primary-light); }
 
-        /* 2. LAYOUT 3 COLUMN */
-        .dashboard-main { display: grid; grid-template-columns: 240px 1fr 300px; gap: 20px; padding: 20px; max-width: 1600px; margin: 0 auto; align-items: start; }
-
-        /* SIDEBAR STICKY */
-        .sidebar { position: sticky; top: 85px; display: flex; flex-direction: column; gap: 10px; }
-        .nav-pill { padding: 12px 15px; background: #fff; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; transition: 0.2s; }
-        .nav-pill:hover { border-color: var(--primary); background: var(--primary-light); }
-        .nav-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .count-badge { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 10px; font-size: 10px; }
-
-        /* CONTENT CARDS */
-        .audit-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
-        .card-header { padding: 15px 20px; background: #fafafa; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .card-title { font-weight: 800; font-size: 14px; text-transform: uppercase; color: var(--text-dark); }
-
-        /* --- NEW TABLE STRUCTURE (MATRIX) --- */
-        .matrix-table { width: 100%; border-collapse: collapse; }
-        .matrix-table th { padding: 12px 15px; background: #f1f5f9; text-align: left; font-size: 10px; text-transform: uppercase; color: var(--text-muted); border-bottom: 2px solid var(--border); }
-        .matrix-table td { padding: 15px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        /* MAIN 2-COLUMN LAYOUT */
+        .main-layout { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start; }
         
-        .item-identity { display: flex; flex-direction: column; gap: 5px; }
-        .vendor-name { font-weight: 700; color: var(--primary); font-size: 13px; }
-        .system-mapping { font-size: 11px; color: var(--text-muted); font-style: italic; }
-        .item-code { font-family: monospace; color: var(--success); font-weight: 700; font-size: 11px; }
+        /* SIDEBAR (STICKY) */
+        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 90px; }
+        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .nav-item:hover { border-color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .filter-btn { background: #fff; color: var(--error); border: 1px solid var(--error); }
+        .filter-btn.active { background: var(--error); color: #fff; }
 
-        /* COMPLIANCE INDICATORS (THE NEW CHECKLIST) */
-        .compliance-grid { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
-        .c-tag { padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid; }
-        .c-ok { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
-        .c-err { background: var(--error-bg); color: var(--error); border-color: var(--error-border); }
-        .c-null { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+        /* CONTENT TABS */
+        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+        .content-card.active { display: block; }
+        
+        /* KLASIK TABEL V7 */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        th { background-color: var(--primary-light); color: var(--primary); padding: 8px 5px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; }
+        td { border: 1px solid var(--border-color); padding: 6px 5px; font-size: 10px; vertical-align: top; word-wrap: break-word; }
+        
+        .section-title td { background-color: var(--primary); color: white; font-weight: 700; padding: 8px 10px; font-size: 12px; text-transform: uppercase; }
+        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 11px; padding: 8px; }
+        
+        /* COLOR BOXES UTK NAMA VENDOR/SISTEM/KODE */
+        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
+        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 10px; }
+        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
+        
+        .doc-val { background: #fdfdfd; padding: 4px; border-radius: 2px; border: 1px solid #f1f5f9; font-weight: 600; font-size: 11px; }
+        
+        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
+        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
 
-        .qty-badge { display: block; font-size: 14px; font-weight: 800; margin-bottom: 2px; }
-        .qty-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+        /* EXPLANATION ROW (Penjelasan Analisis AI) */
+        .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
+        .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; font-weight: 500; }
+        .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
+        .ai-note.ok { background: #f0fdf4; border-left: 3px solid var(--success); color: var(--success); }
 
-        .ai-reason { background: #f8fafc; border-radius: 8px; padding: 10px; margin-top: 10px; border-left: 4px solid var(--primary); font-size: 11px; line-height: 1.4; }
-        .ai-reason.anomali { border-left-color: var(--error); background: var(--error-bg); color: var(--error); }
+        body.filter-anomali .row-match { display: none !important; }
 
-        /* RULES PANEL STICKY */
-        .rules-panel { position: sticky; top: 85px; background: #1e293b; border-radius: 12px; padding: 20px; color: #fff; }
-        .rule-item { display: flex; gap: 10px; margin-bottom: 15px; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .rule-icon { font-size: 16px; }
-
-        @media print { .top-info-bar, .sidebar, .rules-panel { position: static; box-shadow: none; display: none; } .dashboard-main { grid-template-columns: 1fr; } }
+        @media print {
+            body { background: #fff; }
+            .top-info-bar, .sidebar { display: none !important; }
+            .main-layout { display: block; }
+            #dashboard-section { padding: 0; max-width: 100%; }
+            .content-card { display: block !important; margin-bottom: 20px; border: none; }
+        }
     </style>
 </head>
 <body>
 
-<div id="upload-section" style="padding: 50px; text-align: center; background: #fff; margin: 50px auto; max-width: 600px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-    <h2 style="color:var(--primary); margin-bottom: 30px;">WARUNA SMART AUDIT V7</h2>
-    <div style="display: grid; gap: 15px; text-align: left; margin-bottom: 30px;">
-        <div><label class="info-label">1. Dokumen Penawaran</label><input type="file" id="file-penawaran" style="width: 100%;"></div>
-        <div><label class="info-label">2. Laporan Sertifikat</label><input type="file" id="file-sertifikat" style="width: 100%;"></div>
+<div id="upload-section">
+    <div class="app-title">Waruna LSA Audit - V7 Pro</div>
+    <div class="upload-grid">
+        <div class="upload-zone" id="zone-p">
+            <span class="uz-label">📄 Dokumen Penawaran</span>
+            <input type="file" id="file-penawaran" class="file-input" accept="application/pdf">
+        </div>
+        <div class="upload-zone" id="zone-s">
+            <span class="uz-label">📄 Laporan Sertifikat</span>
+            <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
+        </div>
+        <div class="upload-zone" id="zone-d">
+            <span class="uz-label">📄 Delivery Order</span>
+            <input type="file" id="file-do" class="file-input" accept="application/pdf">
+        </div>
     </div>
-    <button id="btn-run" style="background:var(--primary); color:#fff; border:none; padding:15px 40px; border-radius:10px; font-weight:800; cursor:pointer; width:100%;">JALANKAN AUDIT KOMPREHENSIF</button>
+    <button type="button" id="btn-run" class="btn-run">Mulai Analisis Dokumen</button>
 </div>
 
-<div id="loading" style="display:none; text-align:center; padding:100px;">
-    <div style="font-size: 40px;">⏳</div>
-    <h3 id="loading-txt">0---0---0---0 ini proses nya..</h3>
+<div class="loading-box" id="loading">
+    <div class="spinner"></div>
+    <h3 style="margin-top:0; color:var(--text-main);">Memproses Audit Keselamatan...</h3>
+    <div id="loading-txt" style="color: var(--text-muted); font-size: 13px; font-weight: 600;">0---0---0---0 ini proses nya..</div>
 </div>
 
-<div id="dashboard" style="display:none;">
-    <header class="top-info-bar">
-        <div class="ship-brand">
-            <div class="ship-logo">W</div>
-            <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="head-vessel">-</span></div>
+<div id="dashboard-section">
+    
+    <div class="top-info-bar">
+        <div class="ship-info">
+            <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
+            <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
+            <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
+            <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
         </div>
-        <div class="ship-details">
-            <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="head-imo">-</span></div>
-            <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="head-call">-</span></div>
-            <div class="info-box"><span class="info-label">GT</span><span class="info-val" id="head-gt">-</span></div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-action" onclick="downloadHTML()">💾 Download HTML</button>
+            <button class="btn-action" onclick="window.print()" style="background: var(--text-main); color: #fff; border-color: var(--text-main);">🖨️ Print</button>
         </div>
-        <button onclick="window.print()" style="background:var(--text-dark); color:#fff; border:none; padding:8px 20px; border-radius:6px; font-weight:700; cursor:pointer;">DOWNLOAD PDF</button>
-    </header>
+    </div>
 
-    <div class="dashboard-main">
+    <div class="main-layout">
+        
         <aside class="sidebar">
-            <div class="nav-pill active"><span>📋 Validation Summary</span><span class="count-badge" id="count-total">0</span></div>
-            <div class="nav-pill" onclick="filterOnlyError()"><span>⚠️ Only Anomalies</span><span class="count-badge" id="count-error" style="background:var(--error); color:#fff;">0</span></div>
-            <div style="margin-top: 20px; padding: 10px; font-size: 10px; color: var(--text-muted); font-weight: 700;">QUICK NAVIGATION</div>
-            <div id="quick-nav-list" style="display: flex; flex-direction: column; gap: 5px;"></div>
+            <div class="nav-item active" onclick="switchTab('tab-penawaran', this)">📋 Validasi Penawaran</div>
+            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">🛡️ Data Sertifikat (Tabel 1)</div>
+            <div class="nav-item filter-btn" onclick="toggleFilter(this)" style="margin-top: 15px; justify-content: center;">👁️ Hanya Anomali</div>
         </aside>
 
-        <main id="audit-content">
-            </main>
+        <main class="content-area">
+            
+            <div id="tab-penawaran" class="content-card active">
+                <div class="table-responsive">
+                    <table>
+                        <tr class="section-title"><td colspan="6">TABEL 2: PERMINTAAN PENAWARAN (ALIAS MAPPING & COMPLIANCE CHECK)</td></tr>
+                        <tr>
+                            <th width="4%">NO</th>
+                            <th width="45%">POIN PEMERIKSAAN (VENDOR | SISTEM | KODE)</th>
+                            <th width="15%">PENAWARAN (QTY)</th>
+                            <th width="15%">SERTIFIKAT (QTY)</th>
+                            <th width="8%">DO</th>
+                            <th width="13%">STATUS</th>
+                        </tr>
+                        <tbody id="body-penawaran"></tbody>
+                    </table>
+                </div>
+            </div>
 
-        <aside class="rules-panel">
-            <h3 style="margin-top:0; font-size: 14px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px;">LSA REQ COMPLIANCE</h3>
-            <div class="rule-item">
-                <span class="rule-icon">⚓</span>
-                <div><b>Cap Syahbandar</b><br>Wajib untuk Liferaft, CO2, Lifeboat, & FE.</div>
+            <div id="tab-sertifikat" class="content-card">
+                <div class="table-responsive">
+                    <table>
+                        <tr class="section-title"><td colspan="13">TABEL 1: DAFTAR LAPORAN SERTIFIKAT</td></tr>
+                        <tr>
+                            <th width="3%">NO</th><th width="15%">LAPORAN</th><th width="12%">CERT NO</th><th width="12%">SHIP</th>
+                            <th width="12%">OWNER</th><th width="8%">IMO</th><th width="5%">CLS</th><th width="5%">GT</th>
+                            <th width="8%">NAT</th><th width="5%">CALL</th><th width="8%">DATE</th><th width="8%">SIGN</th><th width="7%">STAT</th>
+                        </tr>
+                        <tbody id="body-sertifikat"></tbody>
+                    </table>
+                </div>
             </div>
-            <div class="rule-item">
-                <span class="rule-icon">📅</span>
-                <div><b>Expired HRU</b><br>Harus 2 Tahun. Serial Number wajib unik.</div>
-            </div>
-            <div class="rule-item">
-                <span class="rule-icon">🌬️</span>
-                <div><b>BA Compressor</b><br>Status Air Quality wajib PASS.</div>
-            </div>
-            <div class="rule-item">
-                <span class="rule-icon">📜</span>
-                <div><b>BTKP Sertifikat</b><br>Wajib terlampir untuk item mandatory.</div>
-            </div>
-        </aside>
+
+        </main>
     </div>
 </div>
 
 <script>
-const WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
-const WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
+function bindFile(inId,zoneId){
+    var inp = document.getElementById(inId); if(!inp) return;
+    inp.addEventListener("change", function(){
+        if(this.files.length) document.getElementById(zoneId).classList.add("has-file");
+        else document.getElementById(zoneId).classList.remove("has-file");
+    });
+}
+bindFile("file-penawaran","zone-p");
+bindFile("file-sertifikat","zone-s");
+bindFile("file-do","zone-d");
+
+function switchTab(tabId, el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
+
+let isFilter = false;
+function toggleFilter(el) {
+    isFilter = !isFilter;
+    if(isFilter) {
+        el.classList.add('active'); document.body.classList.add('filter-anomali');
+    } else {
+        el.classList.remove('active'); document.body.classList.remove('filter-anomali');
+    }
+}
 
 function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-document.getElementById("btn-run").addEventListener("click", async () => {
-    const p = document.getElementById("file-penawaran").files[0];
-    const s = document.getElementById("file-sertifikat").files[0];
-    if(!p || !s) return alert("Upload kedua dokumen!");
+var currentShipName = "LSA_Audit";
+function downloadHTML() {
+    var clone = document.documentElement.cloneNode(true);
+    var u = clone.querySelector('#upload-section'); if(u) u.parentNode.removeChild(u);
+    var htmlContent = clone.outerHTML;
+    var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a"); a.href = url; a.download = currentShipName + ".html";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
 
+var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
+
+document.getElementById("btn-run").addEventListener("click", async function(){
+    var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
+    if(!pI.files.length || !sI.files.length) return alert("Penawaran & Sertifikat wajib diunggah.");
+    
+    var jobId = "JOB-" + Date.now();
+    var fd = new FormData();
+    fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
+    if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
+    
     document.getElementById("upload-section").style.display = "none";
-    document.getElementById("loading").style.display = "block";
-
-    let sec = 0;
-    const timer = setInterval(() => {
-        sec++;
-        document.getElementById("loading-txt").innerHTML = `0---0---0---0 ini proses nya.. (Waktu tunggu: <b>${sec}</b> detik)`;
+    document.getElementById("loading").classList.add("show");
+    
+    var startMs = Date.now();
+    var timerInt = setInterval(function() {
+        var s = Math.floor((Date.now() - startMs) / 1000);
+        document.getElementById("loading-txt").innerHTML = `0---0---0---0 ini proses nya.. (Waktu tunggu: <b>${s}</b> detik)`;
     }, 1000);
-
-    const jobId = "JOB-" + Date.now();
-    const fd = new FormData();
-    fd.append("penawaran", p); fd.append("sertifikat", s); fd.append("job_id", jobId);
-
+    
     try {
         await fetch(WH_SUBMIT, {method:"POST", body:fd});
-        const poll = setInterval(async () => {
-            const res = await fetch(WH_POLL+"?job_id="+jobId);
-            const data = await res.json();
-            const ourRow = (Array.isArray(data) ? data : data.data).find(r => r["Job ID"] === jobId);
-
-            if(ourRow && data.status !== "processing") {
-                clearInterval(poll); clearInterval(timer);
-                let full = ""; for(let i=1; i<=10; i++) full += (ourRow["Payload"+i] || "");
-                renderAudit(JSON.parse(full));
-            }
+        var poll = setInterval(async function(){
+            try {
+                var res = await fetch(WH_POLL+"?job_id="+jobId);
+                var text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return; 
+                
+                var data = JSON.parse(text);
+                var rows = Array.isArray(data) ? data : (data.data || [data]);
+                var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
+                
+                if(data.status === "processing" || !ourRow) return; 
+                
+                clearInterval(poll); clearInterval(timerInt);
+                document.getElementById("loading").classList.remove("show");
+                document.getElementById("dashboard-section").style.display = "block";
+                
+                var fullPayloadStr = ""; for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
+                renderAuditReport(JSON.parse(fullPayloadStr));
+                
+            } catch(e) { console.log(e); }
         }, 8000);
-    } catch(e) { alert(e.message); location.reload(); }
+    } catch(e){ clearInterval(timerInt); alert(e.message); location.reload(); }
 });
 
-function renderAudit(parsed) {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-
-    const content = document.getElementById("audit-content");
-    let html = "";
-    
-    // Header Data
-    const headerRow = parsed.tabel_audit.find(r => r.di_sertifikat && r.di_sertifikat.includes("Name:"));
-    if(headerRow) {
-        const parts = headerRow.di_sertifikat.split('|');
-        parts.forEach(p => {
-            const kv = p.split(':'); if(kv.length<2) return;
-            const k = kv[0].trim().toLowerCase(), v = kv[1].trim();
-            if(k.includes("name")) document.getElementById("head-vessel").innerText = v;
-            if(k.includes("imo")) document.getElementById("head-imo").innerText = v;
-            if(k.includes("call")) document.getElementById("head-call").innerText = v;
-            if(k.includes("gt")) document.getElementById("head-gt").innerText = v;
-        });
-    }
-
-    const groups = {};
-    parsed.tabel_audit.forEach(row => {
-        const cat = row.kategori || "Other Verification";
-        if(!groups[cat]) groups[cat] = [];
-        groups[cat].push(row);
+function renderAuditReport(parsed) {
+    if (!parsed.tabel_audit) return;
+    let certRows = [], penRows = [];
+    parsed.tabel_audit.forEach(r => {
+        let k = String(r.kategori || "").toUpperCase();
+        if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
     });
 
-    let totalAnomali = 0;
-    Object.keys(groups).forEach(cat => {
-        html += `
-        <div class="audit-card">
-            <div class="card-header"><div class="card-title">${cat}</div></div>
-            <table class="matrix-table">
-                <thead>
-                    <tr>
-                        <th width="50%">Poin Pemeriksaan & Kepatuhan LSA</th>
-                        <th width="15%">Penawaran</th>
-                        <th width="15%">Sertifikat</th>
-                        <th width="20%">Status Analisis AI</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+    // Populate Top Bar
+    let v_name="-", v_imo="-", v_call="-", v_own="-";
+    for(let r of certRows) {
+        if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
+            String(r.di_sertifikat).split('|').forEach(x => {
+                let kv = x.split(':'); if(kv.length<2) return;
+                let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                if(k.includes("name")) v_name=v; if(k.includes("imo")) v_imo=v;
+                if(k.includes("call")) v_call=v; if(k.includes("owner")) v_own=v;
+            });
+            break;
+        }
+    }
+    document.getElementById("val-vessel").innerText = v_name.toUpperCase();
+    document.getElementById("val-imo").innerText = v_imo;
+    document.getElementById("val-call").innerText = v_call;
+    document.getElementById("val-owner").innerText = v_own;
+    if(v_name !== "-") currentShipName = "Audit_" + v_name;
 
-        groups[cat].forEach(row => {
-            const h = String(row.hasil_ai);
-            const isWarn = h.includes('⚠️') || h.toLowerCase().includes('anomali');
-            if(isWarn) totalAnomali++;
+    // Render Tabel Penawaran (Tabel 2 - Klasik Box)
+    let htmlPen = "";
+    penRows.forEach((r, idx) => {
+        let aliasParts = String(r.alias_sistem || "-").split(" - ");
+        let itemCode = aliasParts[0] || "-";
+        let systemName = aliasParts.slice(1).join(" - ") || "-";
+        
+        let hasilStr = String(r.hasil_ai || "");
+        let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
+        let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
-            // Smart Logic untuk Deteksi Kepatuhan (Compliance Tags)
-            let tags = "";
-            const text = h.toLowerCase();
-            tags += `<span class="c-tag ${text.includes('cap syahbandar') ? (text.includes('tidak ada cap syahbandar') ? 'c-err' : 'c-ok') : 'c-null'}">Syahbandar</span> `;
-            tags += `<span class="c-tag ${text.includes('btkp') ? (text.includes('tidak ada btkp') ? 'c-err' : 'c-ok') : 'c-null'}">BTKP</span> `;
-            tags += `<span class="c-tag ${text.includes('expired') ? (text.includes('expired kurang') ? 'c-err' : 'c-ok') : 'c-null'}">Expiry</span> `;
-            tags += `<span class="c-tag ${text.includes('air quality') ? (text.includes('fail') ? 'c-err' : 'c-ok') : 'c-null'}">Air Quality</span> `;
+        htmlPen += `<tr class="${rowClass}">
+            <td align="center"><b>${idx + 1}</b></td>
+            <td>
+                <div class="box-vendor">${esc(r.keterangan)}</div>
+                <div class="box-system">${esc(systemName)}</div>
+                <div class="box-code">${esc(itemCode)}</div>
+            </td>
+            <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+            <td><div class="doc-val">${esc(r.di_sertifikat)}</div></td>
+            <td align="center">${esc(r.di_do)}</td>
+            <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
+        </tr>`;
 
-            const alias = String(row.alias_sistem || "-").split(" - ");
+        // Baris Penjelasan SOP (Muncul di bawah item jika Anomali ATAU berisi pesan kepatuhan)
+        let isJasa = hasilStr.toLowerCase().includes('jasa') || hasilStr.toLowerCase().includes('tidak memerlukan dokumen');
+        if (isWarn || isJasa || hasilStr.trim() !== "") {
+            let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+            if(cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+            if(cleanReason !== "") {
+                htmlPen += `<tr class="explanation-row ${rowClass}">
+                    <td style="border-right:1px solid var(--border-color);"></td>
+                    <td colspan="5">
+                        <div class="ai-note ${isWarn ? 'err' : 'ok'}">
+                            <b>${isWarn ? '⚠️ Peringatan Kepatuhan LSA:' : '✅ Analisis AI:'}</b> ${esc(cleanReason)}
+                        </div>
+                    </td>
+                </tr>`;
+            }
+        }
+    });
+    document.getElementById("body-penawaran").innerHTML = htmlPen;
+
+    // Render Tabel Sertifikat (Tabel 1 Header Group)
+    let htmlCert = "";
+    let certGroups = {};
+    certRows.forEach(r => {
+        let cNo = "-";
+        String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
+        if(!certGroups[cNo]) certGroups[cNo] = [];
+        certGroups[cNo].push(r);
+    });
+
+    let gIdx = 1;
+    for (let cNo in certGroups) {
+        let groupWarn = certGroups[cNo].some(r => {
+            let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
+        });
+        htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">CERTIFICATE NUMBER: ${esc(cNo)}</td></tr>`;
+        
+        certGroups[cNo].forEach(r => {
+            let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
+            String(r.di_sertifikat).split('|').forEach(p => {
+                let kv = p.split(':'); if(kv.length < 2) return;
+                let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+                if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
+                if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
+                if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
+                if(k.includes("sign")) d.sign=v;
+            });
             
-            html += `
-            <tr class="${isWarn ? 'row-warn' : 'row-ok'}">
-                <td>
-                    <div class="item-identity">
-                        <div class="vendor-name">${esc(row.keterangan)}</div>
-                        <div class="system-mapping">${esc(alias[1] || "-")}</div>
-                        <div class="item-code">${esc(alias[0] || "-")}</div>
-                    </div>
-                    <div class="compliance-grid">${tags}</div>
-                </td>
-                <td><span class="qty-badge">${esc(row.di_penawaran)}</span><span class="qty-label">Qty Billed</span></td>
-                <td><span class="qty-badge">${esc(row.di_sertifikat)}</span><span class="qty-label">Qty Actual</span></td>
-                <td>
-                    <div style="font-weight:800; color:${isWarn?'var(--error)':'var(--success)'}; font-size:11px;">
-                        ${isWarn ? '⚠️ ANOMALI' : '✅ MATCH'}
-                    </div>
-                    <div class="ai-reason ${isWarn?'anomali':''}">${esc(h.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim())}</div>
-                </td>
+            let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
+            let rowClass = isWarn ? 'row-anomali' : 'row-match';
+
+            htmlCert += `<tr class="${rowClass}">
+                <td align="center">${gIdx++}</td>
+                <td><b>${esc(r.keterangan)}</b></td>
+                <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td>${esc(d.imo)}</td>
+                <td>${esc(d.cls)}</td><td>${esc(d.gt)}</td><td>${esc(d.nat)}</td><td>${esc(d.call)}</td>
+                <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
+                <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'BEDA':'OK'}</td>
             </tr>`;
         });
-        html += `</tbody></table></div>`;
-    });
-
-    content.innerHTML = html;
-    document.getElementById("count-total").innerText = parsed.tabel_audit.length;
-    document.getElementById("count-error").innerText = totalAnomali;
-}
-
-function filterOnlyError() {
-    const rows = document.querySelectorAll('.row-ok');
-    rows.forEach(r => r.style.display = r.style.display === 'none' ? '' : 'none');
+    }
+    document.getElementById("body-sertifikat").innerHTML = htmlCert;
 }
 </script>
+
 </body>
 </html>
