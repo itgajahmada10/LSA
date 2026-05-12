@@ -362,7 +362,7 @@ function renderAuditReport(parsed) {
                     <td style="border-right:1px solid var(--border-color);"></td>
                     <td colspan="5">
                         <div class="ai-note ${isWarn ? 'err' : 'ok'}">
-                            <b>${isWarn ? '⚠️ Peringatan Kepatuhan LSA:' : '✅ Bukti Pengecekan AI:'}</b> ${esc(cleanReason)}
+                            <b>${isWarn ? '⚠️ AI Generated (Anomali):' : '✅ AI Generated:'}</b> ${esc(cleanReason)}
                         </div>
                     </td>
                 </tr>`;
