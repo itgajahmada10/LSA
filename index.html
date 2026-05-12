@@ -264,7 +264,7 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     var startMs = Date.now();
     var timerInt = setInterval(function() {
         var s = Math.floor((Date.now() - startMs) / 1000);
-        document.getElementById("loading-txt").innerHTML = `0---0---0---0 ini proses nya.. (Waktu tunggu: <b>${s}</b> detik)`;
+        document.getElementById("loading-txt").innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
     }, 1000);
     
     try {
