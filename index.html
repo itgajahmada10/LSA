@@ -313,12 +313,29 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     }
 });
 function renderAuditReport(parsed) {
-    if (!parsed.tabel_audit) return;
+    // FIX: Jika data berupa array dari Merge Node n8n, satukan objeknya
+    if (Array.isArray(parsed)) {
+        let combined = { tabel_audit: [], summary_sertifikat: [] };
+        parsed.forEach(item => {
+            if (item.tabel_audit) combined.tabel_audit = combined.tabel_audit.concat(item.tabel_audit);
+            if (item.summary_sertifikat) combined.summary_sertifikat = combined.summary_sertifikat.concat(item.summary_sertifikat);
+        });
+        parsed = combined;
+    }
+
+    // Jika setelah disatukan tetap kosong, hentikan proses
+    if (!parsed || !parsed.tabel_audit) {
+        console.error("Data tabel_audit tidak ditemukan pada objek:", parsed);
+        return;
+    }
+
     let certRows = [], penRows = [];
     parsed.tabel_audit.forEach(r => {
         let k = String(r.kategori || "").toUpperCase();
         if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
     });
+
+    // ... (Sisa kode render htmlPen dan certRows ke bawah tetap sama seperti sebelumnya) ...
 
     // 1. Populate Top Bar (Data Kapal)
     let v_name="-", v_imo="-", v_call="-", v_own="-";
