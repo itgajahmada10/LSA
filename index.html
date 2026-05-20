@@ -27,6 +27,7 @@
         .uz-label { display: block; font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
         .file-input { width: 100%; font-size: 10px; cursor: pointer; }
         .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
+        #ui-message { display: none; margin-bottom: 15px; padding: 10px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
         /* LOADING */
         .loading-box { display: none; text-align: center; padding: 40px; background: #fff; border-radius: 12px; max-width: 900px; margin: 40px auto; border: 1px solid var(--border-color); }
@@ -114,6 +115,7 @@
 
 <div id="upload-section">
     <div class="app-title">Waruna LSA Audit - V7 Pro</div>
+    <div id="ui-message"></div>
     <div class="upload-grid">
         <div class="upload-zone" id="zone-p">
             <span class="uz-label">📄 Quotation Document</span>
@@ -134,7 +136,7 @@
 <div class="loading-box" id="loading">
     <div class="spinner"></div>
     <h3 style="margin-top:0; color:var(--text-main);">AI is processing document...</h3>
-    <div id="loading-txt" style="color: var(--text-muted); font-size: 13px; font-weight: 600;">0---0---0---0 ini proses nya..</div>
+    <div id="loading-txt" style="color: var(--text-muted); font-size: 13px; font-weight: 600;">(Waiting time: 0 seconds)</div>
 </div>
 
 <div id="dashboard-section">
@@ -216,6 +218,15 @@ bindFile("file-penawaran","zone-p");
 bindFile("file-sertifikat","zone-s");
 bindFile("file-do","zone-d");
 
+function showMessage(msg, isError) {
+    const el = document.getElementById('ui-message');
+    el.innerHTML = msg;
+    el.style.display = 'block';
+    el.style.backgroundColor = isError ? '#fef2f2' : '#f0fdf4';
+    el.style.color = isError ? '#b91c1c' : '#15803d';
+    el.style.border = `1px solid ${isError ? '#fecaca' : '#bbf7d0'}`;
+}
+
 function switchTab(tabId, el) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     el.classList.add('active');
@@ -251,7 +262,11 @@ var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
 document.getElementById("btn-run").addEventListener("click", async function(){
     var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
-    if(!pI.files.length || !sI.files.length) return alert("Quotation & Certificate documents are required.");
+    
+    if(!pI.files.length || !sI.files.length) {
+        showMessage("⚠️ Dokumen Quotation & Certificate wajib diunggah.", true);
+        return;
+    }
     
     var jobId = "JOB-" + Date.now();
     var fd = new FormData();
@@ -288,9 +303,14 @@ document.getElementById("btn-run").addEventListener("click", async function(){
                 var fullPayloadStr = ""; for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
                 renderAuditReport(JSON.parse(fullPayloadStr));
                 
-            } catch(e) { console.log(e); }
+            } catch(e) { console.log("Polling error: ", e); }
         }, 8000);
-    } catch(e){ clearInterval(timerInt); alert(e.message); location.reload(); }
+    } catch(e){ 
+        clearInterval(timerInt); 
+        document.getElementById("loading").classList.remove("show");
+        document.getElementById("upload-section").style.display = "block";
+        showMessage("Koneksi ke server gagal. " + e.message, true); 
+    }
 });
 
 function renderAuditReport(parsed) {
@@ -318,12 +338,12 @@ function renderAuditReport(parsed) {
     document.getElementById("val-imo").innerText = v_imo;
     document.getElementById("val-call").innerText = v_call;
     document.getElementById("val-owner").innerText = v_own;
-    if(v_name !== "-") currentShipName = "Audit_" + v_name;
+    if(v_name !== "-") currentShipName = "Audit_" + v_name.replace(/\s+/g, '_');
 
-    // Render Tabel Penawaran & Rangkum Anomali
     let htmlPen = "";
     let anomalyList = [];
 
+    // Render Tabel Penawaran & Tangkap Anomali
     penRows.forEach((r, idx) => {
         let aliasParts = String(r.alias_sistem || "-").split(" - ");
         let itemCode = aliasParts[0] || "-";
@@ -333,7 +353,6 @@ function renderAuditReport(parsed) {
         let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
         let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
-        // Tangkap data anomali untuk Ringkasan Kritis
         if (isWarn) {
             let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
             if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
@@ -371,11 +390,14 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // Render Ringkasan Kritis ke dalam TAB SUMMARY
+    // Render TAB SUMMARY (Ringkasan Kritis + Peta Lokasi Sertifikat 11 Sistem)
     let criticalContainer = document.getElementById("critical-summary-container");
+    let summaryHtml = "";
+
+    // 1. Critical Summary Block
     if (anomalyList.length > 0) {
         let listHtml = anomalyList.map(issue => `<li>${issue}</li>`).join('');
-        criticalContainer.innerHTML = `
+        summaryHtml += `
             <div class="critical-summary">
                 <h4 class="critical-title">⚠️ Buyer Attention Required</h4>
                 <p class="critical-subtitle">Ringkasan masalah kritis yang dihasilkan AI berdasarkan SOP LSA:</p>
@@ -383,13 +405,53 @@ function renderAuditReport(parsed) {
             </div>
         `;
     } else {
-        criticalContainer.innerHTML = `
+        summaryHtml += `
             <div class="success-summary">
                 <h4 class="critical-title" style="color: var(--success);">✅ Audit Completed: No Anomalies Detected</h4>
                 <p style="margin:0; font-size:12px; color:#166534; font-weight:500;">Semua item penawaran sesuai dengan dokumen sertifikat berdasarkan bukti pengecekan komponen.</p>
             </div>
         `;
     }
+
+    // 2. Peta Lokasi 11 Sertifikat (Dari AI Watchdog)
+    if (parsed.summary_sertifikat && parsed.summary_sertifikat.length > 0) {
+        summaryHtml += `
+            <div style="margin: 20px;">
+                <h4 style="color: var(--primary); font-size: 14px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px;">📑 Peta Lokasi Dokumen & Nomor Sertifikat</h4>
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th width="5%" class="center">NO</th>
+                            <th width="35%">KATEGORI SISTEM (LSA & FFA)</th>
+                            <th width="40%">NOMOR SERTIFIKAT</th>
+                            <th width="20%">HALAMAN PDF</th>
+                        </tr>
+                        <tbody>
+        `;
+        
+        parsed.summary_sertifikat.forEach((item, idx) => {
+            let isFound = item.no_sertifikat !== "-" && item.no_sertifikat.toLowerCase() !== "tidak ditemukan" && item.halaman !== "-";
+            let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
+            
+            summaryHtml += `
+                <tr>
+                    <td align="center" style="font-weight: 700; color: #64748b;">${idx + 1}</td>
+                    <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
+                    <td><div class="doc-val" style="${valClass}">${esc(item.no_sertifikat)}</div></td>
+                    <td><div class="doc-val" style="${valClass}">${esc(item.halaman)}</div></td>
+                </tr>
+            `;
+        });
+        
+        summaryHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    criticalContainer.innerHTML = summaryHtml;
 
     // Render Tabel Sertifikat
     let htmlCert = "";
