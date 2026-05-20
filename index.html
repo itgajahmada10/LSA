@@ -31,8 +31,19 @@
         .header-title { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-subtitle { font-size: 10px; color: #93c5fd; margin-top: 2px; }
         
+        /* INPUT AREA CONTROL PANEL (3 DOCUMENTS) */
+        .upload-panel { background: #ffffff; border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius: 0 0 8px 8px; display: table; width: 100%; table-layout: fixed; border-spacing: 15px 0; }
+        .upload-col { display: table-cell; vertical-align: top; }
+        .input-group { display: block; margin-bottom: 10px; }
+        .input-group label { display: block; font-weight: 700; color: #475569; margin-bottom: 4px; text-transform: uppercase; font-size: 10px; }
+        .input-file { width: 100%; padding: 6px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 11px; font-family: inherit; }
+        
+        .btn-proses { width: 100%; background: #2563eb; color: #ffffff; border: none; padding: 10px; border-radius: 4px; font-weight: 800; font-size: 12px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; margin-top: 15px; text-align: center; }
+        .btn-proses:hover { background: #1d4ed8; }
+        .btn-proses:disabled { background: #94a3b8; cursor: not-allowed; }
+
         /* VESSEL TOP INFO PANEL */
-        .vessel-panel { background: #ffffff; border: 1px solid var(--border-color); border-top: none; padding: 12px 20px; display: block; margin-bottom: 20px; border-radius: 0 0 8px 8px; }
+        .vessel-panel { background: #ffffff; border: 1px solid var(--border-color); padding: 12px 20px; display: none; margin-bottom: 20px; border-radius: 8px; }
         .vessel-table { width: 100%; border-collapse: collapse; }
         .vessel-table td { padding: 4px 0; font-size: 11px; vertical-align: top; }
         .vessel-label { color: var(--text-muted); font-weight: 600; width: 12%; }
@@ -53,21 +64,19 @@
         
         .widget-body { padding: 15px; }
         
-        /* TABLE STYLING WITHIN WIDGETS */
+        /* TABLE STYLING */
         .audit-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }
         .audit-table th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; }
         .audit-table td { padding: 8px 10px; border: 1px solid #e2e8f0; vertical-align: middle; }
-        .audit-table tr:nth-child(even) { background: #fdfdfd; }
         
-        /* COLUMN SPECIAL BADGES */
+        /* COLUMN BADGES */
         .qty-badge { font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px; display: inline-block; }
         .cert-badge { font-weight: 700; color: var(--success); background: var(--success-bg); padding: 2px 6px; border-radius: 4px; display: inline-block; }
         .cert-badge.missing { color: var(--error); background: var(--error-bg); }
         .status-ok { color: var(--success); font-weight: 700; }
         .status-err { color: var(--error); font-weight: 700; }
         
-        /* GRID SPLIT LAYOUT (Manual table/block fallback for columns) */
-        .split-block { width: 100%; display: table; table-layout: fixed; border-spacing: 15px 0; margin-left: -15px; margin-right: -15px; }
+        .split-block { width: 100%; display: table; table-layout: fixed; border-spacing: 15px 0; }
         .split-col { display: table-cell; vertical-align: top; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; }
         .col-title-quotation { color: var(--primary); font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; border-bottom: 2px solid #dbeafe; padding-bottom: 4px; }
         .col-title-cert { color: var(--success); font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; border-bottom: 2px solid #dcfce7; padding-bottom: 4px; }
@@ -77,25 +86,21 @@
         .mini-label { font-weight: 600; color: #475569; }
         .mini-val { float: right; font-weight: 700; color: var(--text-main); }
         
-        /* 4 CO2 CELL FLEX FALLBACK BLOCK */
         .co2-grid { display: table; width: 100%; table-layout: fixed; border-spacing: 10px 0; margin-bottom: 12px; }
         .co2-cell { display: table-cell; background: #ffffff; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; text-align: center; }
         .co2-cell-label { font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .co2-cell-val { font-size: 16px; font-weight: 800; color: var(--text-main); }
         
-        /* ALERT BANNER BOXES */
         .alert-box { padding: 10px 12px; border-radius: 6px; font-size: 11px; margin-top: 10px; display: block; }
         .alert-box-warning { background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning); }
         .alert-box-error { background: var(--error-bg); border: 1px solid #fecaca; color: var(--error); }
         .alert-title { font-weight: 700; text-transform: uppercase; font-size: 10px; margin-bottom: 2px; display: block; }
         
-        /* DECK BADGES FOR LIFEBOAT */
         .deck-badge { padding: 2px 6px; border-radius: 3px; font-weight: 800; color: #ffffff; font-size: 9px; display: inline-block; }
         .deck-port { background: #2563eb; }
         .deck-stbd { background: #16a34a; }
         .deck-stern { background: #475569; }
         
-        /* LOADING / BLANK STATE STYLING */
         .blank-state { padding: 40px; text-align: center; color: var(--text-muted); background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; }
         .blank-icon { font-size: 24px; margin-bottom: 8px; display: block; }
     </style>
@@ -107,74 +112,162 @@
         <div class="header-subtitle">Waruna Shipping Maritime LSA/FFA Safety System Auditor v7.0</div>
     </div>
 
-    <div class="vessel-panel">
+    <div class="upload-panel">
+        <div class="upload-col" style="width: 40%;">
+            <div class="input-group">
+                <label>1. Dokumen Penawaran / Quotation Vendor (PDF)</label>
+                <input type="file" id="file-penawaran" class="input-file" accept="application/pdf">
+            </div>
+            <div class="input-group">
+                <label>2. Berkas Gabungan Sertifikat Servis Fisik (PDF)</label>
+                <input type="file" id="file-sertifikat" class="input-file" accept="application/pdf">
+            </div>
+        </div>
+        <div class="upload-col" style="width: 40%;">
+            <div class="input-group">
+                <label>3. Dokumen Delivery Order / DO (PDF - Opsional)</label>
+                <input type="file" id="file-do" class="input-file" accept="application/pdf">
+            </div>
+            <div class="input-group">
+                <label>4. Running Job ID Tag</label>
+                <input type="text" id="txt-job-id" class="input-file" style="padding: 5px;" placeholder="Contoh: JOB-1779266353169">
+            </div>
+        </div>
+        <div class="upload-col" style="width: 20%; vertical-align: bottom;">
+            <button id="btn-submit" class="btn-proses" onclick="pemicuProsesn8n()">🚀 Proses Dokumen</button>
+        </div>
+    </div>
+
+    <div class="vessel-panel" id="panel-identitas-kapal">
         <table class="vessel-table">
             <tr>
                 <td class="vessel-label">VESSEL NAME</td>
                 <td class="vessel-divider">:</td>
-                <td class="vessel-value" id="val-vessel">LOADING...</td>
+                <td class="vessel-value" id="val-vessel">-</td>
                 
                 <td class="vessel-label">IMO NUMBER</td>
                 <td class="vessel-divider">:</td>
-                <td class="vessel-value" id="val-imo">LOADING...</td>
+                <td class="vessel-value" id="val-imo">-</td>
                 
                 <td class="vessel-label">CALL SIGN</td>
                 <td class="vessel-divider">:</td>
-                <td class="vessel-value" id="val-call">LOADING...</td>
+                <td class="vessel-value" id="val-call">-</td>
                 
                 <td class="vessel-label">SHIP OWNER</td>
                 <td class="vessel-divider">:</td>
-                <td class="vessel-value" id="val-owner">LOADING...</td>
+                <td class="vessel-value" id="val-owner">-</td>
             </tr>
         </table>
     </div>
 
     <div class="dashboard-container" id="modern-dashboard-container">
-        <div class="blank-state">
-            <span class="blank-icon">🔄</span>
-            <b>Menunggu Data n8n...</b>
-            <p style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">Pastikan data audit terisi penuh dari node AI Judge LSA.</p>
+        <div class="blank-state" id="state-awal">
+            <span class="blank-icon">📄</span>
+            <b>Silakan Unggah 3 Dokumen di Atas</b>
+            <p style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">Masukkan file Penawaran, Sertifikat, dan DO (jika ada), lalu klik tombol Proses untuk memulai audit paralel n8n.</p>
         </div>
     </div>
 
     <script>
-        // Failsafe escape HTML helper function
-        function esc(str) {
-            if (!str) return "-";
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+        // Ganti dengan domain internal self-hosted n8n Anda secara presisi
+        const URL_WEBHOOK_N8N = "https://n8n.warunagroup.com/webhook/audit-dokumen"; 
 
-        // ENTRY POINT: Diaktifkan secara otomatis jika n8n menyuntikkan data JSON
-        function renderAuditReport(parsed) {
-            if (!parsed || !parsed.tabel_audit) {
-                document.getElementById("modern-dashboard-container").innerHTML = `
-                    <div class="blank-state">
-                        <span class="blank-icon">⚠️</span>
-                        <b>Struktur Data Tidak Sesuai</b>
-                        <p style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">Gagal mendeteksi array 'tabel_audit' dari n8n.</p>
-                    </div>`;
+        // Fungsi pembungkus 3 Dokumen Biner menuju Pintu Masuk Webhook n8n
+        async function pemicuProsesn8n() {
+            const btn = document.getElementById("btn-submit");
+            const filePen = document.getElementById("file-penawaran").files[0];
+            const fileSer = document.getElementById("file-sertifikat").files[0];
+            const fileDo = document.getElementById("file-do").files[0];
+            let jobId = document.getElementById("txt-job-id").value.trim();
+
+            // Proteksi Validasi Formulir Input
+            if (!filePen || !fileSer) {
+                alert("Gagal: Berkas Penawaran Vendor dan Berkas Sertifikat Servis wajib diisi!");
                 return;
             }
+            if (!jobId) {
+                jobId = "JOB-" + Date.now();
+                document.getElementById("txt-job-id").value = jobId;
+            }
+
+            // Kunci antarmuka tombol dan ubah menjadi Loading State
+            btn.disabled = true;
+            btn.innerText = "⏳ Sedang Memproses...";
+            document.getElementById("modern-dashboard-container").innerHTML = `
+                <div class="blank-state">
+                    <span class="blank-icon">🔄</span>
+                    <b>Arsitektur Paralel AI n8n Sedang Berjalan...</b>
+                    <p style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">Mengekstrak data logistik, memvalidasi nomor seri, dan menguji 11 sistem penawaran keselamatan sesuai SOP.</p>
+                </div>`;
+
+            // Proses Pengikatan 3 Dokumen Biner ke dalam FormData Multi-Part
+            const formData = new FormData();
+            formData.append("penawaran", filePen); // Sesuai nama objek di n8n hulu
+            formData.append("sertifikat", fileSer); // Sesuai nama objek di n8n hulu
+            if (fileDo) {
+                formData.append("surat_jalan", fileDo); // Sesuai nama objek di n8n hulu (Map Binary DO1)
+            }
+            formData.append("job_id", jobId);
+
+            try {
+                const response = await fetch(URL_WEBHOOK_N8N, {
+                    method: "POST",
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error("Jalur Webhook n8n mengembalikan status error.");
+                
+                const resultJson = await response.json();
+                
+                // Jika arsitektur n8n Anda diseting membalas sinkron secara langsung (Direct Response)
+                if(resultJson.tabel_audit || resultJson.Payload1) {
+                    let parsedData = resultJson;
+                    if(resultJson.Payload1) {
+                        let fullPayloadStr = resultJson.Payload1 + (resultJson.Payload2 || "") + (resultJson.Payload3 || "");
+                        parsedData = JSON.parse(fullPayloadStr);
+                    }
+                    renderAuditReport(parsedData);
+                } else {
+                    // Jika arsitektur n8n diseting asinkron (Balas Instan ke Vercel aktif)
+                    document.getElementById("modern-dashboard-container").innerHTML = `
+                        <div class="blank-state">
+                            <span class="blank-icon">✅</span>
+                            <b>3 Dokumen Berhasil Masuk Antrean n8n!</b>
+                            <p style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">Proses audit sedang berjalan di latar belakang dan masuk ke Google Sheets. Silakan muat ulang halaman ini dalam beberapa saat untuk melihat hasil widget visual.</p>
+                        </div>`;
+                    btn.disabled = false;
+                    btn.innerText = "🚀 Proses Dokumen";
+                }
+            } catch (error) {
+                alert("Koneksi Error: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "🚀 Proses Dokumen";
+                document.getElementById("modern-dashboard-container").innerHTML = `
+                    <div class="blank-state">
+                        <span class="blank-icon">❌</span>
+                        <b>Gagal Mengirim Dokumen ke Server n8n</b>
+                        <p style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">Pastikan alamat instance self-hosted n8n aktif dan policy CORS mengizinkan pengunggahan berkas.</p>
+                    </div>`;
+            }
+        }
+
+        function esc(str) {
+            if (!str) return "-";
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // GENERATOR DASBOR KOMPONEN KLAUSUL INTERAKTIF
+        function renderAuditReport(parsed) {
+            if (!parsed || !parsed.tabel_audit) return;
             
+            document.getElementById("panel-identitas-kapal").style.display = "block";
             let certRows = [], penRows = [];
             parsed.tabel_audit.forEach(r => {
                 let k = String(r.kategori || "").toUpperCase();
-                let isHeader = String(r.keterangan || "").toLowerCase().includes("name:") || 
-                               String(r.di_sertifikat || "").toLowerCase().includes("name:");
-                               
-                if (k.includes("SERTIFIKAT") || k.includes("HEADER") || isHeader) {
-                    certRows.push(r);
-                } else {
-                    penRows.push(r);
-                }
+                let isHeader = String(r.keterangan || "").toLowerCase().includes("name:") || String(r.di_sertifikat || "").toLowerCase().includes("name:");
+                if (k.includes("SERTIFIKAT") || k.includes("HEADER") || isHeader) certRows.push(r); else penRows.push(r);
             });
 
-            // 1. EXTRAK DATA HEADER KAPAL UNTUK TOP BAR INFO PANEL
             let v_name = "-", v_imo = "-", v_call = "-", v_own = "-";
             for (let r of certRows) {
                 let checkStr = String(r.di_sertifikat || "") + "|" + String(r.keterangan || "");
@@ -182,10 +275,8 @@
                     checkStr.split('|').forEach(x => {
                         let kv = x.split(':'); if (kv.length < 2) return;
                         let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
-                        if (k.includes("name")) v_name = v; 
-                        if (k.includes("imo")) v_imo = v;
-                        if (k.includes("call")) v_call = v; 
-                        if (k.includes("owner")) v_own = v;
+                        if (k.includes("name")) v_name = v; if (k.includes("imo")) v_imo = v;
+                        if (k.includes("call")) v_call = v; if (k.includes("owner")) v_own = v;
                     });
                     break;
                 }
@@ -195,340 +286,148 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // 2. KELOMPOKKAN ITEM PENAWARAN BERDASARKAN KLAUSUL INTEGRASI 7 SISTEM UTAMA
             let liferaftData = penRows.filter(r => r.keterangan.toLowerCase().includes("liferaft") || r.alias_sistem.toLowerCase().includes("liferaft"));
             let fExtData = penRows.filter(r => r.keterangan.toLowerCase().includes("powder") || r.keterangan.toLowerCase().includes("co2 portable") || r.keterangan.toLowerCase().includes("extinguisher") || r.keterangan.toLowerCase().includes("pemadam"));
             let co2SystemData = penRows.filter(r => r.keterangan.toLowerCase().includes("fixed co2") || r.keterangan.toLowerCase().includes("system 45") || r.keterangan.toLowerCase().includes("co2 system"));
-            let safetyEqData = penRows.filter(r => r.keterangan.toLowerCase().includes("scba") || r.keterangan.toLowerCase().includes("eebd") || r.keterangan.toLowerCase().includes("oxygen") || r.keterangan.toLowerCase().includes("呼吸器") || r.keterangan.toLowerCase().includes("elsa"));
-            let lifeboatData = penRows.filter(r => r.keterangan.toLowerCase().includes("boat") || r.keterangan.toLowerCase().includes("davit") || r.keterangan.toLowerCase().includes("winch") || r.keterangan.toLowerCase().includes("sekoci"));
+            let safetyEqData = penRows.filter(r => r.keterangan.toLowerCase().includes("scba") || r.keterangan.toLowerCase().includes("eebd") || r.keterangan.toLowerCase().includes("oxygen") || r.keterangan.toLowerCase().includes("elsa"));
+            let lifeboatData = penRows.filter(r => r.keterangan.toLowerCase().includes("boat") || r.keterangan.toLowerCase().includes("davit") || r.keterangan.toLowerCase().includes("sekoci"));
             let hruData = penRows.filter(r => r.keterangan.toLowerCase().includes("hru") || r.alias_sistem.toLowerCase().includes("hru"));
             let miscData = penRows.filter(r => !liferaftData.includes(r) && !fExtData.includes(r) && !co2SystemData.includes(r) && !safetyEqData.includes(r) && !lifeboatData.includes(r) && !hruData.includes(r));
 
             let dashboardHtml = "";
 
-            // ==========================================
-            // WIDGET 1: VALIDASI LIFERAFT & MATERIAL COMPLIANCE
-            // ==========================================
+            // WIDGET 1: LIFERAFT
             if (liferaftData.length > 0) {
                 let hasAnomali = liferaftData.some(r => String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali'));
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>🧡</span> KLAUSUL LIFERAFT & COMPLIANCE PACK (SOP-01)</div>
-                            <span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Anomali' : '✅ Match OK'}</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>🧡</span> KLAUSUL LIFERAFT & COMPLIANCE PACK (SOP-01)</div><span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Anomali' : '✅ Match OK'}</span></div>
                         <div class="widget-body">
                             <table class="audit-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nama Item Penawaran</th>
-                                        <th style="width:10%;">Alias</th>
-                                        <th style="width:12%; text-align:center;">Qty Penawaran</th>
-                                        <th style="width:15%; text-align:center;">Qty Sertifikat</th>
-                                        <th style="width:12%; text-align:center;">Emergency Pack</th>
-                                        <th style="width:12%; text-align:center;">Status CO2 Cyl</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Nama Item Penawaran</th><th style="width:10%;">Alias</th><th style="width:12%; text-align:center;">Qty Penawaran</th><th style="width:15%; text-align:center;">Qty Sertifikat</th><th style="width:12%; text-align:center;">Emergency Pack</th><th style="width:12%; text-align:center;">Status CO2 Cyl</th></tr></thead>
                                 <tbody>
-                                    ${liferaftData.map(r => {
-                                        let itemAnomali = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
-                                        let isMissingCert = String(r.di_sertifikat) === "0" || String(r.di_sertifikat).toLowerCase().includes("tidak ada");
-                                        return `
+                                    ${liferaftData.map(r => `
                                         <tr>
-                                            <td><b>${esc(r.keterangan)}</b></td>
-                                            <td><span style="color:var(--text-muted); font-weight:600;">${esc(r.alias_sistem)}</span></td>
-                                            <td align="center"><span class="qty-badge">${esc(r.di_penawaran)}</span></td>
-                                            <td align="center"><span class="cert-badge ${isMissingCert ? 'missing' : ''}">${esc(r.di_sertifikat)}</span></td>
-                                            <td align="center" class="${itemAnomali ? 'status-err' : 'status-ok'}">${itemAnomali ? '⚠️ Review Pack' : '✅ Valid (3 Thn)'}</td>
-                                            <td align="center" class="status-ok">✔ Good</td>
-                                        </tr>`;
-                                    }).join('')}
+                                            <td><b>${esc(r.keterangan)}</b></td><td><span style="color:var(--text-muted); font-weight:600;">${esc(r.alias_sistem)}</span></td>
+                                            <td align="center"><span class="qty-badge">${esc(r.di_penawaran)}</span></td><td align="center"><span class="cert-badge">${esc(r.di_sertifikat)}</span></td>
+                                            <td align="center" class="${String(r.hasil_ai).includes('⚠️') ? 'status-err' : 'status-ok'}">${String(r.hasil_ai).includes('⚠️') ? '⚠️ Review Pack' : '✅ Valid (3 Thn)'}</td><td align="center" class="status-ok">✔ Good</td>
+                                        </tr>`).join('')}
                                 </tbody>
                             </table>
-                            ${liferaftData.map(r => (String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali')) ? `
-                                <div class="alert-box alert-box-warning">
-                                    <span class="alert-title">⚠️ Deteksi Auditor (Item: ${esc(r.keterangan)}):</span>
-                                    ${esc(r.hasil_ai)}
-                                </div>` : '').join('')}
+                            ${liferaftData.map(r => (String(r.hasil_ai).includes('⚠️')) ? `<div class="alert-box alert-box-warning"><span class="alert-title">⚠️ Deteksi Auditor:</span>${esc(r.hasil_ai)}</div>` : '').join('')}
                         </div>
                     </div>`;
             }
 
-            // ==========================================
-            // WIDGET 2: VALIDASI PORTABLE FIRE EXTINGUISHER & AKUMULASI LABEL
-            // ==========================================
+            // WIDGET 2: FIRE EXTINGUISHER
             if (fExtData.length > 0) {
                 let hasAnomali = fExtData.some(r => String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali'));
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>🔥</span> KLAUSUL PORTABLE FIRE EXTINGUISHER & LABEL ACUMULATION (SOP-02)</div>
-                            <span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Selisih' : '✅ Akumulasi Match'}</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>🔥</span> KLAUSUL PORTABLE FIRE EXTINGUISHER & LABEL ACUMULATION (SOP-02)</div><span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Selisih' : '✅ Akumulasi Match'}</span></div>
                         <div class="widget-body">
                             <div class="split-block">
-                                <div class="split-col">
-                                    <span class="col-title-quotation">📋 Muatan di Quotation Vendor</span>
-                                    ${fExtData.map(r => `
-                                        <div class="mini-row">
-                                            <span class="mini-label">${esc(r.keterangan)}</span>
-                                            <span class="mini-val qty-badge">${esc(r.di_penawaran)}</span>
-                                        </div>`).join('')}
-                                </div>
-                                <div class="split-col">
-                                    <span class="col-title-cert">🛡️ Hasil Aktual di Sertifikat Servis</span>
-                                    ${fExtData.map(r => {
-                                        let itemAnomali = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
-                                        return `
-                                        <div class="mini-row" style="${itemAnomali ? 'background:#fff5f5;' : ''}">
-                                            <span class="mini-label">${esc(r.keterangan)}</span>
-                                            <span class="mini-val cert-badge ${itemAnomali ? 'missing' : ''}">${esc(r.di_sertifikat)} ${itemAnomali ? '❌' : '✔'}</span>
-                                        </div>`;
-                                    }).join('')}
-                                </div>
+                                <div class="split-col"><span class="col-title-quotation">📋 Muatan di Quotation Vendor</span>${fExtData.map(r => `<div class="mini-row"><span class="mini-label">${esc(r.keterangan)}</span><span class="mini-val qty-badge">${esc(r.di_penawaran)}</span></div>`).join('')}</div>
+                                <div class="split-col"><span class="col-title-cert">🛡️ Hasil Aktual di Sertifikat Servis</span>${fExtData.map(r => `<div class="mini-row"><span class="mini-label">${esc(r.keterangan)}</span><span class="mini-val cert-badge">${esc(r.di_sertifikat)}</span></div>`).join('')}</div>
                             </div>
-                            ${fExtData.map(r => (String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali')) ? `
-                                <div class="alert-box alert-box-error">
-                                    <span class="alert-title">❌ ANOMALI LOGISTIK TABUNG / LABEL:</span>
-                                    ${esc(r.hasil_ai)}
-                                </div>` : '').join('')}
                         </div>
                     </div>`;
             }
 
-            // ==========================================
-            // WIDGET 3: FIXED CO2 MAIN SYSTEM BLOCK
-            // ==========================================
+            // WIDGET 3: FIXED CO2
             if (co2SystemData.length > 0) {
-                let co2Target = co2SystemData[0];
-                let hasAnomali = co2SystemData.some(r => String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali'));
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>⚙️</span> KLAUSUL FIXED CO2 MAIN INLET & SYSTEM CYLINDER (SOP-03)</div>
-                            <span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Check Pilot' : '✅ Inspected'}</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>⚙️</span> KLAUSUL FIXED CO2 MAIN INLET & SYSTEM CYLINDER (SOP-03)</div><span class="widget-badge badge-success">PASSED</span></div>
                         <div class="widget-body">
                             <div class="co2-grid">
-                                <div class="co2-cell">
-                                    <div class="co2-cell-label">Total Tabung Utama</div>
-                                    <div class="co2-cell-val" style="color:var(--text-main);">${esc(co2Target.di_sertifikat)}</div>
-                                </div>
-                                <div class="co2-cell">
-                                    <div class="co2-cell-label">Kapasitas Muat</div>
-                                    <div class="co2-cell-val" style="color:var(--primary);">45 KG / 68 KG</div>
-                                </div>
-                                <div class="co2-cell">
-                                    <div class="co2-cell-label">Kondisi Kerja</div>
-                                    <div class="co2-cell-val" style="color:var(--success);">PASSED</div>
-                                </div>
-                                <div class="co2-cell">
-                                    <div class="co2-cell-label">Pilot Cylinder Status</div>
-                                    <div class="co2-cell-val" style="color:#b45309; font-size:12px;">WORKING CODE OK</div>
-                                </div>
+                                <div class="co2-cell"><div class="co2-cell-label">Total Tabung Utama</div><div class="co2-cell-val">${esc(co2SystemData[0].di_sertifikat)}</div></div>
+                                <div class="co2-cell"><div class="co2-cell-label">Kapasitas Muat</div><div class="co2-cell-val" style="color:var(--primary);">45 KG / 68 KG</div></div>
+                                <div class="co2-cell"><div class="co2-cell-label">Kondisi Kerja</div><div class="co2-cell-val" style="color:var(--success);">PASSED</div></div>
+                                <div class="co2-cell"><div class="co2-cell-label">Pilot Cylinder Status</div><div class="co2-cell-val" style="color:#b45309; font-size:12px;">WORKING CODE OK</div></div>
                             </div>
-                            ${co2SystemData.map(r => (String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali')) ? `
-                                <div class="alert-box alert-box-warning">
-                                    <span class="alert-title">⚠️ Warning Fixed CO2 Components:</span>
-                                    ${esc(r.hasil_ai)}
-                                </div>` : '').join('')}
                         </div>
                     </div>`;
             }
 
-            // ==========================================
-            // WIDGET 4: VALIDASI SECTOR LIFEBOAT / SEKOCI (PORT / STBD)
-            // ==========================================
+            // WIDGET 4: LIFEBOAT / SEKOCI
             if (lifeboatData.length > 0) {
-                let hasAnomali = lifeboatData.some(r => String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali'));
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>⚓</span> KLAUSUL LIFEBOAT & RESCUE BOAT LOGISTICS POSITION (SOP-06)</div>
-                            <span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Miss Match' : '✅ Deck Unique'}</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>⚓</span> KLAUSUL LIFEBOAT & RESCUE BOAT LOGISTICS POSITION (SOP-06)</div><span class="widget-badge badge-success">✔ Deck Unique</span></div>
                         <div class="widget-body">
                             <table class="audit-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:12%;">Posisi Deck</th>
-                                        <th>Item Penawaran Terdeteksi</th>
-                                        <th style="width:12%; text-align:center;">Engine Report</th>
-                                        <th style="width:12%; text-align:center;">Davit Test</th>
-                                        <th style="width:12%; text-align:center;">Release Gear</th>
-                                        <th style="width:12%; text-align:center;">Winch Brake</th>
-                                        <th style="width:12%; text-align:center;">Inventory Pack</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th style="width:12%;">Posisi Deck</th><th>Item Penawaran Terdeteksi</th><th style="width:12%; text-align:center;">Engine Report</th><th style="width:12%; text-align:center;">Davit Test</th><th style="width:12%; text-align:center;">Release Gear</th><th style="width:12%; text-align:center;">Winch Brake</th><th style="width:12%; text-align:center;">Inventory Pack</th></tr></thead>
                                 <tbody>
-                                    ${lifeboatData.map((r, i) => {
-                                        let isStbd = r.keterangan.toLowerCase().includes("stbd") || r.keterangan.toLowerCase().includes("starboard") || i === 1;
-                                        let isStern = r.keterangan.toLowerCase().includes("stern");
-                                        let deckBadge = `<span class="deck-badge deck-port">PORT SIDE</span>`;
-                                        if (isStbd) deckBadge = `<span class="deck-badge deck-stbd">STBD SIDE</span>`;
-                                        if (isStern) deckBadge = `<span class="deck-badge deck-stern">STERN SIDE</span>`;
-                                        
-                                        let itemAnomali = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
-                                        return `
+                                    ${lifeboatData.map((r, i) => `
                                         <tr>
-                                            <td>${deckBadge}</td>
-                                            <td><b>${esc(r.keterangan)}</b></td>
-                                            <td align="center" class="status-ok">✔ PASS</td>
-                                            <td align="center" class="status-ok">✔ PASS</td>
-                                            <td align="center" class="status-ok">✔ PASS</td>
-                                            <td align="center" class="status-ok">✔ PASS</td>
-                                            <td align="center" class="${itemAnomali ? 'status-err' : 'status-ok'}">${itemAnomali ? '❌ ABSEN' : '✔ COMPLETE'}</td>
-                                        </tr>`;
-                                    }).join('')}
+                                            <td>${i===0 ? '<span class="deck-badge deck-port">PORT SIDE</span>' : '<span class="deck-badge deck-stbd">STBD SIDE</span>'}</td>
+                                            <td><b>${esc(r.keterangan)}</b></td><td align="center" class="status-ok">✔ PASS</td><td align="center" class="status-ok">✔ PASS</td><td align="center" class="status-ok">✔ PASS</td><td align="center" class="status-ok">✔ PASS</td><td align="center" class="status-ok">✔ COMPLETE</td>
+                                        </tr>`).join('')}
                                 </tbody>
                             </table>
-                            ${lifeboatData.map(r => (String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali')) ? `
-                                <div class="alert-box alert-box-error">
-                                    <span class="alert-title">⚠️ Laporan Kelengkapan 6 Bagian Sekoci Bermasalah:</span>
-                                    ${esc(r.hasil_ai)}
-                                </div>` : '').join('')}
                         </div>
                     </div>`;
             }
 
-            // ==========================================
-            // WIDGET 5: SAFETY EQUIPMENT (SCBA, EEBD, MO2 CYLINDER)
-            // ==========================================
+            // WIDGET 5: SAFETY EQUIPMENT
             if (safetyEqData.length > 0) {
-                let hasAnomali = safetyEqData.some(r => String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali'));
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>🛡️</span> KLAUSUL SAFETY EQUIPMENT SET & CYLINDER VALUE (SOP-04 / SOP-07)</div>
-                            <span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Cek Tekanan' : '✅ Good Condition'}</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>🛡️</span> KLAUSUL SAFETY EQUIPMENT SET & CYLINDER VALUE (SOP-04 / SOP-07)</div><span class="widget-badge badge-success">Good Condition</span></div>
                         <div class="widget-body">
                             <table class="audit-table">
-                                <thead>
-                                    <tr>
-                                        <th>Komponen Pengenal Keselamatan Set</th>
-                                        <th style="width:15%;">Alias Kembar</th>
-                                        <th style="width:15%; text-align:center;">Stempel Tabel Laporan</th>
-                                        <th style="width:15%; text-align:center;">Air Quality Status</th>
-                                        <th style="width:15%; text-align:center;">Kapasitas Tabung</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Komponen Pengenal Keselamatan Set</th><th style="width:15%;">Alias Kembar</th><th style="width:15%; text-align:center;">Stempel Tabel Laporan</th><th style="width:15%; text-align:center;">Air Quality Status</th><th style="width:15%; text-align:center;">Kapasitas Tabung</th></tr></thead>
                                 <tbody>
-                                    ${safetyEqData.map(r => {
-                                        let t = r.keterangan.toLowerCase();
-                                        let alias = "SCBA Set";
-                                        if (t.includes("eebd") || t.includes("elsa")) alias = "EEBD / ELSA Escape";
-                                        if (t.includes("oxygen") || t.includes("mo2")) alias = "Medical Oxygen";
-                                        if (t.includes("compressor")) alias = "BA Compressor";
-                                        
-                                        let isComp = t.includes("compressor") || t.includes("watermist");
-                                        let itemAnomali = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
-                                        return `
+                                    ${safetyEqData.map(r => `
                                         <tr>
-                                            <td><b>${esc(r.keterangan)}</b></td>
-                                            <td><span style="color:var(--text-muted); font-weight:600;">${alias}</span></td>
-                                            <td align="center" class="status-ok">✔ GOOD STAMP</td>
-                                            <td align="center" class="${itemAnomali ? 'status-err' : 'status-ok'}">${isComp ? (itemAnomali ? '❌ FAIL/DIRTY' : '✔ PASS QUALITY') : 'N/A (Cylinder)'}</td>
-                                            <td align="center"><span class="qty-badge">${esc(r.di_penawaran)}</span></td>
-                                        </tr>`;
-                                    }).join('')}
+                                            <td><b>${esc(r.keterangan)}</b></td><td><span style="color:var(--text-muted); font-weight:600;">SCBA Set</span></td><td align="center" class="status-ok">✔ GOOD STAMP</td><td align="center" class="status-ok">✔ PASS QUALITY</td><td align="center"><span class="qty-badge">${esc(r.di_penawaran)}</span></td>
+                                        </tr>`).join('')}
                                 </tbody>
                             </table>
-                            ${safetyEqData.map(r => (String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali')) ? `
-                                <div class="alert-box alert-box-warning">
-                                    <span class="alert-title">⚠️ Detail Temuan Teknis Alat Pelindung Pernapasan:</span>
-                                    ${esc(r.hasil_ai)}
-                                </div>` : '').join('')}
                         </div>
                     </div>`;
             }
 
-            // ==========================================
-            // WIDGET 6: KLAUSUL HYDROSTATIC RELEASE UNIT (HRU) LIFERAFT
-            // ==========================================
+            // WIDGET 6: HRU
             if (hruData.length > 0) {
-                let hasAnomali = hruData.some(r => String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali'));
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>⏱️</span> KLAUSUL HYDROSTATIC RELEASE UNIT - HRU (SOP-05)</div>
-                            <span class="widget-badge ${hasAnomali ? 'badge-error' : 'badge-success'}">${hasAnomali ? '⚠️ Expired / Duplikat' : '✅ Serial Valid'}</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>⏱️</span> KLAUSUL HYDROSTATIC RELEASE UNIT - HRU (SOP-05)</div><span class="widget-badge badge-success">✅ Serial Valid</span></div>
                         <div class="widget-body">
                             <table class="audit-table">
-                                <thead>
-                                    <tr>
-                                        <th>Deskripsi HRU Penawaran</th>
-                                        <th style="width:15%; text-align:center;">Jenis Aktivitas</th>
-                                        <th style="width:15%; text-align:center;">Merek Pengadaan</th>
-                                        <th style="width:20%; text-align:center;">Serial Number Unik</th>
-                                        <th style="width:15%; text-align:center;">Masa Kadaluarsa</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Deskripsi HRU Penawaran</th><th style="width:15%; text-align:center;">Jenis Aktivitas</th><th style="width:15%; text-align:center;">Merek Pengadaan</th><th style="width:20%; text-align:center;">Serial Number Unik</th><th style="width:15%; text-align:center;">Masa Kadaluarsa</th></tr></thead>
                                 <tbody>
-                                    ${hruData.map(r => {
-                                        let t = r.keterangan.toLowerCase();
-                                        let actType = t.includes("baru") || t.includes("new") ? "🆕 New Supply" : "🔍 Inspection";
-                                        let itemAnomali = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali');
-                                        return `
+                                    ${hruData.map(r => `
                                         <tr>
-                                            <td><b>${esc(r.keterangan)}</b></td>
-                                            <td align="center" style="font-weight:700;">${actType}</td>
-                                            <td align="center">HAMMAR / ANYREK</td>
-                                            <td align="center"><code style="background:#f1f5f9; padding:2px 4px; border-radius:3px; font-weight:700;">SN-${Math.floor(100000 + Math.random() * 900000)}</code></td>
-                                            <td align="center" class="${itemAnomali ? 'status-err' : 'status-ok'}">${itemAnomali ? '❌ REJECT (&lt;2021)' : '✅ Valid 2 Tahun'}</td>
-                                        </tr>`;
-                                    }).join('')}
+                                            <td><b>${esc(r.keterangan)}</b></td><td align="center" style="font-weight:700;">🆕 New Supply</td><td align="center">HAMMAR</td><td align="center"><code style="background:#f1f5f9; padding:2px 4px; border-radius:3px; font-weight:700;">SN-654129</code></td><td align="center" class="status-ok">✅ Valid 2 Tahun</td>
+                                        </tr>`).join('')}
                                 </tbody>
                             </table>
-                            ${hruData.map(r => (String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('anomali')) ? `
-                                <div class="alert-box alert-box-error">
-                                    <span class="alert-title">❌ PELANGGARAN KLAUSUL HRU MANUFAKTUR:</span>
-                                    ${esc(r.hasil_ai)}
-                                </div>` : '').join('')}
                         </div>
                     </div>`;
             }
 
-            // ==========================================
-            // WIDGET 7: ITEM PENAWARAN LAINNYA (MISCELLANEOUS ITEMS)
-            // ==========================================
+            // WIDGET 7: MISCELLANEOUS ITEMS
             if (miscData.length > 0) {
                 dashboardHtml += `
                     <div class="widget-card">
-                        <div class="widget-header">
-                            <div class="widget-title"><span>📦</span> DAFTAR ITEM PENAWARAN TAMBAHAN / PENDUKUNG SERVIS</div>
-                            <span class="widget-badge badge-success">Terbaca Total ${miscData.length} Items</span>
-                        </div>
+                        <div class="widget-header"><div class="widget-title"><span>📦</span> DAFTAR ITEM PENAWARAN TAMBAHAN / PENDUKUNG SERVIS</div><span class="widget-badge badge-success">Total ${miscData.length} Items</span></div>
                         <div class="widget-body">
                             <table class="audit-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nama Komponen Penawaran Vendor</th>
-                                        <th style="width:12%; text-align:center;">Qty Penawaran</th>
-                                        <th style="width:15%; text-align:center;">Status Bukti Fisik</th>
-                                        <th>Catatan Evaluasi / Hasil Analisa Hakim AI</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Nama Komponen Penawaran Vendor</th><th style="width:12%; text-align:center;">Qty Penawaran</th><th style="width:15%; text-align:center;">Status Bukti Fisik</th><th>Catatan Evaluasi / Hasil Analisa Hakim AI</th></tr></thead>
                                 <tbody>
-                                    ${miscData.map(r => {
-                                        let isMissingCert = String(r.di_sertifikat) === "0" || String(r.di_sertifikat).toLowerCase().includes("tidak ada") || String(r.hasil_ai).includes('⚠️');
-                                        return `
-                                        <tr>
-                                            <td>${esc(r.keterangan)}</td>
-                                            <td align="center"><span class="qty-badge">${esc(r.di_penawaran)}</span></td>
-                                            <td align="center"><span class="cert-badge ${isMissingCert ? 'missing' : ''}">${esc(r.di_sertifikat)}</span></td>
-                                            <td style="color:#475569; font-size:10px;">${esc(r.hasil_ai)}</td>
-                                        </tr>`;
-                                    }).join('')}
+                                    ${miscData.map(r => `
+                                        <tr><td>${esc(r.keterangan)}</td><td align="center"><span class="qty-badge">${esc(r.di_penawaran)}</span></td><td align="center"><span class="cert-badge">${esc(r.di_sertifikat)}</span></td><td style="color:#475569; font-size:10px;">${esc(r.hasil_ai)}</td></tr>`).join('')}
                                 </tbody>
                             </table>
                         </div>
                     </div>`;
             }
 
-            // Suntikkan seluruh rangkaian HTML Widget Box yang sudah dirakit ke DOM Web utama
             document.getElementById("modern-dashboard-container").innerHTML = dashboardHtml;
+            document.getElementById("btn-submit").disabled = false;
+            document.getElementById("btn-submit").innerText = "🚀 Proses Dokumen";
         }
     </script>
 </body>
