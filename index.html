@@ -6,105 +6,45 @@
     <title>Waruna Group | Smart Audit LSA V7</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1e3a8a; --primary-light: #eff6ff; 
-            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
-            --success: #15803d; --error: #b91c1c;
-            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; --border-system: #7dd3fc; 
-            --bg-code: #f0fdf4; --border-code: #86efac;     
-        }
-        
+        :root { --primary: #1e3a8a; --primary-light: #eff6ff; --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b; --success: #15803d; --error: #b91c1c; --bg-vendor: #fef9c3; --border-vendor: #facc15; --bg-system: #e0f2fe; --border-system: #7dd3fc; --bg-code: #f0fdf4; --border-code: #86efac; }
         body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f1f5f9; margin: 0; padding: 0; line-height: 1.3; }
         * { box-sizing: border-box; }
-
-        /* UPLOAD SECTION */
-        #upload-section { max-width: 900px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .app-title { text-align: center; color: var(--primary); font-size: 20px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; }
+        #upload-section { max-width: 900px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); }
         .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .upload-zone { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; background: #f8fafc; }
-        .upload-zone.has-file { border-color: var(--success); background: #f0fdf4; border-style: solid; }
-        .uz-label { display: block; font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
-        .file-input { width: 100%; font-size: 10px; cursor: pointer; }
-        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
-        #ui-message { display: none; margin-bottom: 15px; padding: 10px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
-
-        /* LOADING */
-        .loading-box { display: none; text-align: center; padding: 40px; background: #fff; border-radius: 12px; max-width: 900px; margin: 40px auto; border: 1px solid var(--border-color); }
-        .loading-box.show { display: block; }
-        .spinner { width: 40px; height: 40px; margin: 0 auto 15px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* DASHBOARD LAYOUT */
+        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 800; padding: 12px; border-radius: 8px; border: none; cursor: pointer; }
         #dashboard-section { display: none; padding: 15px; max-width: 1300px; margin: 0 auto; }
-        
-        .top-info-bar { background: #fff; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 10px; z-index: 1000; }
-        .ship-info { display: flex; gap: 20px; align-items: center; }
-        .info-box { display: flex; flex-direction: column; }
-        .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
-        .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
-        .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        
-        .main-layout { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start; }
-        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 90px; }
-        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .filter-btn { background: #fff; color: var(--error); border: 1px solid var(--error); }
-        .filter-btn.active { background: var(--error); color: #fff; }
-
-        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-        .content-card.active { display: block; animation: fadeIn 0.3s ease; }
-        
-        .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--error); }
-        .critical-title { color: var(--error); font-size: 16px; font-weight: 800; margin-top: 0; }
-        
-        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        th { background-color: var(--primary-light); color: var(--primary); padding: 8px 5px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; }
-        td { border: 1px solid var(--border-color); padding: 6px 5px; font-size: 10px; vertical-align: top; }
-        
-        .section-title td { background-color: var(--primary); color: white; font-weight: 700; padding: 8px 10px; }
-        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; }
-        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; }
-        .ai-note { padding: 6px; border-radius: 4px; font-size: 10px; margin-top: 5px; }
-        .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
+        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; margin-bottom: 5px; }
+        .nav-item.active { background: var(--primary); color: #fff; }
+        .content-card { display: none; background: #fff; border: 1px solid var(--border-color); }
+        .content-card.active { display: block; }
+        table { border-collapse: collapse; width: 100%; }
+        th { background-color: var(--primary-light); padding: 8px; text-align: left; border: 1px solid var(--border-color); }
+        td { border: 1px solid var(--border-color); padding: 6px; }
+        .section-title td { background-color: var(--primary); color: white; font-weight: 700; }
+        .explanation-row td { background-color: #f8fafc; }
     </style>
 </head>
 <body>
 
 <div id="upload-section">
-    <div class="app-title">Waruna LSA Audit - V7 Final</div>
-    <div id="ui-message"></div>
+    <h1>Waruna LSA Audit - V7 Final</h1>
     <div class="upload-grid">
-        <div class="upload-zone" id="zone-p"><span class="uz-label">Quotation</span><input type="file" id="file-penawaran" class="file-input" accept="application/pdf"></div>
-        <div class="upload-zone" id="zone-s"><span class="uz-label">Certificate</span><input type="file" id="file-sertifikat" class="file-input" accept="application/pdf"></div>
-        <div class="upload-zone" id="zone-d"><span class="uz-label">DO</span><input type="file" id="file-do" class="file-input" accept="application/pdf"></div>
+        <div class="upload-zone"><input type="file" id="file-penawaran" accept="application/pdf"></div>
+        <div class="upload-zone"><input type="file" id="file-sertifikat" accept="application/pdf"></div>
+        <div class="upload-zone"><input type="file" id="file-do" accept="application/pdf"></div>
     </div>
-    <button type="button" id="btn-run" class="btn-run">RUN COMPREHENSIVE AUDIT</button>
-</div>
-
-<div class="loading-box" id="loading">
-    <div class="spinner"></div>
-    <h3 style="margin-top:0;">AI is processing document...</h3>
-    <div id="loading-txt" style="color: var(--text-muted);">(Waiting time: 0 seconds)</div>
+    <button type="button" id="btn-run" class="btn-run">RUN AUDIT</button>
 </div>
 
 <div id="dashboard-section">
-    <div class="top-info-bar">
-        <div class="ship-info">
-            <div class="info-box"><span class="info-label">Vessel</span><span class="info-val" id="val-vessel">-</span></div>
-            <div class="info-box"><span class="info-label">IMO</span><span class="info-val" id="val-imo">-</span></div>
-        </div>
-        <button class="btn-action" onclick="window.print()">🖨️ Print</button>
-    </div>
-
-    <div class="main-layout">
+    <div class="main-layout" style="display:grid; grid-template-columns: 200px 1fr; gap:20px;">
         <aside class="sidebar">
-            <div class="nav-item active" onclick="switchTab('tab-summary', this)">📊 Summary</div>
-            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">🛡️ Certificate</div>
-            <div class="nav-item" onclick="switchTab('tab-penawaran', this)">📋 Quotation</div>
+            <div class="nav-item active" onclick="switchTab('tab-summary', this)">Summary</div>
+            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">Certificate</div>
+            <div class="nav-item" onclick="switchTab('tab-penawaran', this)">Quotation</div>
         </aside>
-
-        <main class="content-area">
+        <main>
             <div id="tab-summary" class="content-card active"><div id="critical-summary-container"></div></div>
             <div id="tab-sertifikat" class="content-card"><table><tbody id="body-sertifikat"></tbody></table></div>
             <div id="tab-penawaran" class="content-card"><table><tbody id="body-penawaran"></tbody></table></div>
@@ -113,115 +53,40 @@
 </div>
 
 <script>
-// Fungsi Logic Cerdas untuk memilah data
+function switchTab(tabId, el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
+
+function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
 function renderAuditReport(parsed) {
     if (!parsed.tabel_audit) return;
     let certRows = [], penRows = [];
     
+    // PEMISAHAN OTOMATIS
     parsed.tabel_audit.forEach(r => {
         let certContent = String(r.di_sertifikat || "").toLowerCase();
-        // LOGIKA BARU: Jika ada data sertifikat, masuk ke certRows
         let isCertData = certContent.includes("certno:") || certContent.includes("imo:") || certContent.includes("page:");
-        let isBarangFisik = String(r.keterangan || "").toLowerCase().match(/unit|pack|cyl|pc|set/);
-
-        if (isCertData && !isBarangFisik) {
-            certRows.push(r);
-        } else {
-            penRows.push(r);
-        }
+        let isBarangFisik = String(r.keterangan || "").toLowerCase().match(/unit|pack|cyl|pc|set|lot/);
+        if (isCertData && !isBarangFisik) certRows.push(r); else penRows.push(r);
     });
 
-       // Render Tabel Sertifikat
-    let htmlCert = "";
-    let certGroups = {};
-    certRows.forEach(r => {
-        let cNo = "-";
-        String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
-        if(!certGroups[cNo]) certGroups[cNo] = [];
-        certGroups[cNo].push(r);
-    });
-
-    let gIdx = 1;
-    for (let cNo in certGroups) {
-        let groupWarn = certGroups[cNo].some(r => {
-            let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
-        });
-        htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">CERTIFICATE NUMBER: ${esc(cNo)}</td></tr>`;
-        
-        certGroups[cNo].forEach(r => {
-            let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
-            String(r.di_sertifikat).split('|').forEach(p => {
-                let kv = p.split(':'); if(kv.length < 2) return;
-                let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
-                if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
-                if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
-                if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
-                if(k.includes("sign")) d.sign=v;
-            });
-            
-            let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
-            let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-            htmlCert += `<tr class="${rowClass}">
-                <td align="center">${gIdx++}</td>
-                <td><b>${esc(r.keterangan)}</b></td>
-                <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td>${esc(d.imo)}</td>
-                <td>${esc(d.cls)}</td><td>${esc(d.gt)}</td><td>${esc(d.nat)}</td><td>${esc(d.call)}</td>
-                <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
-                <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'BEDA':'OK'}</td>
-            </tr>`;
-        });
-    }
-    document.getElementById("body-sertifikat").innerHTML = htmlCert;
-}
-    
-    // Render Tabel Penawaran & Tangkap Anomali
+    // RENDER PENAWARAN
+    let htmlPen = "";
     penRows.forEach((r, idx) => {
-        let aliasParts = String(r.alias_sistem || "-").split(" - ");
-        let itemCode = aliasParts[0] || "-";
-        let systemName = aliasParts.slice(1).join(" - ") || "-";
-        
-        let hasilStr = String(r.hasil_ai || "");
-        let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
-        let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-        if (isWarn) {
-            let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
-            if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-            anomalyList.push(`<b>${esc(r.keterangan)}:</b> ${esc(cleanReason)}`);
-        }
-
-        htmlPen += `<tr class="${rowClass}">
-            <td align="center"><b>${idx + 1}</b></td>
-            <td>
-                <div class="box-vendor">${esc(r.keterangan)}</div>
-                <div class="box-system">${esc(systemName)}</div>
-                <div class="box-code">${esc(itemCode)}</div>
-            </td>
-            <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-            <td><div class="doc-val">${esc(r.di_sertifikat)}</div></td>
-            <td align="center">${esc(r.di_do)}</td>
-            <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
-        </tr>`;
-
-        let isJasa = hasilStr.toLowerCase().includes('jasa') || hasilStr.toLowerCase().includes('tidak memerlukan dokumen');
-        if (isWarn || isJasa || hasilStr.trim() !== "") {
-            let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
-            if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-            if(cleanReason !== "") {
-                htmlPen += `<tr class="explanation-row ${rowClass}">
-                    <td style="border-right:1px solid var(--border-color);"></td>
-                    <td colspan="5">
-                        <div class="ai-note ${isWarn ? 'err' : 'ok'}">
-                            <b>${isWarn ? '⚠️ AI Generated (Anomali):' : '✅ AI Generated:'}</b> ${esc(cleanReason)}
-                        </div>
-                    </td>
-                </tr>`;
-            }
-        }
+        htmlPen += `<tr><td>${idx+1}</td><td>${esc(r.keterangan)}</td><td>${esc(r.di_penawaran)}</td><td>${esc(r.di_sertifikat)}</td><td>${esc(r.di_do)}</td><td>${esc(r.hasil_ai)}</td></tr>`;
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
+    // RENDER SERTIFIKAT
+    let htmlCert = "";
+    certRows.forEach((r, idx) => {
+        htmlCert += `<tr><td>${idx+1}</td><td>${esc(r.keterangan)}</td><td>${esc(r.di_sertifikat)}</td></tr>`;
+    });
+    document.getElementById("body-sertifikat").innerHTML = htmlCert;
 }
 </script>
 </body>
