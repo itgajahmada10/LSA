@@ -72,8 +72,8 @@
         .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--error); }
         .critical-title { color: var(--error); font-size: 16px; font-weight: 800; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
         .critical-subtitle { font-size: 12px; color: #991b1b; margin-top: 0; margin-bottom: 15px; font-style: italic; }
-        .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 12px; line-height: 1.6; font-weight: 500; }
-        .critical-list li { margin-bottom: 8px; }
+        .critical-summary .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 12px; line-height: 1.6; font-weight: 500; list-style-type: decimal; }
+        .critical-summary .critical-list li { margin-bottom: 8px; }
         
         .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--success); }
 
@@ -244,7 +244,6 @@ function toggleFilter(el) {
 
 function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
 
-// Fungsi pembantu pemicu accordion buka-tutup detail baris (Aman & Lancar)
 function toggleAccordionRow(id) {
     const target = document.getElementById(`acc-row-${id}`);
     if(target) target.classList.toggle("hidden");
@@ -381,7 +380,7 @@ function renderAuditReport(parsed) {
 
         let numId = idx + 1;
 
-        // INJEKSI BARIS TABEL KLASIK ASLI (KONSISTEN & KOKOH)
+        // INJEKSI BARIS TABEL KLASIK ASLI
         htmlPen += `<tr class="${rowClass} cursor-pointer hover:bg-slate-100 transition-colors" onclick="toggleAccordionRow(${numId})">
             <td align="center"><b>${numId}</b></td>
             <td>
@@ -395,7 +394,7 @@ function renderAuditReport(parsed) {
             <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
         </tr>`;
 
-        // INJEKSI ACCORDION WIDGET BOX (MENGIKUTI 7 KLAUSUL FILE WORD)
+        // INJEKSI ACCORDION WIDGET BOX KLAUSUL DETAIL
         let subDetailCardHtml = "";
         let sysLower = systemName.toLowerCase() + " " + esc(r.keterangan).toLowerCase();
 
@@ -428,7 +427,7 @@ function renderAuditReport(parsed) {
                         </div>
                     </div>
                     <div class="p-2.5 rounded-lg border text-[10px] ${isWarn?'border-red-200 bg-red-50 text-red-800':'border-emerald-200 bg-emerald-50 text-emerald-800'}">
-                        <b>Hasil Temuan Teknis:</b> ${esc(cleanReason || "Seluruh kuantitas emergency pack, penanda sinyal, baterai, dan silinder gas dinyatakan sesuai parameter SOP-01.")}
+                        <b>Hasil Temuan Evaluasi SOP:</b> ${esc(cleanReason || "Seluruh kuantitas material internal emergency pack, silinder pendorong, dan masa kedaluwarsa dinyatakan patuh terhadap parameter SOP-01.")}
                     </div>
                 </div>`;
         } else if (sysLower.includes("powder") || sysLower.includes("extinguisher") || sysLower.includes("co2 portable") || sysLower.includes("pemadam")) {
@@ -448,17 +447,15 @@ function renderAuditReport(parsed) {
                         </div>
                         <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
                             <h4 class="text-[10px] font-bold text-emerald-900 uppercase mb-2">Sertifikat Unit</h4>
-                            <div class="flex justify-between font-bold ${isWarn?'text-red-600':'text-emerald-700'}"><span>${esc(r.keterangan)}</span><span>${esc(certQty)} ${isWarn?'❌':'✓'}</span></div>
+                            <div class="flex justify-between font-bold ${isWarn?'text-red-600':'text-emerald-700'}"><span>${esc(r.keterangan)}</span><span>${esc(certQty)} ${isWarn?'❌':'✔'}</span></div>
                         </div>
                     </div>
                     <div class="bg-slate-50 border border-slate-100 rounded-lg p-2 text-[10px] font-medium text-slate-600">
-                        <b>SOP Akumulasi Label:</b> Jumlah Label penawaran harus sama dengan total keseluruhan unit pemadam fisik yang diinspeksi.
+                        <b>SOP Akumulasi Label:</b> Jumlah kuantitas Label penawaran harus sama dengan total keseluruhan unit pemadam fisik yang diinspeksi.
                     </div>
-                    ${isWarn ? `
-                    <div class="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2.5 text-[10px] text-red-800">
-                        <div class="font-bold">⚠️</div>
-                        <div><b>Ketidaksesuaian Kritis:</b> ${esc(cleanReason)}</div>
-                    </div>` : ''}
+                    <div class="p-2.5 rounded-lg border text-[10px] ${isWarn?'border-red-200 bg-red-50 text-red-800':'border-emerald-200 bg-emerald-50 text-emerald-800'}">
+                        <b>Hasil Temuan Evaluasi SOP:</b> ${esc(cleanReason || "Kapasitas muatan, jenis zat pemadam tabung, dan perhitungan akumulasi label dinyatakan sinkron terhadap parameter SOP-02.")}
+                    </div>
                 </div>`;
         } else if (sysLower.includes("scba") || sysLower.includes("eebd") || sysLower.includes("oxygen") || sysLower.includes("elsa")) {
             subDetailCardHtml = `
@@ -478,9 +475,11 @@ function renderAuditReport(parsed) {
                     </div>
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px]">
                         <b class="text-slate-700 block mb-1">Riwayat Pengujian Tabung Kepatuhan 5 Tahun:</b>
-                        <div class="flex justify-between"><span>Status Uji Tekan Cylinder:</span><span class="${isWarn?'text-red-600 font-bold':'text-emerald-700 font-bold'}">${isWarn?'Hydrotest Expired ❌':'Passed Valid ✓'}</span></div>
+                        <div class="flex justify-between"><span>Status Validitas Hydrotest Tabung:</span><span class="${isWarn?'text-red-600 font-bold':'text-emerald-700 font-bold'}">${isWarn?'Melebihi Batas 5 Tahun ❌':'Passed Valid (Di bawah 5 Tahun) ✔'}</span></div>
                     </div>
-                    <div class="p-2 bg-slate-100 rounded text-slate-700 text-[10px]"><b>Evaluasi:</b> ${esc(cleanReason || "Komponen Set terstempel OK. Kuantitas silinder dan working code sinkron.")}</div>
+                    <div class="p-2.5 rounded-lg border text-[10px] ${isWarn?'border-red-200 bg-red-50 text-red-800':'border-emerald-200 bg-emerald-50 text-emerald-800'}">
+                        <b>Hasil Temuan Evaluasi SOP:</b> ${esc(cleanReason || "Seluruh komponen penunjang set terstempel OK/Good Condition, kapasitas silinder dan working code sinkron terhadap parameter SOP-04.")}
+                    </div>
                 </div>`;
         } else if (sysLower.includes("boat") || sysLower.includes("davit") || sysLower.includes("sekoci")) {
             subDetailCardHtml = `
@@ -500,7 +499,9 @@ function renderAuditReport(parsed) {
                     <div class="text-[10px] text-slate-600 font-medium">
                         <b>SOP Unik Posisi Deck:</b> Setiap bundle laporan sekoci wajib memuat posisi penempatan lambung yang berbeda (*Port, Starboard, atau Stern*).
                     </div>
-                    <div class="p-2 rounded bg-slate-50 text-[10px]"><b>Analisis Posisi & Kelengkapan:</b> ${esc(cleanReason || "Posisi deck terdeteksi unik dan memenuhi standar 6 pilar dokumen keselamatan.")}</div>
+                    <div class="p-2.5 rounded-lg border text-[10px] ${isWarn?'border-red-200 bg-red-50 text-red-800':'border-emerald-200 bg-emerald-50 text-emerald-800'}">
+                        <b>Hasil Temuan Evaluasi SOP:</b> ${esc(cleanReason || "Posisi penempatan deck tervalidasi unik, serta kelengkapan 6 dokumen pilar keselamatan luar dinyatakan lengkap berdasarkan SOP-06.")}
+                    </div>
                 </div>`;
         } else {
             subDetailCardHtml = `
@@ -614,7 +615,7 @@ function renderAuditReport(parsed) {
     }
     document.getElementById("body-sertifikat").innerHTML = htmlCert;
 
-    // UNLOCK & AKTIFKAN KEMBALI TOMBOL UTAMA SETELAH RENDER SELESAI (ID: btn-run)
+    // UNLOCK & AKTIFKAN KEMBALI TOMBOL UTAMA BER-ID SINKRON (ID: btn-run)
     document.getElementById("btn-run").disabled = false;
     document.getElementById("btn-run").innerText = "RUN COMPREHENSIVE AUDIT";
 }
