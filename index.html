@@ -35,7 +35,7 @@
         .spinner { width: 40px; height: 40px; margin: 0 auto 15px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* DASHBOARD */
+        /* DASHBOARD LAYOUT */
         #dashboard-section { display: none; padding: 15px; max-width: 1200px; margin: 0 auto; }
         
         .top-info-bar { 
@@ -49,17 +49,17 @@
         .info-val { font-weight: 800; font-size: 13px; color: var(--primary); }
         .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
-        /* COMPLIANCE CARD */
+        /* COMPLIANCE CARD CONTAINER */
         .cert-block { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 25px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .cert-header-title { background: var(--primary); color: #fff; padding: 10px 15px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* METADATA BLOCK */
+        /* METADATA BLOCK GRID */
         .cert-meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 12px 15px; background: var(--bg-cert-header); border-bottom: 1px solid var(--border-color); }
         .meta-item { display: flex; flex-direction: column; background: #fff; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); }
         .meta-lbl { font-size: 9px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
         .meta-val { font-size: 11px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
 
-        /* TABLE */
+        /* LEGAL TABLES */
         .table-responsive { width: 100%; overflow-x: auto; }
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
         th { background-color: #f1f5f9; color: #334155; padding: 8px 10px; font-size: 10px; font-weight: 800; border-bottom: 2px solid var(--border-color); border-right: 1px solid var(--border-color); text-transform: uppercase; text-align: left; }
@@ -74,10 +74,7 @@
         .badge-pass { background-color: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
         .badge-fail { background-color: #fee2e2; color: var(--error); border: 1px solid #fecaca; }
 
-        /* EXECUTIVE WARNING */
-        .alert-box { background: #fff1f2; border-left: 4px solid var(--error); padding: 12px 15px; margin: 15px; border-radius: 4px; }
-        .alert-title { color: #991b1b; font-weight: 800; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; }
-        .alert-desc { color: #7f1d1d; font-size: 11px; font-weight: 500; }
+        .explanation-row td { background-color: #f8fafc; border-top: none; padding: 0px !important; }
 
         @media print {
             body { background: #fff; }
@@ -95,7 +92,7 @@
     <div id="ui-message"></div>
     
     <div class="upload-zone" id="zone-s">
-        <span class="uz-label">📄 Unggah File Sertifikat Kapal</span>
+        <span class="uz-label">📄 Unggah Berkas Sertifikat Gabungan (PDF)</span>
         <input type="file" id="file-sertifikat" class="file-input" accept="application/pdf">
     </div>
     <button type="button" id="btn-run" class="btn-run">ANALISIS INTEGRITAS SERTIFIKAT</button>
@@ -118,11 +115,10 @@
         <button class="btn-action" onclick="window.print()">🖨️ Cetak Laporan</button>
     </div>
 
-    <div id="certificate-inspection-container"></div>
+    <div id="certificate-inspection-container" class="space-y-6"></div>
 </div>
 
 <script>
-// Binding file upload visual
 const fileInput = document.getElementById("file-sertifikat");
 if(fileInput) {
     fileInput.addEventListener("change", function(){
@@ -153,7 +149,6 @@ document.getElementById("btn-run").addEventListener("click", async function(){
     const fd = new FormData();
     fd.append("sertifikat", fileInput.files[0]);
     fd.append("job_id", jobId);
-    // Dummy payload penawaran kosong karena v8 berfokus pada sertifikat saja
     fd.append("penawaran", new Blob(["#"], {type: 'text/plain'}), "dummy_q.txt");
     
     document.getElementById("upload-section").style.display = "none";
@@ -183,11 +178,25 @@ document.getElementById("btn-run").addEventListener("click", async function(){
                 document.getElementById("loading").classList.remove("show");
                 document.getElementById("dashboard-section").style.display = "block";
                 
+                // ====================================================================
+                // PERBAIKAN UTAMA: STITCHER JALUR PAYLOAD 1 SAMPAI 10 SEBELUM PARSING
+                // ====================================================================
                 let fullPayloadStr = ""; 
-                for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
-                renderCertificateReport(JSON.parse(fullPayloadStr));
+                for(let i = 1; i <= 10; i++) {
+                    if (ourRow["Payload" + i]) {
+                        fullPayloadStr += ourRow["Payload" + i];
+                    }
+                }
                 
-            } catch(e) { console.log("Polling error: ", e); }
+                // Proteksi string kosong untuk menghindari Crash murni di web
+                if (!fullPayloadStr || fullPayloadStr.trim() === "") {
+                    console.error("Error: Payload data dari database kosong.");
+                    return;
+                }
+
+                renderCertificateReport(JSON.parse(fullPayloadStr.trim()));
+                
+            } catch(e) { console.error("Polling/Parsing Error: ", e); }
         }, 8000);
     } catch(e){ 
         clearInterval(timerInt); 
@@ -198,21 +207,24 @@ document.getElementById("btn-run").addEventListener("click", async function(){
 });
 
 function renderCertificateReport(parsed) {
-    if (Array.isArray(parsed)) {
-        let combined = { tabel_audit: [] };
-        parsed.forEach(item => { if (item.tabel_audit) combined.tabel_audit = combined.tabel_audit.concat(item.tabel_audit); });
-        parsed = combined;
+    if (!parsed || !parsed.tabel_audit) {
+        console.warn("Struktur data tabel_audit tidak ditemukan.");
+        return;
     }
 
-    if (!parsed || !parsed.tabel_audit) return;
-
-    // Filter baris metadata / komponen sertifikat
+    // Saring murni data baris sertifikat
     const certRows = parsed.tabel_audit.filter(r => {
         let k = String(r.kategori || "").toUpperCase();
         return k.includes("SERTIFIKAT") || k.includes("HEADER");
     });
 
-    // Ekstrak Informasi Dasar Kapal (dari baris pertama yang valid)
+    if (certRows.length === 0) {
+        document.getElementById("certificate-inspection-container").innerHTML = 
+            `<div class="p-6 text-center bg-white rounded-lg border font-semibold text-slate-500">⚠️ Tidak ada data komponen yang berhasil ditarik dari sertifikat ini.</div>`;
+        return;
+    }
+
+    // Ekstrak Informasi Pokok Identitas Kapal
     let v_name="-", v_imo="-", v_call="-", v_class="-";
     for(let r of certRows) {
         if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -230,7 +242,7 @@ function renderCertificateReport(parsed) {
     document.getElementById("val-call").innerText = v_call;
     document.getElementById("val-class").innerText = v_class.toUpperCase();
 
-    // Pengelompokan Komponen Berdasarkan Nomor Sertifikat (Sesuai Gambar 1 Anda)
+    // Grouping data komponen secara dinamis per Lembar Nomor Sertifikat (Sesuai Gambar 1)
     let certGroups = {};
     certRows.forEach(r => {
         let cNo = "UNKN-CERT";
@@ -243,11 +255,9 @@ function renderCertificateReport(parsed) {
 
     let containerHtml = "";
 
-    // Iterasi per lembar sertifikat pembungkus (Header ditulis ulang)
     for (let cNo in certGroups) {
-        let meta = { ship: v_name, imo: v_imo, date: "-", sign: "-", place: "Jakarta" };
+        let meta = { ship: v_name, imo: v_imo, date: "-", sign: "-", place: "Batam" };
         
-        // Cari metadata tanggal/tanda tangan khusus sertifikat ini
         certGroups[cNo].forEach(r => {
             String(r.di_sertifikat).split('|').forEach(p => {
                 let kv = p.split(':'); if(kv.length < 2) return;
@@ -258,12 +268,12 @@ function renderCertificateReport(parsed) {
             });
         });
 
-        // Bangun Box Dokumen Utama Berdasarkan No Sertifikat
+        // Buka lembar pembungkus blok nomor sertifikat (Auto-Repeat Header Terjaga)
         containerHtml += `
         <div class="cert-block">
             <div class="cert-header-title">
                 <span>📋 CERTIFICATE NUMBER: ${esc(cNo)}</span>
-                <span class="text-[10px] bg-blue-900 px-2 py-0.5 rounded">VALIDATED BY AI</span>
+                <span class="text-[10px] bg-blue-950 px-2 py-0.5 rounded font-bold tracking-wide">V8 PRO INDEPENDENT VERIFIER</span>
             </div>
             
             <div class="cert-meta-grid">
@@ -277,24 +287,26 @@ function renderCertificateReport(parsed) {
                 <table>
                     <thead>
                         <tr>
-                            <th width="5%" class="text-center">NO</th>
-                            <th width="35%">INSPECTION ITEM / COMPONENT</th>
-                            <th width="12%" class="text-center">QTY</th>
-                            <th width="18%" class="text-center">EXPIRY DATE</th>
-                            <th width="30%">SOP COMPLIANCE ANALYSIS (PIC CHECKLIST)</th>
+                            <th width="4%" class="text-center">NO</th>
+                            <th width="42%">INSPECTION POINT / COMPONENT NAME</th>
+                            <th width="8%" class="text-center">QTY</th>
+                            <th width="14%" class="text-center">EXPIRY DATE</th>
+                            <th width="32%">SOP COMPLIANCE ANALYSIS (PIC REPORT)</th>
                         </tr>
                     </thead>
                     <tbody>`;
 
-        certGroups[cNo].forEach((r, idx) => {
+        let itemIndex = 1;
+        certGroups[cNo].forEach((r) => {
             let itemDesc = esc(r.keterangan);
             let rawCertStr = String(r.di_sertifikat || "");
             
-            // Logika pendeteksi Status RN khusus Liferaft & item emergency pack
-            let isRN = itemDesc.toLowerCase().includes("pack") || itemDesc.toLowerCase().includes("ration") || itemDesc.toLowerCase().includes("water") || rawCertStr.toLowerCase().includes("rn") || rawCertStr.toLowerCase().includes("renew");
+            // Saring metadata header murni agar tidak merusak isi badan tabel komponen
+            if(itemDesc.toLowerCase().includes("service report") || itemDesc.toLowerCase().includes("certificate of inspection")) return;
+
+            let isRN = itemDesc.toLowerCase().includes("pack") || itemDesc.toLowerCase().includes("ration") || itemDesc.toLowerCase().includes("water") || rawCertStr.toLowerCase().includes("rn") || rawCertStr.toLowerCase().includes("renew") || rawCertStr.toLowerCase().includes("first aid");
             let rnTagHtml = isRN ? `<br><span class="box-rn-tag">⚡ STATUS: RENEWAL (RN)</span>` : '';
 
-            // Ekstrak detail kuantitas & exp internal dari string payload
             let itemQty = "1";
             let expDate = "-";
             rawCertStr.split('|').forEach(p => {
@@ -305,41 +317,42 @@ function renderCertificateReport(parsed) {
             });
 
             let hasilStr = String(r.hasil_ai || "");
-            let isAnomali = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda') || hasilStr.toLowerCase().includes('expired');
+            let isAnomali = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('non-compliant') || hasilStr.toLowerCase().includes('expired');
             
             let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI|✔ OK/gi, '').trim();
             if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-            if(!cleanReason) cleanReason = "Komponen terverifikasi memenuhi kelayakan standar keselamatan pelayaran sesuai instruksi kerja.";
+            if(!cleanReason) cleanReason = "Komponen terverifikasi memenuhi kelayakan regulasi kelautan tanpa deteksi anomali struktural.";
 
+            // RAKIT BARIS KLASIK DENGAN SUB-ACCORDION CARD AUTO-OPENED DI BAWAHNYA
             containerHtml += `
-                <tr>
-                    <td align="center" style="vertical-align: middle; font-weight: 700; color: #64748b;">${idx + 1}</td>
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td align="center" style="vertical-align: middle; font-weight: 700; color: #64748b;">${itemIndex++}</td>
                     <td style="vertical-align: middle;">
                         <span class="item-name">${itemDesc}</span>
                         ${rnTagHtml}
                     </td>
-                    <td align="center" style="vertical-align: middle; font-weight: 700;"><div class="bg-slate-50 px-2 py-1 rounded border inline-block min-w-[30px]">${esc(itemQty)}</div></td>
+                    <td align="center" style="vertical-align: middle; font-weight: 700;"><div class="bg-slate-50 px-2 py-0.5 rounded border inline-block min-w-[30px]">${esc(itemQty)}</div></td>
                     <td align="center" style="vertical-align: middle;" class="text-date">${esc(expDate)}</td>
                     <td style="vertical-align: middle;" class="p-2">
-                        <div class="flex flex-col gap-1.5">
-                            <div class="text-[10px] text-slate-700 font-medium leading-relaxed">${esc(cleanReason)}</div>
-                            <div>
+                        <div class="flex flex-col gap-1">
+                            <div class="text-[10px] text-slate-700 font-semibold leading-relaxed">${esc(cleanReason)}</div>
+                            <div class="mt-1">
                                 <span class="status-badge ${isAnomali ? 'badge-fail' : 'badge-pass'}">
                                     ${isAnomali ? '⚠️ NON-COMPLIANT' : '✓ SOP COMPLIANT'}
                                 </span>
                             </div>
                         </div>
-                    </div>
-                </td>
-            </tr>`;
+                    </td>
+                </tr>`;
         });
 
         containerHtml += `</tbody></table></div></div>`;
     }
 
     document.getElementById("certificate-inspection-container").innerHTML = containerHtml;
+    document.getElementById("btn-run").disabled = false;
+    document.getElementById("btn-run").innerText = "ANALISIS INTEGRITAS SERTIFIKAT";
 }
 </script>
-
 </body>
 </html>
