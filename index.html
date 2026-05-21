@@ -47,6 +47,7 @@
         .status-badge { padding: 3px 6px; border-radius: 4px; font-weight: 800; font-size: 9px; text-align: center; display: inline-block; text-transform: uppercase; }
         .badge-pass { background-color: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
         .badge-fail { background-color: #fee2e2; color: var(--error); border: 1px solid #fecaca; }
+        @media print { body { background: #fff; } .top-info-bar, #upload-section { display: none !important; } #dashboard-section { padding: 0; max-width: 100%; } .cert-block { page-break-inside: avoid; box-shadow: none; } }
     </style>
 </head>
 <body>
@@ -149,7 +150,7 @@ document.getElementById("btn-run").addEventListener("click", async function(){
 function renderCertificateReport(parsed) {
     if (!parsed || !parsed.tabel_audit) return;
 
-    // Mapping dinamis data induk kapal terpusat
+    // Sinkronisasi Data Induk Kapal secara Makro Dinamis
     document.getElementById("val-vessel").innerText = esc(parsed.vessel_name || "MT. CHIRA");
     document.getElementById("val-imo").innerText = esc(parsed.imo_number || "9293210");
     document.getElementById("val-call").innerText = esc(parsed.call_sign || "YDJQ4");
@@ -157,18 +158,21 @@ function renderCertificateReport(parsed) {
     const allRows = parsed.tabel_audit;
     let certGroups = {};
     
-    // Tahap filter dan grouping dinamis murni berbasis memori
     allRows.forEach(r => {
         let itemDesc = esc(r.keterangan || "");
         let rawCertStr = String(r.di_sertifikat || "");
         
+        if(itemDesc.toLowerCase().includes("service report") || itemDesc.toLowerCase().includes("certificate of inspection") || String(r.kategori).toUpperCase() === "HEADER") return;
+
+        // Validasi Status RN (Renewal) Maritim
         let isRN = rawCertStr.toLowerCase().includes("status: rn") || 
                    rawCertStr.toLowerCase().includes("renew") || 
                    itemDesc.toLowerCase().includes("marking") || 
                    itemDesc.toLowerCase().includes("strapping") ||
                    String(r.hasil_ai || "").toLowerCase().includes("rn");
 
-        if (!isRN) return; // SOP STRICT: Buang data reguler (OK) dari monitor
+        // SOP COMPLIANT FRONTEND FILTER: Singkirkan status "OK", murnikan data "RN"
+        if (!isRN) return;
 
         let cNo = (r.certificate_no || "0908/CMSI/LSA/03/2026").trim().replace(/['"]+/g, '');
         if (!certGroups[cNo]) certGroups[cNo] = [];
@@ -258,7 +262,7 @@ function renderCertificateReport(parsed) {
 
     document.getElementById("certificate-inspection-container").innerHTML = containerHtml || `
         <div class="p-8 text-center bg-white rounded-lg border font-bold text-slate-500 uppercase">
-            ✓ Dokumen Bersih. Tidak ada temuan komponen berstatus Renewal (RN).
+            ✓ Analisis Selesai: Tidak ada temuan komponen berstatus Renewal (RN) pada bundel sertifikat ini.
         </div>`;
 }
 </script>
