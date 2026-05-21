@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
+<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waruna Group | Multi-Certificate Audit V8</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -153,29 +152,22 @@ function renderCertificateReport(parsed) {
 
     const allRows = parsed.tabel_audit;
 
-    // Hardcode fallback sesuai data fisik berkas MT. CHIRA agar halaman tidak kosong
     document.getElementById("val-vessel").innerText = "MT. CHIRA";
     document.getElementById("val-imo").innerText = "9293210";
     document.getElementById("val-call").innerText = "YDJQ4";
 
-    // ====================================================================
-    // LOGIKA UTAMA: GROUPING DATA SECARA DINAMIS BERDASARKAN NOMOR SERTIFIKAT
-    // ====================================================================
     let certGroups = {};
     allRows.forEach(r => {
         let rawCertStr = String(r.di_sertifikat || "");
         let detectedNo = "";
 
-        // Strategi 1: Ambil key certificate_no dari penugasan n8n
         if (r.certificate_no && r.certificate_no !== "-") {
             detectedNo = r.certificate_no;
         } else {
-            // Strategi 2: Cari teks CertNo di dalam di_sertifikat string payload
             let match = rawCertStr.match(/CertNo:\s*([^\s|]+)/i);
-            detectedNo = match ? match[1] : "0908/CMSI/LSA/03/2026"; // Fallback ke nomor urut pertama
+            detectedNo = match ? match[1] : "0908/CMSI/LSA/03/2026";
         }
 
-        // Standardisasi pembersihan string nomor seri
         detectedNo = detectedNo.trim().replace(/['"]+/g, '');
         if (detectedNo.toLowerCase().includes("unkn") || detectedNo === "-") detectedNo = "0908/CMSI/LSA/03/2026";
 
@@ -185,16 +177,14 @@ function renderCertificateReport(parsed) {
 
     let containerHtml = "";
 
-    // Gelar tabel terpisah berulang untuk setiap nomor sertifikat yang ditemukan
     Object.keys(certGroups).forEach((cNo) => {
         let rowsInGroup = certGroups[cNo];
         
-        // Ambil sampel data baris pertama untuk mendeteksi nomor seri liferaft fisik
         let sampleCertStr = String(rowsInGroup[0]?.di_sertifikat || "");
         let serialMatch = sampleCertStr.match(/Serial:\s*([^\s|]+)/i);
         let liferaftSerial = serialMatch ? serialMatch[1] : "13013100";
 
-        // Variabel penampung baris komponen khusus status RN saja
+        // Variabel penampung baris tabel dinamis khusus item RN
         let tbodyRowsHtml = "";
         let itemIndex = 1;
 
@@ -204,11 +194,11 @@ function renderCertificateReport(parsed) {
             
             if(itemDesc.toLowerCase().includes("service report") || itemDesc.toLowerCase().includes("certificate of inspection") || String(r.kategori).toUpperCase() === "HEADER") return;
 
-            // Deteksi cerdas status OK vs RN dari database Sheets
+            // Logika deteksi status RN (Renewal) secara presisi
             let isRN = rawCertStr.toLowerCase().includes("status: rn") || rawCertStr.toLowerCase().includes("renew") || itemDesc.toLowerCase().includes("marking") || itemDesc.toLowerCase().includes("strapping");
             
             // ====================================================================
-            // CRITICAL SOP FILTER: JIKA BUKAN ELEMEN RENEWAL (RN), LANJUTKAN LOOP (LEWATI RENDERING)
+            // MANDATORY SOP FILTER: SEMBUNYIKAN SELESAI ITEM "OK", HANYA GEGARES ITEM "RN"
             // ====================================================================
             if (!isRN) return;
 
@@ -226,7 +216,6 @@ function renderCertificateReport(parsed) {
                 });
             }
 
-            // Fallback penulisan tanggal kedaluwarsa jika data text loss
             if (expDate === "-" || expDate === "") {
                 if(itemDesc.toLowerCase().includes("ration")) expDate = "03-2028";
                 if(itemDesc.toLowerCase().includes("water")) expDate = "05-2028";
@@ -260,7 +249,7 @@ function renderCertificateReport(parsed) {
                 </tr>`;
         });
 
-        // Blok sertifikat hanya akan dicetak jika lembar sertifikat tersebut memiliki minimal 1 item RN
+        // Hanya gambar blok nomor sertifikat jika lembar tersebut terbukti memiliki temuan RN
         if (tbodyRowsHtml !== "") {
             containerHtml += `
             <div class="cert-block">
@@ -296,11 +285,11 @@ function renderCertificateReport(parsed) {
         }
     });
 
-    // Validasi akhir: Jika dari seluruh lembar bundel sertifikat bersih dari temuan RN, cetak informasi aman
+    // Output pengaman jika bundel sertifikat bersih total tanpa ada status RN
     if (containerHtml === "") {
         document.getElementById("certificate-inspection-container").innerHTML = `
             <div class="p-8 text-center bg-white rounded-lg border font-bold text-slate-500 uppercase tracking-wide">
-                ✓ Seluruh Lembar Sertifikat Bersih. Tidak Ada Komponen Temuan Berstatus Renewal (RN).
+                ✓ Seluruh Lembar Sertifikat Patuh. Tidak Ada Komponen Temuan Berstatus Renewal (RN).
             </div>`;
     } else {
         document.getElementById("certificate-inspection-container").innerHTML = containerHtml;
