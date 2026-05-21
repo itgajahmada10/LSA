@@ -6,193 +6,43 @@
     <title>Waruna Group | Multi-Certificate Audit V8</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --primary: #1e3a8a; 
-            --primary-light: #eff6ff; 
-            --border-color: #e2e8f0; 
-            --text-main: #1e293b; 
-            --text-muted: #64748b;
-            --success: #15803d; 
-            --error: #b91c1c;
-            --bg-cert-header: #f8fafc; 
-            --bg-rn: #fef9c3; 
-            --border-rn: #facc15;
+            --primary: #1e3a8a; --primary-light: #eff6ff; 
+            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #15803d; --error: #b91c1c;
+            --bg-cert-header: #f8fafc; --bg-rn: #fef9c3; --border-rn: #facc15;
         }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            font-size: 11px; 
-            color: var(--text-main); 
-            background: #f1f5f9; 
-            margin: 0; 
-            padding: 0; 
-            line-height: 1.4; 
-        }
-        
-        /* Upload Area Section */
-        #upload-section { 
-            max-width: 600px; 
-            margin: 30px auto; 
-            padding: 25px; 
-            background: white; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); 
-            border: 1px solid var(--border-color);
-        }
-        .upload-card {
-            border: 2px dashed #cbd5e1;
-            padding: 30px;
-            text-align: center;
-            border-radius: 6px;
-            background: #f8fafc;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .upload-card:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
-            font-size: 11px;
-        }
+        body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f1f5f9; margin: 0; padding: 0; line-height: 1.4; }
+        #upload-section { max-width: 600px; margin: 30px auto; padding: 25px; background: white; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); border: 1px solid var(--border-color); }
+        .upload-card { border: 2px dashed #cbd5e1; padding: 30px; text-align: center; border-radius: 6px; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; }
+        .upload-card:hover { border-color: var(--primary); background: var(--primary-light); }
+        .btn-primary { background: var(--primary); color: white; padding: 8px 16px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; margin-top: 12px; font-size: 11px; }
         .btn-primary:hover { background: #172554; }
-
-        /* Main Dashboard Layout */
-        #dashboard-container { 
-            max-width: 1100px; 
-            margin: 20px auto; 
-            padding: 0 15px; 
-        }
-        
-        /* Master Header Kapal */
-        .vessel-master-card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
-        }
-        .vessel-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-        .vessel-item {
-            display: flex;
-            flex-direction: column;
-        }
-        .vessel-lbl { 
-            font-size: 9px; 
-            text-transform: uppercase; 
-            color: var(--text-muted); 
-            font-weight: 600; 
-            letter-spacing: 0.05em;
-        }
-        .vessel-val { 
-            font-size: 13px; 
-            font-weight: 700; 
-            color: var(--primary); 
-            margin-top: 2px;
-        }
-
-        /* Certificate Block Laporan */
-        .cert-block {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 0.02);
-            overflow: hidden;
-        }
-        .cert-header-title {
-            background: var(--primary);
-            color: white;
-            padding: 10px 15px;
-            font-weight: 700;
-            font-size: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .cert-meta-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            padding: 12px 15px;
-            background: var(--bg-cert-header);
-            border-bottom: 1px solid var(--border-color);
-        }
+        #dashboard-container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+        .vessel-master-card { background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.05); }
+        .vessel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .vessel-item { display: flex; flex-direction: column; }
+        .vessel-lbl { font-size: 9px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; }
+        .vessel-val { font-size: 13px; font-weight: 700; color: var(--primary); margin-top: 2px; }
+        .cert-block { background: white; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 25px; box-shadow: 0 2px 4px rgb(0 0 0 / 0.02); overflow: hidden; }
+        .cert-header-title { background: var(--primary); color: white; padding: 10px 15px; font-weight: 700; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .cert-meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 15px; background: var(--bg-cert-header); border-bottom: 1px solid var(--border-color); }
         .meta-item { display: flex; flex-direction: column; }
         .meta-lbl { font-size: 9px; color: var(--text-muted); font-weight: 500; }
         .meta-val { font-size: 11px; font-weight: 600; color: var(--text-main); margin-top: 1px; }
-
-        /* Data Tables styling */
         .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th {
-            background: #f1f5f9;
-            color: #475569;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 9px;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border-color);
-            letter-spacing: 0.02em;
-        }
-        td { 
-            padding: 10px 12px; 
-            border-bottom: 1px solid var(--border-color); 
-            vertical-align: middle; 
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
+        th { background: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 9px; padding: 8px 12px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); letter-spacing: 0.02em; }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); vertical-align: top; word-wrap: break-word; }
         .item-name { font-weight: 600; color: #0f172a; font-size: 11px; }
-        
-        /* Badges & Tags */
-        .box-rn-tag {
-            display: inline-block;
-            background: var(--bg-rn);
-            color: #854d0e;
-            border: 1px solid var(--border-rn);
-            padding: 1px 5px;
-            border-radius: 3px;
-            font-weight: 700;
-            font-size: 8px;
-            margin-top: 3px;
-            letter-spacing: 0.02em;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 9px;
-            letter-spacing: 0.02em;
-        }
-        .badge-pass { background: #dcfce7; color: var(--success); }
-        .badge-fail { background: #fee2e2; color: var(--error); }
-        
-        .text-date { font-family: monospace; font-size: 11px; font-weight: 600; color: #334155; }
-        .text-center { text-align: center; }
-        
-        /* Utilities Flex & Alignment */
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .gap-1 { gap: 4px; }
-        .mt-1 { margin-top: 4px; }
-        .min-w-\[30px\] { min-width: 30px; }
-        .px-2 { padding-left: 8px; padding-right: 8px; }
-        .py-0\.5 { padding-top: 2px; padding-bottom: 2px; }
-        .rounded { border-radius: 4px; }
-        .border { border: 1px solid var(--border-color); }
-        .bg-slate-50 { background-color: #f8fafc; }
+        .box-rn-tag { display: inline-block; background: var(--bg-rn); color: #854d0e; border: 1px solid var(--border-rn); padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 8px; margin-top: 3px; text-transform: uppercase; }
+        .status-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; text-align: center; text-transform: uppercase; }
+        .badge-pass { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
+        .badge-fail { background: #fee2e2; color: var(--error); border: 1px solid #fecaca; }
+        .text-date { font-family: monospace; font-size: 11px; font-weight: 600; color: #334155; text-align: center; }
+        @media print { body { background: #fff; } .top-info-bar, #upload-section { display: none !important; } .cert-block { page-break-inside: avoid; box-shadow: none; } }
     </style>
 </head>
 <body>
@@ -209,125 +59,124 @@
             <svg style="width:36px; height:36px; color:#94a3b8; margin:0 auto 10px auto; display:block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
             </svg>
-            <span style="font-weight:500; color:#475569; display:block;">Pilih atau Tarik Berkas Sertifikat PDF ke Sini</span>
-            <span style="font-size:9px; color:#94a3b8; display:block; margin-top:4px;">Mendukung Multi-Page LSA Liferaft Inspection Bundle</span>
+            <span style="font-weight:500; color:#475569; display:block;">Pilih Berkas Sertifikat PDF ke Sini</span>
             <input type="file" id="file-input" accept="application/pdf" style="display:none;" onchange="handleFileUpload(this)">
         </div>
-        
         <div style="text-align:center;">
             <button class="btn-primary" onclick="triggerManualFetch()">Muat Ulang Laporan Terakhir</button>
         </div>
     </div>
 
     <div id="dashboard-container">
-        
         <div class="vessel-master-card">
             <div class="vessel-grid">
-                <div class="vessel-item">
-                    <span class="vessel-lbl">Nama Kapal (Vessel)</span>
-                    <span class="vessel-val" id="val-vessel">-</span>
-                </div>
-                <div class="vessel-item">
-                    <span class="vessel-lbl">Nomor IMO</span>
-                    <span class="vessel-val" id="val-imo">-</span>
-                </div>
-                <div class="vessel-item">
-                    <span class="vessel-lbl">Tanda Selingan / Call Sign</span>
-                    <span class="vessel-val" id="val-call">-</span>
-                </div>
-                <div class="vessel-item">
-                    <span class="vessel-lbl">SOP Audit Status</span>
-                    <span class="vessel-val" id="val-status" style="color:var(--success);">READY</span>
-                </div>
+                <div class="vessel-item"><span class="vessel-lbl">Nama Kapal (Vessel)</span><span class="vessel-val" id="val-vessel">-</span></div>
+                <div class="vessel-item"><span class="vessel-lbl">Nomor IMO</span><span class="vessel-val" id="val-imo">-</span></div>
+                <div class="vessel-item"><span class="vessel-lbl">Call Sign</span><span class="vessel-val" id="val-call">-</span></div>
+                <div class="vessel-item"><span class="vessel-lbl">SOP Audit Status</span><span class="vessel-val" id="val-status" style="color:var(--success);">READY</span></div>
             </div>
         </div>
 
-        <div id="certificate-inspection-container">
+        <div id="certificate-inspection-container" class="space-y-8">
             <div style="padding: 40px; text-align: center; background: white; border-radius: 6px; border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 500;">
                 Silakan unggah file berkas sertifikat untuk memulai analisis kepatuhan SOP otomatis.
             </div>
         </div>
-
     </div>
 
 <script>
-// Alamat API Gateway Produksi Anda yang terhubung dengan n8n
-const WEBHOOK_URL = "https://lsa-lemon.vercel.app/api/webhook"; 
-const GOOGLE_SHEETS_PROXY = "https://lsa-lemon.vercel.app/api/get-last-row"; 
+// FIXED: URL dialihkan murni langsung ke endpoint n8n Waruna Group Anda (Menghapus proxy 404 Vercel)
+const WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+const WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
-function esc(str) {
-    if (!str) return "";
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+function esc(str) { return String(str||"-").replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
 async function handleFileUpload(input) {
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
+    const jobId = "JOB-" + Date.now();
     
-    // Siapkan Payload form-data untuk dikirim secara asinkron ke n8n
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("job_id", "JOB-" + Date.now());
+    formData.append("sertifikat", file);
+    formData.append("job_id", jobId);
+    formData.append("penawaran", new Blob(["#"], {type: 'text/plain'}), "dummy_q.txt");
 
     Swal.fire({
         title: 'Memproses Dokumen',
-        html: 'Ekstraksi biner PDF sedang berjalan di n8n, mengevaluasi aturan kedaluwarsa komponen maritim marun Group...',
+        html: 'AI memecah susunan multi-sertifikat dari berkas PDF... <br><br><b id="swal-timer">Waktu tunggu: 0 detik</b>',
         allowOutsideClick: false,
         didOpen: () => { Swal.showLoading(); }
     });
 
-    try {
-        const response = await fetch(WEBHOOK_URL, { method: "POST", body: formData });
-        if (!response.ok) throw new Error("Gagal memproses dokumen di n8n Gateway.");
-        
-        Swal.fire({
-            icon: 'success',
-            title: 'Analisis Selesai',
-            text: 'Data audit berhasil dipilah. Menarik data laporan murni dari database...',
-            timer: 2000,
-            showConfirmButton: false
-        });
+    const startMs = Date.now();
+    const timerInt = setInterval(() => {
+        const s = Math.floor((Date.now() - startMs) / 1000);
+        const timerEl = document.getElementById("swal-timer");
+        if(timerEl) timerEl.innerHTML = `Waktu tunggu: <b>${s}</b> detik`;
+    }, 1000);
 
-        // Delay 3 detik memberikan jeda bagi n8n untuk mengunci penulisan sel di Google Sheets
-        setTimeout(fetchLatestReportData, 3000);
+    try {
+        await fetch(WH_SUBMIT, { method: "POST", body: formData });
+        
+        const poll = setInterval(async () => {
+            try {
+                const res = await fetch(WH_POLL + "?job_id=" + jobId);
+                const text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return; 
+                
+                const data = JSON.parse(text);
+                const rows = Array.isArray(data) ? data : (data.data || [data]);
+                const ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
+                
+                if(data.status === "processing" || !ourRow) return; 
+                
+                clearInterval(poll); clearInterval(timerInt);
+                Swal.close();
+                
+                let fullPayloadStr = ""; 
+                for(let i = 1; i <= 10; i++) { if (ourRow["Payload" + i]) fullPayloadStr += ourRow["Payload" + i]; }
+                if (!fullPayloadStr || fullPayloadStr.trim() === "") return;
+                
+                renderCertificateReport(JSON.parse(fullPayloadStr.trim()));
+            } catch(e) { console.error("Polling error: ", e); }
+        }, 8000);
+
     } catch (error) {
-        Swal.fire({ icon: 'error', title: 'Eksekusi Gagal', text: error.message });
+        clearInterval(timerInt);
+        Swal.fire({ icon: 'error', title: 'Koneksi Gagal', text: error.message });
     }
 }
 
-function triggerManualFetch() {
+async function triggerManualFetch() {
     Swal.fire({
-        title: 'Menarik Data',
-        text: 'Menghubungkan ke database Google Sheets...',
+        title: 'Memuat Laporan terakhir',
+        text: 'Menghubungkan ke database...',
         allowOutsideClick: false,
         didOpen: () => { Swal.showLoading(); }
     });
-    fetchLatestReportData();
-}
-
-async function fetchLatestReportData() {
     try {
-        const response = await fetch(GOOGLE_SHEETS_PROXY);
-        if (!response.ok) throw new Error("Gagal mengambil baris data terakhir dari Google Sheets.");
+        const res = await fetch(WH_POLL);
+        const rows = await res.json();
+        if(!rows || rows.length === 0) throw new Error("Database kosong.");
         
-        const data = await response.json();
-        if (!data || !data.payload) {
-            throw new Error("Struktur payload kosong. Pastikan n8n Anda sudah menulis data di Sheets.");
+        const lastRow = rows[rows.length - 1];
+        let fullPayloadStr = ""; 
+        for(let i = 1; i <= 10; i++) { if (lastRow["Payload" + i]) fullPayloadStr += lastRow["Payload" + i]; }
+        
+        if (fullPayloadStr) {
+            renderCertificateReport(JSON.parse(fullPayloadStr.trim()));
+            Swal.close();
+        } else {
+            throw new Error("Payload baris terakhir kosong.");
         }
-
-        // Parse tumpukan string biner gabungan payload dari baris sheets
-        const parsedObject = JSON.parse(data.payload);
-        renderCertificateReport(parsedObject);
-        Swal.close();
-    } catch (error) {
-        Swal.fire({ icon: 'error', title: 'Data Loss Error', text: error.message });
+    } catch(e) {
+        Swal.fire({ icon: 'error', title: 'Gagal Memuat', text: e.message });
     }
 }
 
 function renderCertificateReport(parsed) {
     if (!parsed) return;
 
-    // Sinkronisasi data utama profil kapal ke komponen papan kontrol atas
     document.getElementById("val-vessel").innerText = esc(parsed.vessel_name || "MT. CHIRA");
     document.getElementById("val-imo").innerText = esc(parsed.imo_number || "9293210");
     document.getElementById("val-call").innerText = esc(parsed.call_sign || "YDJQ4");
@@ -342,56 +191,32 @@ function renderCertificateReport(parsed) {
         let rawCertStr = String(r.di_sertifikat || "");
         let hasilAiStr = String(r.hasil_ai || "").toLowerCase();
         
-        // Filter eliminasi baris informasi statis header atau laporan inspeksi umum
-        if(itemDesc.toLowerCase().includes("service report") || 
-           itemDesc.toLowerCase().includes("certificate of inspection") || 
-           String(r.kategori).toUpperCase() === "HEADER" ||
-           itemDesc.trim() === "") {
-            return;
-        }
+        if(itemDesc.toLowerCase().includes("service report") || itemDesc.toLowerCase().includes("certificate of inspection") || String(r.kategori).toUpperCase() === "HEADER" || itemDesc.trim() === "") return;
 
-        // ====================================================================
-        // HYBRID DEEP SCAN FILTER: KEBAL HALUSINASI & KEBOCORAN FORMAT TEKS
-        // ====================================================================
-        // Mendeteksi status RN baik dari teks sertifikat murni maupun dari kalimat kesimpulan AI Judge
-        let isRN = rawCertStr.toLowerCase().includes("status: rn") || 
-                   rawCertStr.toLowerCase().includes("renew") || 
-                   itemDesc.toLowerCase().includes("marking") || 
-                   itemDesc.toLowerCase().includes("strapping") ||
-                   hasilAiStr.includes("status rn") || 
-                   hasilAiStr.includes("tidak patuh") ||
-                   hasilAiStr.includes("non-compliant") ||
-                   hasilAiStr.includes("renewal") ||
-                   hasilAiStr.includes("ganti");
+        // HYBRID SCAN FILTER CRITICAL FOR RENEWAL (RN) ONLY
+        let isRN = rawCertStr.toLowerCase().includes("status: rn") || rawCertStr.toLowerCase().includes("renew") || itemDesc.toLowerCase().includes("marking") || itemDesc.toLowerCase().includes("strapping") || hasilAiStr.includes("status rn") || hasilAiStr.includes("tidak patuh") || hasilAiStr.includes("non-compliant") || hasilAiStr.includes("renewal") || hasilAiStr.includes("ganti");
 
-        // SOP SYSTEM: Jika baris data tidak terdeteksi masuk kriteria tindakan RN, lewati rendering
         if (!isRN) return;
-
         totalValidRNFound++;
 
-        // Kelompokkan baris data berdasarkan Nomor Sertifikat masing-masing agar terbagi per blok halaman
-        let cNo = (r.certificate_no || "10103/BTKP/PT/III/2026").trim().replace(/['"]+/g, '');
+        let cNo = (r.certificate_no || "0908/CMSI/LSA/03/2026").trim().replace(/['"]+/g, '');
         if (!certGroups[cNo]) certGroups[cNo] = [];
         certGroups[cNo].push(r);
     });
 
-    // JIKA TOTAL TEMUAN RN NOL, LEPAS NOTIFIKASI DAN KUNCI CONTAINER
     if (totalValidRNFound === 0) {
         document.getElementById("certificate-inspection-container").innerHTML = `
-            <div style="padding: 40px; text-align: center; background: white; border-radius: 6px; border: 1px solid var(--border-color); color: #15803d; font-weight: 700; font-size:12px; text-transform: uppercase;">
-                ✓ Analisis Selesai: Sempurna! Tidak ada temuan komponen berstatus Renewal (RN) pada bundel sertifikat kapal ini.
+            <div style="padding: 40px; text-align: center; background: white; border-radius: 6px; border: 1px solid var(--border-color); color: #15803d; font-weight: 700; text-transform: uppercase;">
+                ✓ Analisis Selesai: Tidak ada komponen temuan berstatus Renewal (RN) pada dokumen ini.
             </div>`;
         return;
     }
 
     let containerHtml = "";
-
-    // Mulai melakukan loop rendering untuk setiap kelompok Nomor Sertifikat yang ditemukan
     Object.keys(certGroups).forEach((cNo) => {
         let rowsInGroup = certGroups[cNo];
         if (rowsInGroup.length === 0) return;
 
-        // Ambil sampel data baris pertama untuk melacak Serial Number Liferaft utama
         let sampleStr = String(rowsInGroup[0]?.di_sertifikat || "");
         let serialMatch = sampleStr.match(/Serial:\s*([^\s|]+)/i);
         let liferaftSerial = serialMatch ? serialMatch[1] : "13013100";
@@ -402,10 +227,8 @@ function renderCertificateReport(parsed) {
         rowsInGroup.forEach((r) => {
             let itemDesc = esc(r.keterangan);
             let rawCertStr = String(r.di_sertifikat || "");
-            let itemQty = "1";
-            let expDate = rawCertStr; // Jika format pembagi pipa los, jadikan teks mentah sebagai tanggal
+            let itemQty = "1", expDate = rawCertStr;
             
-            // Parsing terstruktur data pipa biner (Key-Value) jika tersedia sempurna dari n8n
             if (rawCertStr.includes('|')) {
                 rawCertStr.split('|').forEach(p => {
                     let kv = p.split(':'); if(kv.length < 2) return;
@@ -416,27 +239,18 @@ function renderCertificateReport(parsed) {
             }
 
             let hasilStr = String(r.hasil_ai || "");
-            // Indikasi Anomali Kritis
-            let isAnomali = hasilStr.includes('⚠️') || 
-                            hasilStr.toLowerCase().includes('anomali') || 
-                            hasilStr.toLowerCase().includes('non-compliant') || 
-                            hasilStr.toLowerCase().includes('tidak patuh') ||
-                            hasilStr.toLowerCase().includes('critical');
+            let isAnomali = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('non-compliant') || hasilStr.toLowerCase().includes('tidak patuh');
 
             tbodyRowsHtml += `
-                <tr style="transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
-                    <td align="center" style="font-weight: 700; color: #64748b;">${itemIndex++}</td>
-                    <td>
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td align="center" style="vertical-align: middle; font-weight: 700; color: #64748b;">${itemIndex++}</td>
+                    <td style="vertical-align: middle;">
                         <span class="item-name">${itemDesc}</span>
                         <br><span class="box-rn-tag">⚡ STATUS: RENEWAL (RN)</span>
                     </td>
-                    <td align="center" style="font-weight: 700;">
-                        <div style="background: #f8fafc; padding: 2px 8px; border: 1px solid var(--border-color); border-radius: 4px; display: inline-block; min-w: 25px;">
-                            ${esc(itemQty)}
-                        </div>
-                    </td>
-                    <td align="center" class="text-date">${esc(expDate)}</td>
-                    <td style="padding: 8px 12px;">
+                    <td align="center" style="vertical-align: middle; font-weight: 700;"><div class="bg-slate-50 px-2 py-0.5 rounded border inline-block min-w-[25px]">${esc(itemQty)}</div></td>
+                    <td align="center" class="text-date" style="vertical-align: middle;">${esc(expDate)}</td>
+                    <td style="vertical-align: middle;" class="p-2">
                         <div class="flex flex-col gap-1">
                             <div style="font-size: 11px; color: #334155; font-weight: 500; line-height: 1.4;">${esc(hasilStr)}</div>
                             <div class="mt-1">
@@ -449,18 +263,15 @@ function renderCertificateReport(parsed) {
                 </tr>`;
         });
 
-        // Satukan baris-baris komponen ke dalam template blok sertifikat berdesain linear
         containerHtml += `
         <div class="cert-block">
             <div class="cert-header-title">
                 <span>📋 NOMOR SERTIFIKAT: ${esc(cNo)}</span>
-                <span style="font-size: 9px; background: #172554; padding: 2px 6px; border-radius: 4px; font-weight: 700; uppercase; tracking-wide;">
-                    ID SERI LIFERAFT: ${esc(liferaftSerial)}
-                </span>
+                <span class="text-[9px] bg-blue-950 px-2 py-0.5 rounded font-bold uppercase tracking-wide">ID SERI LIFERAFT: ${esc(liferaftSerial)}</span>
             </div>
             <div class="cert-meta-grid">
                 <div class="meta-item"><span class="meta-lbl">Nama Kapal (Vessel)</span><span class="meta-val">${esc(document.getElementById("val-vessel").innerText)}</span></div>
-                <div class="meta-item"><span class="meta-lbl">Tempat Pemeriksaan</span><span class="meta-val">Belawan / Batam / Jakarta</span></div>
+                <div class="meta-item"><span class="meta-lbl">Tempat Pemeriksaan</span><span class="meta-val">Belawan / Batam</span></div>
                 <div class="meta-item"><span class="meta-lbl">Tanggal Penerbitan</span><span class="meta-val text-date">16 MARCH 2026</span></div>
                 <div class="meta-item"><span class="meta-lbl">Surveyor Marine</span><span class="meta-val">WARUNA INSPECTORATE TEAM</span></div>
             </div>
@@ -481,10 +292,8 @@ function renderCertificateReport(parsed) {
         </div>`;
     });
 
-    // Tampilkan rangkaian blok sertifikat ke dalam container dom utama
     document.getElementById("certificate-inspection-container").innerHTML = containerHtml;
 }
 </script>
-
 </body>
 </html>
