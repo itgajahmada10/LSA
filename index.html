@@ -172,12 +172,14 @@
             <div id="tab-sertifikat" class="content-card">
                 <div class="table-responsive">
                     <table>
-                        <tr class="section-title"><td colspan="13">CERTIFICATE LIST</td></tr>
-                        <tr>
-                            <th width="3%">NO</th><th width="15%">REPORT</th><th width="12%">CERT NO</th><th width="12%">SHIP</th>
-                            <th width="12%">OWNER</th><th width="8%">IMO</th><th width="5%">CLS</th><th width="5%">GT</th>
-                            <th width="8%">NAT</th><th width="5%">CALL</th><th width="8%">DATE</th><th width="8%">SIGN</th><th width="7%">STAT</th>
-                        </tr>
+                        <thead>
+                            <tr class="section-title"><td colspan="13">CERTIFICATE LIST</td></tr>
+                            <tr>
+                                <th width="3%">NO</th><th width="15%">REPORT</th><th width="12%">CERT NO</th><th width="12%">SHIP</th>
+                                <th width="12%">OWNER</th><th width="8%">IMO</th><th width="5%">CLS</th><th width="5%">GT</th>
+                                <th width="8%">NAT</th><th width="5%">CALL</th><th width="8%">DATE</th><th width="8%">SIGN</th><th width="7%">STAT</th>
+                            </tr>
+                        </thead>
                         <tbody id="body-sertifikat"></tbody>
                     </table>
                 </div>
@@ -186,15 +188,17 @@
             <div id="tab-penawaran" class="content-card">
                 <div class="table-responsive">
                     <table>
-                        <tr class="section-title"><td colspan="6">QUOTATION (ALIAS MAPPING & COMPLIANCE CHECK)</td></tr>
-                        <tr>
-                            <th width="4%">NO</th>
-                            <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                            <th width="15%">QUOTATION (QTY)</th>
-                            <th width="15%">CERTIFICATE (QTY)</th>
-                            <th width="8%">DO</th>
-                            <th width="13%">STATUS</th>
-                        </tr>
+                        <thead>
+                            <tr class="section-title"><td colspan="6">QUOTATION (ALIAS MAPPING & COMPLIANCE CHECK)</td></tr>
+                            <tr>
+                                <th width="4%">NO</th>
+                                <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
+                                <th width="15%">QUOTATION (QTY)</th>
+                                <th width="15%">CERTIFICATE (QTY)</th>
+                                <th width="8%">DO</th>
+                                <th width="13%">STATUS</th>
+                            </tr>
+                        </thead>
                         <tbody id="body-penawaran"></tbody>
                     </table>
                 </div>
@@ -375,23 +379,23 @@ function renderAuditReport(parsed) {
 
         let numId = idx + 1;
 
-        // INJEKSI BARIS KLASIK TABEL UTAMA (Efek hover dipertahankan untuk estetika)
-        htmlPen += `<tr class="${rowClass} hover:bg-slate-50 transition-colors">
-            <td align="center"><b>${numId}</b></td>
-            <td>
+        // INJEKSI BARIS TABEL KLASIK
+        htmlPen += `<tr class="${rowClass}">
+            <td align="center" style="vertical-align: middle;"><b>${numId}</b></td>
+            <td style="vertical-align: middle;">
                 <div class="box-vendor">${esc(r.keterangan)}</div>
                 <div class="box-system">${esc(systemName)}</div>
                 <div class="box-code">${esc(itemCode)}</div>
             </td>
-            <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-            <td><div class="doc-val">${esc(certQty)}</div></td>
-            <td align="center">${esc(r.di_do)}</td>
+            <td style="vertical-align: middle;"><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+            <td style="vertical-align: middle;"><div class="doc-val">${esc(certQty)}</div></td>
+            <td align="center" style="vertical-align: middle;">${esc(r.di_do)}</td>
             <td class="${isWarn?'err-cell':'ok-cell'}" style="vertical-align: middle; text-align: center; font-weight: 800;">
                 ${isWarn ? 'ANOMALI ⚠️' : 'MATCH ✅'}
             </td>
         </tr>`;
 
-        // BREAKDOWN BLOK CARD DETAIL (LANGSUNG TERBUKA TANPA KELAS HIDDEN)
+        // STRUKTUR DETAIL CARD (DI-RENDER UTUH DI DALAM ELEMEN TD TABEL LEGAL)
         let subDetailCardHtml = "";
         let sysLower = systemName.toLowerCase() + " " + esc(r.keterangan).toLowerCase();
 
@@ -494,14 +498,14 @@ function renderAuditReport(parsed) {
                 </div>`;
         }
 
-        // TAMPILKAN ACCORDION ROW SECARA PERMANEN (TANPA KELAS HIDDEN)
+        // PERBAIKAN TOTAL: MENGHAPUS 'hidden' AGAR BARIS LANGSUNG TERGELAR UNTUK PIC
         htmlPen += `<tr id="acc-row-${numId}" class="explanation-row ${rowClass}">
-            <td style="border-right: 1px solid var(--border-color);"></td>
-            <td colspan="5" class="p-0">${subDetailCardHtml}</td>
+            <td style="border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);"></td>
+            <td colspan="5" class="p-0 border-b border-slate-200" style="background-color: #f8fafc;">${subDetailCardHtml}</td>
         </tr>`;
     });
 
-    document.getElementById("body-penawaran").innerHTML = htmlPen;
+    document.getElementById("body-penawaran").innerHTML = tableBodyHtml = htmlPen;
 
     // 3. Render TAB SUMMARY
     let criticalContainer = document.getElementById("critical-summary-container");
@@ -529,12 +533,14 @@ function renderAuditReport(parsed) {
                 <h4 style="color: var(--primary); font-size: 14px; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px;">📑 Peta Lokasi Dokumen & Nomor Sertifikat</h4>
                 <div class="table-responsive">
                     <table>
-                        <tr>
-                            <th width="5%" class="center">NO</th>
-                            <th width="35%">KATEGORI SISTEM (LSA & FFA)</th>
-                            <th width="40%">NOMOR SERTIFIKAT</th>
-                            <th width="20%">HALAMAN PDF</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th width="5%" class="center">NO</th>
+                                <th width="35%">KATEGORI SISTEM (LSA & FFA)</th>
+                                <th width="40%">NOMOR SERTIFIKAT</th>
+                                <th width="20%">HALAMAN PDF</th>
+                            </tr>
+                        </thead>
                         <tbody>`;
         
         parsed.summary_sertifikat.forEach((item, idx) => {
@@ -598,8 +604,11 @@ function renderAuditReport(parsed) {
     }
     document.getElementById("body-sertifikat").innerHTML = htmlCert;
 
-    // AMAN: MENGEMBALIKAN FUNGSI TOMBOL RUN TANPA ERROR BLOCKED
+    // VALIDASI PERBAIKAN UTAMAKAN ID ASLI
     document.getElementById("btn-run").disabled = false;
     document.getElementById("btn-run").innerText = "RUN COMPREHENSIVE AUDIT";
 }
 </script>
+
+</body>
+</html>
