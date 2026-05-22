@@ -403,7 +403,7 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // 3. Render TAB SUMMARY
+    // 3. Render TAB SUMMARY (DIOPTIMALKAN UNTUK SELURUH SOP VALIDASI BARU)
     let criticalContainer = document.getElementById("critical-summary-container");
     let summaryHtml = "";
 
@@ -430,7 +430,7 @@ function renderAuditReport(parsed) {
                         <th width="5%" style="text-align:center;">NO</th>
                         <th width="30%">KATEGORI SISTEM KESELAMATAN</th>
                         <th width="25%">NOMOR SERTIFIKAT AKTUAL</th>
-                        <th width="40%">TEMUAN (RN PER SERTIFIKAT)</th> 
+                        <th width="40%">HASIL TEMUAN AUDIT & STATUS MATERIAL</th> 
                     </tr>
                 <tbody>`;
         
@@ -469,69 +469,71 @@ function renderAuditReport(parsed) {
             let rnFromAI = String(item.temuan_rn || "-").trim();
             let componentStatusHtml = `<span style="color:#94a3b8; font-size:10px; font-style:italic;">Menunggu Integrasi Berkas Berlangsung</span>`;
             
-            if (key.toUpperCase().includes("LIFERAFT") || key.toUpperCase().includes("LIFEBOAT")) {
-                if (isFound) {
-                    if (rnFromAI !== "-" && rnFromAI !== "") {
-                        // PERBAIKAN STRING AI: Memaksa Enter sebelum Nomor Sertifikat jika AI tidak sengaja menggabungkannya
-                        rnFromAI = rnFromAI.replace(/(.)(Sertifikat\s+[a-zA-Z0-9/_-]+:|[0-9]{3,}[a-zA-Z0-9/_-]+:)/gi, function(match, p1, p2) {
-                            return p1 === '\n' ? match : p1 + '\n' + p2;
-                        });
+            if (isFound) {
+                if (rnFromAI !== "-" && rnFromAI !== "") {
+                    // PENGAMAN STRIP: Memaksa enter sebelum nomor sertifikat baru jika AI menyatukannya
+                    rnFromAI = rnFromAI.replace(/(.)(Sertifikat\s+[a-zA-Z0-9/_-]+:|[0-9]{3,}[a-zA-Z0-9/_-]+:|CertNo\s+[a-zA-Z0-9/_-]+:)/gi, function(match, p1, p2) {
+                        return p1 === '\n' ? match : p1 + '\n' + p2;
+                    });
 
-                        // GAYA VISUAL BARU: List vertikal bersih ke bawah sesuai contoh yang diminta
-                        componentStatusHtml = `<div style="display:flex; flex-direction:column; gap:12px; padding: 4px 0;">`;
-                        
-                        rnFromAI.split(/\\n|\n/).forEach(line => {
-                            let cleanLine = line.trim();
-                            if(cleanLine !== "" && cleanLine !== "-") {
-                                let parts = cleanLine.split(':');
-                                if (parts.length > 1) {
-                                    let certLabel = parts[0].trim();
-                                    let itemsStr = parts.slice(1).join(':').trim(); 
-                                    
-                                    // Membuat Header Sertifikat dan membungkus list di bawahnya
-                                    componentStatusHtml += `<div style="display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
-                                        <span style="font-weight:800; color:#1e3a8a; font-size:11px;">📄 ${esc(certLabel)}:</span>
-                                        <div style="display:flex; flex-direction:column; gap:3px; padding-left: 4px; margin-top:2px;">`;
-                                    
+                    // RENDER DINAMIS LOG LIST UNTUK SELURUH SOP
+                    componentStatusHtml = `<div style="display:flex; flex-direction:column; gap:12px; padding: 4px 0; width:100%;">`;
+                    
+                    rnFromAI.split(/\\n|\n/).forEach(line => {
+                        let cleanLine = line.trim();
+                        if(cleanLine !== "" && cleanLine !== "-") {
+                            let parts = cleanLine.split(':');
+                            if (parts.length > 1) {
+                                let certLabel = parts[0].trim();
+                                let itemsStr = parts.slice(1).join(':').trim(); 
+                                
+                                componentStatusHtml += `<div style="display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #e2e8f0; padding-bottom:8px; width:100%;">
+                                    <span style="font-weight:800; color:var(--primary); font-size:11px;">📄 ${esc(certLabel)}:</span>
+                                    <div style="display:flex; flex-direction:column; gap:4px; padding-left: 6px; margin-top:2px;">`;
+                                
+                                // Deteksi apakah temuan berupa list item dipisah koma atau kalimat utuh
+                                if (itemsStr.includes(',')) {
                                     itemsStr.split(',').forEach(it => {
                                         let cleanIt = it.replace(/\./g, '').trim(); 
                                         if(cleanIt !== "" && cleanIt !== "-") {
+                                            // Tukar icon otomatis jika mendeteksi kata-kata anomali regulasi
+                                            let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar');
+                                            let icon = isAnomali ? '⚠️' : '🛠️';
                                             componentStatusHtml += `<span style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
-                                                <span>🛠️</span> <span style="padding-top:1px;">${esc(cleanIt)}</span>
+                                                <span>${icon}</span> <span style="padding-top:1px;">${esc(cleanIt)}</span>
                                             </span>`;
                                         }
                                     });
-                                    componentStatusHtml += `</div></div>`;
                                 } else {
-                                     // Fallback jika baris tidak mengandung titik dua
-                                     componentStatusHtml += `<div style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
-                                         <span>🛠️</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
-                                     </div>`;
+                                    let isAnomali = itemsStr.toLowerCase().includes('anomali') || itemsStr.toLowerCase().includes('tidak') || itemsStr.toLowerCase().includes('melanggar');
+                                    let icon = isAnomali ? '⚠️' : '🛠️';
+                                    componentStatusHtml += `<span style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
+                                        <span>${icon}</span> <span style="padding-top:1px;">${esc(itemsStr)}</span>
+                                    </span>`;
                                 }
+                                componentStatusHtml += `</div></div>`;
+                            } else {
+                                 let isAnomali = cleanLine.toLowerCase().includes('anomali') || cleanLine.toLowerCase().includes('tidak') || cleanLine.toLowerCase().includes('melanggar');
+                                 let icon = isAnomali ? '⚠️' : '🛠️';
+                                 componentStatusHtml += `<div style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+                                     <span>${icon}</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
+                                 </div>`;
                             }
-                        });
-                        componentStatusHtml += `</div>`;
-                    } else {
-                        componentStatusHtml = `<span class="badge-ok" style="font-size:10px; font-weight:700; color:#166534; background:#f0fdf4; padding:2px 6px; border-radius:3px; border:1px solid #bbf7d0;">✅ UTUH (TIDAK ADA PERGANTIAN MATERIAL RN)</span>`;
-                    }
+                        }
+                    });
+                    componentStatusHtml += `</div>`;
                 } else {
-                    componentStatusHtml = `<span style="color:var(--error); font-weight:600;">⚠️ Sertifikat Tidak Terlampir</span>`;
+                    componentStatusHtml = `<span class="badge-ok" style="font-size:10px; font-weight:700; color:#166534; background:#f0fdf4; padding:2px 6px; border-radius:3px; border:1px solid #bbf7d0;">✅ TERVERIFIKASI (SESUAI SOP / TIDAK ADA ANOMALI MATERIAL)</span>`;
                 }
-            } else if (key.toUpperCase().includes("FIRE EXTINGUISHER")) {
-                componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Karakter: Cek Berat Tabung & Penjumlahan Label (SOP-02)</span>`;
-            } else if (key.toUpperCase().includes("FIXED CO2")) {
-                componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Karakter: Deteksi Pilot Cylinder (SOP-03)</span>`;
-            } else if (key.toUpperCase().includes("SCBA") || key.toUpperCase().includes("EEBD")) {
-                componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Karakter: Kondisi Kelengkapan Mask/Valve Set (SOP-04)</span>`;
             } else {
-                componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Menunggu Mapping Dokumen</span>`;
+                componentStatusHtml = `<span style="color:var(--error); font-weight:600; font-size:10px;">⚠️ SERTIFIKAT TIDAK TERLAMPIR</span>`;
             }
             
             summaryHtml += `<tr>
                 <td align="center" style="font-weight: 700; color: #64748b;">${sIdx++}</td>
                 <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
                 <td><div class="doc-val" style="${valClass}">${esc(noCert)}</div></td>
-                <td><div class="doc-val" style="background:#fff; min-height:34px; display:flex; align-items:flex-start;">${componentStatusHtml}</div></td>
+                <td><div class="doc-val" style="background:#fff; min-height:34px; display:flex; align-items:flex-start; width:100%; border:none; padding:0;">${componentStatusHtml}</div></td>
             </tr>`;
         }
         summaryHtml += `</tbody></table></div></div>`;
