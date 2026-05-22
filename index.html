@@ -331,7 +331,7 @@ function renderAuditReport(parsed) {
         if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
     });
 
-    // 1. Populate Top Bar (Data Kapal)
+    // 1. Populate Top Bar
     let v_name="-", v_imo="-", v_call="-", v_own="-";
     for(let r of certRows) {
         if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -349,7 +349,7 @@ function renderAuditReport(parsed) {
     document.getElementById("val-owner").innerText = v_own;
     if(v_name !== "-") currentShipName = "Audit_" + v_name.replace(/\s+/g, '_');
 
-    // 2. Render Tabel Penawaran & Tangkap Anomali
+    // 2. Render Tabel Penawaran
     let htmlPen = ""; let anomalyList = [];
     penRows.forEach((r, idx) => {
         let rawAlias = String(r.alias_sistem || "-").trim();
@@ -370,7 +370,6 @@ function renderAuditReport(parsed) {
         }
 
         let certQty = String(r.di_sertifikat || "-").trim();
-        // REVISI KRUSIAL: Menghapus filter pembatas string 30 karakter agar tabel penawaran tidak blank/kosong akibat evaluasi panjang AI
         let badgeHtml = esc(certQty);
         if (certQty.toUpperCase().includes("(RN)")) {
             badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge-rn">RN</span>`;
@@ -404,7 +403,7 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // 3. Render TAB SUMMARY (REVISI LOGIKA PENYATUAN OBJEK AGAR RN SELALU MENANG ATAS KOSONG "-")
+    // 3. Render TAB SUMMARY (Pembaruan UI Multi-Line Sertifikat & Badge Temuan RN)
     let criticalContainer = document.getElementById("critical-summary-container");
     let summaryHtml = "";
 
@@ -431,30 +430,31 @@ function renderAuditReport(parsed) {
                         <th width="5%" style="text-align:center;">NO</th>
                         <th width="30%">KATEGORI SISTEM KESELAMATAN</th>
                         <th width="25%">NOMOR SERTIFIKAT AKTUAL</th>
-                        <th width="40%">INTERNAL MATERIAL STATUS (RENEWAL REQUIRED)</th> 
+                        <th width="40%">TEMUAN (RN PER SERTIFIKAT)</th> 
                     </tr>
                 <tbody>`;
         
-        // PERBAIKAN LOGIKA DEDUPLIKASI: Menjamin data RN nyata dari sertifikat menimpa data kosong "-"
         let uniqueSummaryMap = {};
         parsed.summary_sertifikat.forEach(item => {
             let key = String(item.sistem).trim();
+            // Fallback: Mendukung key temuan_rn (baru) atau material_rn (lama) jika model bandel
+            let currentRnVal = item.temuan_rn || item.material_rn || "-";
+            
             if(!uniqueSummaryMap[key]) {
                 uniqueSummaryMap[key] = {
                     sistem: item.sistem,
                     no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
                     halaman: item.halaman || "-",
-                    material_rn: item.material_rn || "-"
+                    temuan_rn: currentRnVal
                 };
             } else {
                 if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
                     uniqueSummaryMap[key].no_sertifikat = item.certificate_no || item.no_sertifikat;
                 }
-                // Jika data lama bernilai "-" atau kosong, dan ada data baru yang berisi komponen RN, TIMPA SECARA MUTLAK
-                if (String(uniqueSummaryMap[key].material_rn).trim() === "-" || String(uniqueSummaryMap[key].material_rn).trim() === "") {
-                    uniqueSummaryMap[key].material_rn = item.material_rn || "-";
-                } else if (item.material_rn && item.material_rn !== "-" && uniqueSummaryMap[key].material_rn !== item.material_rn) {
-                    uniqueSummaryMap[key].material_rn += ", " + item.material_rn;
+                if (String(uniqueSummaryMap[key].temuan_rn).trim() === "-" || String(uniqueSummaryMap[key].temuan_rn).trim() === "") {
+                    uniqueSummaryMap[key].temuan_rn = currentRnVal;
+                } else if (currentRnVal && currentRnVal !== "-" && uniqueSummaryMap[key].temuan_rn !== currentRnVal) {
+                    uniqueSummaryMap[key].temuan_rn += "\n" + currentRnVal;
                 }
             }
         });
@@ -463,21 +463,41 @@ function renderAuditReport(parsed) {
         for (let key in uniqueSummaryMap) {
             let item = uniqueSummaryMap[key];
             let noCert = String(item.no_sertifikat).trim();
-            if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 40) noCert = "-";
+            if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 50) noCert = "-";
             let isFound = noCert !== "-";
             let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
             
-            let rnFromAI = String(item.material_rn || "-").trim();
+            let rnFromAI = String(item.temuan_rn || "-").trim();
             let componentStatusHtml = `<span style="color:#94a3b8; font-size:10px; font-style:italic;">Menunggu Integrasi Berkas Berlangsung</span>`;
             
-            if (key.toUpperCase().includes("LIFERAFT")) {
+            if (key.toUpperCase().includes("LIFERAFT") || key.toUpperCase().includes("LIFEBOAT")) {
                 if (isFound) {
                     if (rnFromAI !== "-" && rnFromAI !== "") {
-                        componentStatusHtml = `<div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; padding: 2px 0;">
-                            <span style="font-weight:700; color:#701a75; margin-right:4px;">[RN]:</span>`;
-                        rnFromAI.split('|').forEach(it => {
-                            if(it.trim() !== "" && it.trim() !== "-") {
-                                componentStatusHtml += `<span class="badge-rn" style="font-size:9px; padding:1px 5px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:2px;">🛠️ ${esc(it.trim())}</span>`;
+                        // Render UI badge per baris teks (format pemisah multi-sertifikat dari prompt)
+                        componentStatusHtml = `<div style="display:flex; flex-direction:column; gap:6px; padding: 4px 0;">`;
+                        
+                        // Pecah kalimat berdasarkan enter (\n) yang dikirimkan oleh AI
+                        rnFromAI.split(/\\n|\n/).forEach(line => {
+                            if(line.trim() !== "" && line.trim() !== "-") {
+                                let parts = line.split(':');
+                                if (parts.length > 1) {
+                                    let certLabel = parts[0].trim();
+                                    let itemsStr = parts.slice(1).join(':').trim(); // Gabungkan sisa titik dua (jika ada)
+                                    
+                                    componentStatusHtml += `<div style="display:flex; align-items:flex-start; flex-wrap:wrap; gap:4px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">
+                                        <span style="font-weight:700; color:#334155; margin-right:4px; font-size:10px; padding-top:2px;">${esc(certLabel)}:</span>`;
+                                    
+                                    itemsStr.split(',').forEach(it => {
+                                        let cleanIt = it.replace('.', '').trim(); // Bersihkan titik penutup
+                                        if(cleanIt !== "" && cleanIt !== "-") {
+                                            componentStatusHtml += `<span class="badge-rn" style="font-size:9px; padding:2px 5px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:3px;">🛠️ ${esc(cleanIt)}</span>`;
+                                        }
+                                    });
+                                    componentStatusHtml += `</div>`;
+                                } else {
+                                    // Fallback UI jika format titik dua dari AI tidak terdeteksi
+                                     componentStatusHtml += `<div style="font-size:10px; color:#701a75; font-weight:600; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">🛠️ ${esc(line.trim())}</div>`;
+                                }
                             }
                         });
                         componentStatusHtml += `</div>`;
