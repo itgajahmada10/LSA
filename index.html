@@ -463,7 +463,7 @@ function renderAuditReport(parsed) {
         for (let key in uniqueSummaryMap) {
             let item = uniqueSummaryMap[key];
             let noCert = String(item.no_sertifikat).trim();
-            if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 50) noCert = "-";
+            if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
             let isFound = noCert !== "-";
             let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
             
