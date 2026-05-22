@@ -3,17 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna Group | Smart Audit LSA V8 Pro</title>
+    <title>Waruna Group | Smart Audit LSA V8.2 Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a; --primary-light: #eff6ff; 
-            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
-            --success: #15803d; --error: #b91c1c; --warning: #b45309;
-            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; --border-system: #7dd3fc;
-            --bg-code: #f0fdf4; --border-code: #86efac;     
-            --bg-rn: #fae8ff; --border-rn: #e9d5ff; --text-rn: #701a75;
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff; 
+            --border-color: #e2e8f0; 
+            --text-main: #1e293b; 
+            --text-muted: #64748b;
+            --success: #15803d; 
+            --error: #b91c1c;
+            --warning: #b45309;
+            --bg-vendor: #fef9c3; 
+            --border-vendor: #facc15; 
+            --bg-system: #e0f2fe; 
+            --border-system: #7dd3fc;
+            --bg-code: #f0fdf4; 
+            --border-code: #86efac;     
+            --bg-rn: #fae8ff;
+            --border-rn: #e9d5ff;
+            --text-rn: #701a75;
         }
         
         body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f1f5f9; margin: 0; padding: 0; line-height: 1.4; }
@@ -360,8 +370,7 @@ function renderAuditReport(parsed) {
         }
 
         let certQty = String(r.di_sertifikat || "-").trim();
-        if (certQty.toLowerCase().includes("qty aktual") || certQty.length > 30) certQty = "0";
-
+        // REVISI KRUSIAL: Menghapus filter pembatas string 30 karakter agar tabel penawaran tidak blank/kosong akibat evaluasi panjang AI
         let badgeHtml = esc(certQty);
         if (certQty.toUpperCase().includes("(RN)")) {
             badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge-rn">RN</span>`;
@@ -395,7 +404,7 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // 3. Render TAB SUMMARY (ANTI-DUPLIKASI DAN MURNI DARI MATERIAL_RN SERTIFIKAT AI)
+    // 3. Render TAB SUMMARY (REVISI LOGIKA PENYATUAN OBJEK AGAR RN SELALU MENANG ATAS KOSONG "-")
     let criticalContainer = document.getElementById("critical-summary-container");
     let summaryHtml = "";
 
@@ -426,7 +435,7 @@ function renderAuditReport(parsed) {
                     </tr>
                 <tbody>`;
         
-        // PENGAMAN DEDUPLIKASI: Gabungkan array summary agar sistem dengan nama yang sama tidak muncul berkali-kali
+        // PERBAIKAN LOGIKA DEDUPLIKASI: Menjamin data RN nyata dari sertifikat menimpa data kosong "-"
         let uniqueSummaryMap = {};
         parsed.summary_sertifikat.forEach(item => {
             let key = String(item.sistem).trim();
@@ -438,14 +447,14 @@ function renderAuditReport(parsed) {
                     material_rn: item.material_rn || "-"
                 };
             } else {
-                // Jika sertifikat kosong di baris pertama tapi ada di baris kedua, satukan data nomornya
-                if(uniqueSummaryMap[key].no_sertifikat === "-" && item.certificate_no) {
-                    uniqueSummaryMap[key].no_sertifikat = item.certificate_no;
+                if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
+                    uniqueSummaryMap[key].no_sertifikat = item.certificate_no || item.no_sertifikat;
                 }
-                // Satukan strings material RN jika ada tambahan di baris duplikatnya
-                if(item.material_rn && item.material_rn !== "-" && uniqueSummaryMap[key].material_rn !== item.material_rn) {
-                    if(uniqueSummaryMap[key].material_rn === "-") uniqueSummaryMap[key].material_rn = item.material_rn;
-                    else uniqueSummaryMap[key].material_rn += ", " + item.material_rn;
+                // Jika data lama bernilai "-" atau kosong, dan ada data baru yang berisi komponen RN, TIMPA SECARA MUTLAK
+                if (String(uniqueSummaryMap[key].material_rn).trim() === "-" || String(uniqueSummaryMap[key].material_rn).trim() === "") {
+                    uniqueSummaryMap[key].material_rn = item.material_rn || "-";
+                } else if (item.material_rn && item.material_rn !== "-" && uniqueSummaryMap[key].material_rn !== item.material_rn) {
+                    uniqueSummaryMap[key].material_rn += ", " + item.material_rn;
                 }
             }
         });
@@ -466,9 +475,9 @@ function renderAuditReport(parsed) {
                     if (rnFromAI !== "-" && rnFromAI !== "") {
                         componentStatusHtml = `<div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; padding: 2px 0;">
                             <span style="font-weight:700; color:#701a75; margin-right:4px;">[RN]:</span>`;
-                        rnFromAI.split(',').forEach(it => {
+                        rnFromAI.split('|').forEach(it => {
                             if(it.trim() !== "" && it.trim() !== "-") {
-                                componentStatusHtml += `<span class="badge-rn" style="font-size:9px; padding:1px 5px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:2px;">🛠 * ${esc(it.trim())}</span>`;
+                                componentStatusHtml += `<span class="badge-rn" style="font-size:9px; padding:1px 5px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:2px;">🛠️ ${esc(it.trim())}</span>`;
                             }
                         });
                         componentStatusHtml += `</div>`;
