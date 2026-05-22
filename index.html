@@ -1,4 +1,4 @@
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -784,7 +784,8 @@ function renderAuditReport(parsed) {
                             <th width="5%" style="text-align:center;">NO</th>
                             <th width="35%">KATEGORI SISTEM KESELAMATAN</th>
                             <th width="30%">NOMOR SERTIFIKAT AKTUAL</th>
-                            <th width="30%">RENEWED ITEMS STATUS (RN)</th> </tr>
+                            <th width="30%">RENEWED ITEMS STATUS (RN)</th> 
+                        </tr>
                     <tbody>
         `;
         parsed.summary_sertifikat.forEach((item, idx) => {
@@ -793,11 +794,9 @@ function renderAuditReport(parsed) {
             let isFound = noCert !== "-";
             let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
             
-            // Logika Pengisian Kolom RN secara Otomatis khusus untuk Liferaft
             let rnDisplayHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Bukan Kategori Material Pack</span>`;
             if (String(item.sistem).toUpperCase().includes("LIFERAFT")) {
                 if (liferaftRnItems.length > 0) {
-                    // Buat susunan badge ungu kecil ke samping untuk tiap item yang RN
                     rnDisplayHtml = `<div style="display:flex; flex-wrap:wrap; gap:4px;">`;
                     liferaftRnItems.forEach(rnItem => {
                         rnDisplayHtml += `<span class="badge-rn" style="font-size:9px; padding:2px 4px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:3px;">🛠️ ${esc(rnItem)}</span>`;
@@ -878,5 +877,6 @@ function renderAuditReport(parsed) {
     }
     document.getElementById("body-sertifikat").innerHTML = htmlCert;
 }
-    f.write(html_content)
-print("File successfully created!")
+</script>
+</body>
+</html>
