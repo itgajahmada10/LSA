@@ -7,237 +7,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a8a;
-            --primary-light: #eff6ff; 
-            --border-color: #e2e8f0; 
-            --text-main: #1e293b; 
-            --text-muted: #64748b;
-            --success: #15803d; 
-            --error: #b91c1c;
-            --warning: #b45309;
-            --bg-vendor: #fef9c3; 
-            --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; 
-            --border-system: #7dd3fc;
-            --bg-code: #f0fdf4; 
-            --border-code: #86efac;     
-            --bg-rn: #fae8ff;
-            --border-rn: #e9d5ff;
-            --text-rn: #701a75;
+            --primary: #1e3a8a; --primary-light: #eff6ff; 
+            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #15803d; --error: #b91c1c; --warning: #b45309;
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
+            --bg-system: #e0f2fe; --border-system: #7dd3fc;
+            --bg-code: #f0fdf4; --border-code: #86efac;     
+            --bg-rn: #fae8ff; --border-rn: #e9d5ff; --text-rn: #701a75;
         }
         
-        body { 
-            font-family: 'Inter', sans-serif;
-            font-size: 11px; 
-            color: var(--text-main); 
-            background: #f1f5f9; 
-            margin: 0; 
-            padding: 0; 
-            line-height: 1.4;
-        }
+        body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f1f5f9; margin: 0; padding: 0; line-height: 1.4; }
         * { box-sizing: border-box; }
 
         /* UPLOAD SECTION */
-        #upload-section { 
-            max-width: 900px;
-            margin: 400px auto; 
-            margin-top: 40px;
-            padding: 25px; 
-            background: #fff; 
-            border-radius: 12px; 
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
-        }
-        .app-title { 
-            text-align: center;
-            color: var(--primary); 
-            font-size: 22px; 
-            font-weight: 800; 
-            margin-bottom: 20px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .upload-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 15px; 
-            margin-bottom: 20px;
-        }
-        .upload-zone { 
-            border: 2px dashed #cbd5e1; 
-            border-radius: 8px; 
-            padding: 20px 15px; 
-            text-align: center;
-            background: #f8fafc; 
-            transition: all 0.2s ease;
-        }
-        .upload-zone.has-file { 
-            border-color: var(--success); 
-            background: #f0fdf4; 
-            border-style: solid;
-        }
-        .uz-label { 
-            display: block; 
-            font-weight: 700; 
-            color: var(--primary); 
-            font-size: 11px; 
-            text-transform: uppercase;
-            margin-bottom: 10px; 
-        }
-        .file-input { 
-            width: 100%; 
-            font-size: 10px; 
-            cursor: pointer;
-        }
-        .btn-run { 
-            width: 100%; 
-            background: var(--primary); 
-            color: #fff; 
-            font-weight: 800; 
-            font-size: 14px;
-            padding: 14px; 
-            border-radius: 8px; 
-            border: none; 
-            cursor: pointer; 
-            text-transform: uppercase;
-            transition: background 0.2s;
-        }
-        .btn-run:hover {
-            background: #1d4ed8;
-        }
-        #ui-message { 
-            display: none; 
-            margin-bottom: 15px; 
-            padding: 12px; 
-            border-radius: 6px; 
-            font-weight: 600;
-            text-align: center; 
-            font-size: 12px; 
-        }
+        #upload-section { max-width: 900px; margin: 40px auto; padding: 25px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .app-title { text-align: center; color: var(--primary); font-size: 22px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 20px 15px; text-align: center; background: #f8fafc; transition: all 0.2s ease; }
+        .upload-zone.has-file { border-color: var(--success); background: #f0fdf4; border-style: solid; }
+        .uz-label { display: block; font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; margin-bottom: 10px; }
+        .file-input { width: 100%; font-size: 10px; cursor: pointer; }
+        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; padding: 14px; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; transition: background 0.2s; }
+        .btn-run:hover { background: #1d4ed8; }
+        #ui-message { display: none; margin-bottom: 15px; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
         /* LOADING */
-        .loading-box { 
-            display: none;
-            text-align: center; 
-            padding: 40px; 
-            background: #fff; 
-            border-radius: 12px; 
-            max-width: 900px; 
-            margin: 40px auto; 
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
+        .loading-box { display: none; text-align: center; padding: 40px; background: #fff; border-radius: 12px; max-width: 900px; margin: 40px auto; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .loading-box.show { display: block; }
-        .spinner { 
-            width: 40px; 
-            height: 40px; 
-            margin: 0 auto 15px;
-            border: 4px solid var(--primary-light); 
-            border-top-color: var(--primary); 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite;
-        }
+        .spinner { width: 40px; height: 40px; margin: 0 auto 15px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* DASHBOARD LAYOUT */
-        #dashboard-section { 
-            display: none;
-            padding: 20px; 
-            max-width: 1400px; 
-            margin: 0 auto; 
-        }
-        
-        /* TOP INFO BAR (STICKY) */
-        .top-info-bar { 
-            background: #fff;
-            border-radius: 8px; 
-            padding: 15px 20px; 
-            margin-bottom: 20px; 
-            border: 1px solid var(--border-color); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
-            position: sticky; 
-            top: 10px; 
-            z-index: 1000;
-        }
-        .ship-info { 
-            display: flex; 
-            gap: 25px; 
-            align-items: center;
-        }
-        .info-box { 
-            display: flex; 
-            flex-direction: column;
-        }
-        .info-label { 
-            font-size: 9px; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-        .info-val { 
-            font-weight: 800; 
-            font-size: 14px; 
-            color: var(--primary);
-        }
-        .btn-action { 
-            padding: 8px 15px; 
-            border: 1px solid var(--primary); 
-            background: #fff;
-            color: var(--primary); 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 11px; 
-            font-weight: 700; 
-            text-transform: uppercase;
-        }
+        #dashboard-section { display: none; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .top-info-bar { background: #fff; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 10px; z-index: 1000; }
+        .ship-info { display: flex; gap: 25px; align-items: center; }
+        .info-box { display: flex; flex-direction: column; }
+        .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
+        .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
         .btn-action:hover { background: var(--primary-light); }
 
-        /* MAIN 2-COLUMN LAYOUT */
-        .main-layout { 
-            display: grid;
-            grid-template-columns: 220px 1fr; 
-            gap: 20px; 
-            align-items: start; 
-        }
-        
-        /* SIDEBAR (STICKY) */
-        .sidebar { 
-            display: flex;
-            flex-direction: column; 
-            gap: 10px; 
-            position: sticky; 
-            top: 90px; 
-        }
-        .nav-item { 
-            padding: 12px 15px;
-            background: #fff; 
-            border: 1px solid var(--border-color); 
-            border-radius: 6px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            transition: all 0.2s;
-        }
+        .main-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
+        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 90px; }
+        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
         .nav-item:hover { border-color: var(--primary); background: #f8fafc; }
         .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
         .filter-btn { background: #fff; color: var(--error); border: 1px solid var(--error); }
         .filter-btn.active { background: var(--error); color: #fff; }
 
-        /* CONTENT TABS */
-        .content-card { 
-            display: none;
-            background: #fff; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-        }
+        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -265,7 +83,6 @@
         
         .badge-rn { background-color: var(--bg-rn); border: 1px solid var(--border-rn); color: var(--text-rn); font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
         .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
-
         .doc-val { background: #f8fafc; padding: 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600; font-size: 11px; }
         
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
@@ -578,7 +395,7 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // 3. Render TAB SUMMARY (MURNI BERBASIS BUKTI FISIK SERTIFIKAT)
+    // 3. Render TAB SUMMARY (ANTI-DUPLIKASI DAN MURNI DARI MATERIAL_RN SERTIFIKAT AI)
     let criticalContainer = document.getElementById("critical-summary-container");
     let summaryHtml = "";
 
@@ -609,23 +426,50 @@ function renderAuditReport(parsed) {
                     </tr>
                 <tbody>`;
         
-        parsed.summary_sertifikat.forEach((item, idx) => {
-            let noCert = String(item.no_sertifikat || "-").trim();
+        // PENGAMAN DEDUPLIKASI: Gabungkan array summary agar sistem dengan nama yang sama tidak muncul berkali-kali
+        let uniqueSummaryMap = {};
+        parsed.summary_sertifikat.forEach(item => {
+            let key = String(item.sistem).trim();
+            if(!uniqueSummaryMap[key]) {
+                uniqueSummaryMap[key] = {
+                    sistem: item.sistem,
+                    no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
+                    halaman: item.halaman || "-",
+                    material_rn: item.material_rn || "-"
+                };
+            } else {
+                // Jika sertifikat kosong di baris pertama tapi ada di baris kedua, satukan data nomornya
+                if(uniqueSummaryMap[key].no_sertifikat === "-" && item.certificate_no) {
+                    uniqueSummaryMap[key].no_sertifikat = item.certificate_no;
+                }
+                // Satukan strings material RN jika ada tambahan di baris duplikatnya
+                if(item.material_rn && item.material_rn !== "-" && uniqueSummaryMap[key].material_rn !== item.material_rn) {
+                    if(uniqueSummaryMap[key].material_rn === "-") uniqueSummaryMap[key].material_rn = item.material_rn;
+                    else uniqueSummaryMap[key].material_rn += ", " + item.material_rn;
+                }
+            }
+        });
+
+        let sIdx = 1;
+        for (let key in uniqueSummaryMap) {
+            let item = uniqueSummaryMap[key];
+            let noCert = String(item.no_sertifikat).trim();
             if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 40) noCert = "-";
             let isFound = noCert !== "-";
             let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
             
-            // LOGIKA AUDIT VALID 100%: Murni menyalin dari properti JSON hasil ekstraksi fisik berkas sertifikat
             let rnFromAI = String(item.material_rn || "-").trim();
             let componentStatusHtml = `<span style="color:#94a3b8; font-size:10px; font-style:italic;">Menunggu Integrasi Berkas Berlangsung</span>`;
             
-            if (String(item.sistem).toUpperCase().includes("LIFERAFT")) {
+            if (key.toUpperCase().includes("LIFERAFT")) {
                 if (isFound) {
                     if (rnFromAI !== "-" && rnFromAI !== "") {
                         componentStatusHtml = `<div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; padding: 2px 0;">
                             <span style="font-weight:700; color:#701a75; margin-right:4px;">[RN]:</span>`;
                         rnFromAI.split(',').forEach(it => {
-                            componentStatusHtml += `<span class="badge-rn" style="font-size:9px; padding:1px 5px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:2px;">🛠️ ${esc(it.trim())}</span>`;
+                            if(it.trim() !== "" && it.trim() !== "-") {
+                                componentStatusHtml += `<span class="badge-rn" style="font-size:9px; padding:1px 5px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:2px;">🛠 * ${esc(it.trim())}</span>`;
+                            }
                         });
                         componentStatusHtml += `</div>`;
                     } else {
@@ -634,23 +478,23 @@ function renderAuditReport(parsed) {
                 } else {
                     componentStatusHtml = `<span style="color:var(--error); font-weight:600;">⚠️ Sertifikat Tidak Terlampir</span>`;
                 }
-            } else if (String(item.sistem).toUpperCase().includes("FIRE EXTINGUISHER")) {
+            } else if (key.toUpperCase().includes("FIRE EXTINGUISHER")) {
                 componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Karakter: Cek Berat Tabung & Penjumlahan Label (SOP-02)</span>`;
-            } else if (String(item.sistem).toUpperCase().includes("FIXED CO2")) {
+            } else if (key.toUpperCase().includes("FIXED CO2")) {
                 componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Karakter: Deteksi Pilot Cylinder (SOP-03)</span>`;
-            } else if (String(item.sistem).toUpperCase().includes("SCBA") || String(item.sistem).toUpperCase().includes("EEBD")) {
+            } else if (key.toUpperCase().includes("SCBA") || key.toUpperCase().includes("EEBD")) {
                 componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Karakter: Kondisi Kelengkapan Mask/Valve Set (SOP-04)</span>`;
             } else {
                 componentStatusHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Menunggu Mapping Dokumen</span>`;
             }
             
             summaryHtml += `<tr>
-                <td align="center" style="font-weight: 700; color: #64748b;">${idx + 1}</td>
+                <td align="center" style="font-weight: 700; color: #64748b;">${sIdx++}</td>
                 <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
                 <td><div class="doc-val" style="${valClass}">${esc(noCert)}</div></td>
                 <td><div class="doc-val" style="background:#fff; min-height:34px; display:flex; align-items:center;">${componentStatusHtml}</div></td>
             </tr>`;
-        });
+        }
         summaryHtml += `</tbody></table></div></div>`;
     }
     criticalContainer.innerHTML = summaryHtml;
