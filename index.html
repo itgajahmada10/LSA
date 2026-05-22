@@ -681,6 +681,9 @@ function renderAuditReport(parsed) {
     document.getElementById("val-owner").innerText = v_own;
     if(v_name !== "-") currentShipName = "Audit_" + v_name.replace(/\s+/g, '_');
 
+    // Kumpulkan daftar komponen yang RN dari tabel penawaran untuk dimasukkan ke Summary Liferaft
+    let liferaftRnItems = [];
+    
     // 2. Render Tabel Penawaran & Tangkap Anomali
     let htmlPen = "";
     let anomalyList = [];
@@ -707,12 +710,16 @@ function renderAuditReport(parsed) {
 
         let certQty = String(r.di_sertifikat || "-").trim();
         
-        // Render Badge visual jika ada status RN atau OK di dalam teks Qty Sertifikat
+        // Deteksi item Liferaft yang berstatus RN
+        if (certQty.toUpperCase().includes("(RN)") || hasilStr.toUpperCase().includes("RN")) {
+            liferaftRnItems.push(r.keterangan);
+        }
+        
         let badgeHtml = esc(certQty);
         if (certQty.toUpperCase().includes("(RN)")) {
-            badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge-rn">RN (Renewed)</span>`;
+            badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge-rn">RN</span>`;
         } else if (certQty.toUpperCase().includes("(OK)")) {
-            badgeHtml = `${esc(certQty.replace(/\(OK\)/gi, ''))} <span class="badge-ok">OK (Checked)</span>`;
+            badgeHtml = `${esc(certQty.replace(/\(OK\)/gi, ''))} <span class="badge-ok">OK</span>`;
         }
 
         htmlPen += `<tr class="${rowClass}">
@@ -736,7 +743,7 @@ function renderAuditReport(parsed) {
                     <td></td>
                     <td colspan="5">
                         <div class="ai-note ${isWarn ? 'err' : 'ok'}">
-                            <b>${isWarn ? '⚠️ AI Evaluation (Anomali):' : '✅ AI Evaluation:'}</b> ${esc(cleanReason)}
+                            <b>${isWarn ? '⚠️ AI Evaluation:' : '✅ AI Evaluation:'}</b> ${esc(cleanReason)}
                         </div>
                     </td>
                 </tr>`;
@@ -745,7 +752,7 @@ function renderAuditReport(parsed) {
     });
     document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-    // 3. Render TAB SUMMARY (Ringkasan Kritis & Peta Lokasi Sertifikat)
+    // 3. Render TAB SUMMARY (Executive Summary + Kolom Perubahan RN)
     let criticalContainer = document.getElementById("critical-summary-container");
     let summaryHtml = "";
 
@@ -770,29 +777,45 @@ function renderAuditReport(parsed) {
     if (parsed.summary_sertifikat && parsed.summary_sertifikat.length > 0) {
         summaryHtml += `
             <div style="margin: 20px;">
-                <h4 style="color: var(--primary); font-size: 13px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px;">📑 Peta Lokasi Dokumen & Nomor Sertifikat (11 Sistem Utama)</h4>
+                <h4 style="color: var(--primary); font-size: 13px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px;">📑 Peta Status Material & Validitas Sertifikasi (11 Sistem Utama)</h4>
                 <div class="table-responsive">
                     <table>
                         <tr>
-                            <th width="6%" style="text-align:center;">NO</th>
-                            <th width="39%">KATEGORI SISTEM KESELAMATAN (LSA & FFA)</th>
-                            <th width="35%">NOMOR SERTIFIKAT AKTUAL</th>
-                            <th width="20%">HALAMAN PDF</th>
-                        </tr>
+                            <th width="5%" style="text-align:center;">NO</th>
+                            <th width="35%">KATEGORI SISTEM KESELAMATAN</th>
+                            <th width="30%">NOMOR SERTIFIKAT AKTUAL</th>
+                            <th width="30%">RENEWED ITEMS STATUS (RN)</th> </tr>
                     <tbody>
         `;
         parsed.summary_sertifikat.forEach((item, idx) => {
             let noCert = String(item.no_sertifikat || "-").trim();
             if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 40) noCert = "-";
-            let isFound = noCert !== "-" && item.halaman !== "-";
+            let isFound = noCert !== "-";
             let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
+            
+            // Logika Pengisian Kolom RN secara Otomatis khusus untuk Liferaft
+            let rnDisplayHtml = `<span style="color:#64748b; font-size:10px; font-style:italic;">Bukan Kategori Material Pack</span>`;
+            if (String(item.sistem).toUpperCase().includes("LIFERAFT")) {
+                if (liferaftRnItems.length > 0) {
+                    // Buat susunan badge ungu kecil ke samping untuk tiap item yang RN
+                    rnDisplayHtml = `<div style="display:flex; flex-wrap:wrap; gap:4px;">`;
+                    liferaftRnItems.forEach(rnItem => {
+                        rnDisplayHtml += `<span class="badge-rn" style="font-size:9px; padding:2px 4px; background:#fae8ff; border:1px solid #e9d5ff; color:#701a75; font-weight:600; border-radius:3px;">🛠️ ${esc(rnItem)}</span>`;
+                    });
+                    rnDisplayHtml += `</div>`;
+                } else {
+                    rnDisplayHtml = `<span class="badge-ok" style="font-size:10px; font-weight:700;">👁️ OK (Hanya Pengecekan Fisik)</span>`;
+                }
+            } else if (String(item.sistem).toUpperCase().includes("BREATHING") || String(item.sistem).toUpperCase().includes("EEBD")) {
+                rnDisplayHtml = `<span style="color:#64748b; font-size:10px;">Diproses via Logika Hidrotest (SOP-04)</span>`;
+            }
             
             summaryHtml += `
                 <tr>
                     <td align="center" style="font-weight: 700; color: #64748b;">${idx + 1}</td>
                     <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
                     <td><div class="doc-val" style="${valClass}">${esc(noCert)}</div></td>
-                    <td><div class="doc-val" style="${valClass}">${esc(item.halaman)}</div></td>
+                    <td><div class="doc-val" style="background:#fff; min-height:28px; display:flex; align-items:center;">${rnDisplayHtml}</div></td>
                 </tr>
             `;
         });
@@ -855,12 +878,5 @@ function renderAuditReport(parsed) {
     }
     document.getElementById("body-sertifikat").innerHTML = htmlCert;
 }
-</script>
-
-</body>
-</html>
-"""
-
-with open("smart_audit_lsa_v7_pro.html", "w", encoding="utf-8") as f:
     f.write(html_content)
 print("File successfully created!")
