@@ -114,10 +114,22 @@
         .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
         .doc-val { background: #fbf9fc; padding: 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 600; font-size: 11px; }
         
-        /* CONTAINER BADGE VERTIKAL UNTUK NO SERTIFIKAT */
-        .cert-vertical-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-        .cert-badge-item { background: #fbf9fc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.01); text-align: left; }
-        .cert-badge-empty { font-weight: 500; color: var(--text-muted); font-style: italic; background: transparent; border: none; padding: 0; }
+        /* STACKED BADGE UNTUK NO SERTIFIKAT */
+        .cert-vertical-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+        .cert-badge-item { background: #fbf9fc; padding: 5px 8px; border-radius: 5px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 11px; }
+        .cert-badge-empty { font-weight: 500; color: var(--text-muted); font-style: italic; }
+
+        /* STRUKTUR GRID KOMPONEN SUB-CARD MARITIM (SOP-01) */
+        .status-grid-container { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; padding: 2px 0; }
+        .cert-sub-card { flex: 1 1 calc(50% - 10px); min-width: 220px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 6px; }
+        .cert-sub-title { font-weight: 800; color: var(--primary); font-size: 11px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: block; }
+        .component-item-row { display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 600; color: #334155; background: #fff; padding: 4px 6px; border-radius: 4px; border: 1px solid #f1f5f9; }
+        .item-badge-status { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; }
+        .item-badge-status.rn { background: var(--bg-rn); border: 1px solid var(--border-rn); color: var(--text-rn); }
+        .item-badge-status.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        
+        /* BANNER LEGALITAS ADMINISTRASI (SOP-00) */
+        .admin-violation-banner { width: 100%; background: #fff5f5; border-left: 4px solid var(--error); border-radius: 4px; padding: 6px 10px; font-size: 10px; font-weight: 700; color: var(--error); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
 
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
@@ -213,7 +225,7 @@
                     <div id="tab-penawaran" class="content-card">
                         <div class="table-responsive">
                             <table>
-                                <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK</td></tr>
+                                <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK (ONLY ANOMALIES)</td></tr>
                                 <tr>
                                     <th width="4%" style="text-align:center;">NO</th>
                                     <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
@@ -254,14 +266,11 @@
         
         let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
 
-        // --- TOGGLE MINIMIZE SIDEBAR FORM ---
         function toggleUploadForm() {
             const panel = document.getElementById('uploadPanel');
             const toggleText = document.getElementById('toggleText');
             const toggleIcon = document.getElementById('toggleIcon');
-            
             panel.classList.toggle('is-hidden');
-            
             if (panel.classList.contains('is-hidden')) {
                 toggleText.innerText = "Show Upload Form";
                 toggleIcon.setAttribute('data-lucide', 'sidebar-open');
@@ -272,7 +281,6 @@
             lucide.createIcons();
         }
 
-        // --- INTERAKSI UI ---
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
             el.innerHTML = msg; 
@@ -304,9 +312,7 @@
             var clone = document.documentElement.cloneNode(true);
             var u = clone.querySelector('.left-panel'); if(u) u.parentNode.removeChild(u);
             var actionBtns = clone.querySelector('.action-buttons'); if(actionBtns) actionBtns.parentNode.removeChild(actionBtns);
-            
-            var rp = clone.querySelector('.right-panel');
-            if(rp) rp.style.width = '100%';
+            var rp = clone.querySelector('.right-panel'); if(rp) rp.style.width = '100%';
 
             var htmlContent = clone.outerHTML;
             var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
@@ -315,7 +321,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- RENDER DATA & PEMBUATAN INLINE FLEX GRID ---
+        // --- MANIPULASI DATA VISUAL SINKRONISASI TOTAL STANDAR SOP MARITIM ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -355,7 +361,7 @@
             document.getElementById("val-owner").innerText = v_own;
             if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
-            // 2. Tab Penawaran (Quotation)
+            // 2. Tab Penawaran (Murni Hanya Menampilkan Baris Anomali Saja)
             let htmlPen = ""; let anomalyList = [];
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
@@ -367,47 +373,35 @@
                 
                 let hasilStr = String(r.hasil_ai || "");
                 let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
-                let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
                 if (isWarn) {
                     let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
                     if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
                     anomalyList.push(`<b>${esc(r.keterangan)}:</b> ${esc(cleanReason)}`);
-                }
 
-                let certQty = String(r.di_sertifikat || "-").trim();
-                let badgeHtml = esc(certQty);
-                if (certQty.toUpperCase().includes("(RN)")) {
-                    badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge-rn">RN</span>`;
-                } else if (certQty.toUpperCase().includes("(OK)")) {
-                    badgeHtml = `${esc(certQty.replace(/\(OK\)/gi, ''))} <span class="badge-ok">OK</span>`;
-                }
+                    let certQty = String(r.di_sertifikat || "-").trim();
+                    htmlPen += `<tr class="row-anomali">
+                        <td align="center"><b>${idx + 1}</b></td>
+                        <td>
+                            <div class="box-vendor">${esc(r.keterangan)}</div>
+                            <div class="box-system">${esc(systemName)}</div>
+                            <div class="box-code">${esc(itemCode)}</div>
+                        </td>
+                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+                        <td><div class="doc-val">${esc(certQty)}</div></td>
+                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
+                        <td class="err-cell">⚠️ ANOMALI</td>
+                    </tr>`;
 
-                htmlPen += `<tr class="${rowClass}">
-                    <td align="center"><b>${idx + 1}</b></td>
-                    <td>
-                        <div class="box-vendor">${esc(r.keterangan)}</div>
-                        <div class="box-system">${esc(systemName)}</div>
-                        <div class="box-code">${esc(itemCode)}</div>
-                    </td>
-                    <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                    <td><div class="doc-val">${badgeHtml}</div></td>
-                    <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                    <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
-                </tr>`;
-
-                if (hasilStr.trim() !== "") {
-                    let cleanReason = hasilStr.replace(/✅ MATCH[:]?|⚠️ ANOMALI[:]?/gi, '').trim();
-                    if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-                    if(cleanReason !== "") {
-                        htmlPen += `<tr class="explanation-row ${rowClass}">
+                    if (cleanReason !== "") {
+                        htmlPen += `<tr class="explanation-row row-anomali">
                             <td></td>
-                            <td colspan="5"><div class="ai-note ${isWarn ? 'err' : 'ok'}"><b>${isWarn ? '⚠️ AI Evaluation:' : '✅ AI Evaluation:'}</b> ${esc(cleanReason)}</div></td>
+                            <td colspan="5"><div class="ai-note err"><b>⚠️ AI Evaluation:</b> ${esc(cleanReason)}</div></td>
                         </tr>`;
                     }
                 }
             });
-            document.getElementById("body-penawaran").innerHTML = htmlPen;
+            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
             // 3. Tab Summary
             let criticalContainer = document.getElementById("critical-summary-container");
@@ -471,13 +465,10 @@
                     if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
                     let isFound = noCert !== "-";
                     
-                    // ALTERNATIF CERDAS: Memecah string koma menjadi susunan box badge vertikal
                     let noCertHtml = `<div class="cert-vertical-container">`;
                     if (isFound) {
                         noCert.split(',').forEach(num => {
-                            if(num.trim() !== "") {
-                                noCertHtml += `<div class="cert-badge-item">${esc(num.trim())}</div>`;
-                            }
+                            if(num.trim() !== "") noCertHtml += `<div class="cert-badge-item">${esc(num.trim())}</div>`;
                         });
                     } else {
                         noCertHtml += `<div class="cert-badge-item cert-badge-empty">-</div>`;
@@ -485,7 +476,8 @@
                     noCertHtml += `</div>`;
                     
                     let rnFromAI = String(item.temuan_rn || "-").trim();
-                    let componentStatusHtml = `<span style="color:#94a3b8; font-size:10px; font-style:italic;">Menunggu Integrasi Berkas Berlangsung</span>`;
+                    let componentStatusHtml = "";
+                    let adminViolationHtml = "";
                     
                     if (isFound) {
                         if (rnFromAI !== "-" && rnFromAI !== "") {
@@ -493,53 +485,56 @@
                                 return p1 === '\n' ? match : p1 + '\n' + p2;
                             });
 
-                            componentStatusHtml = `<div style="display:flex; flex-wrap:wrap; gap:10px; padding: 4px 0; width:100%;">`;
+                            componentStatusHtml = `<div class="status-grid-container">`;
                             
                             rnFromAI.split(/\\n|\n/).forEach(line => {
                                 let cleanLine = line.trim();
                                 if(cleanLine !== "" && cleanLine !== "-") {
+                                    
+                                    // FILTER: Pisahkan anomali stempel/legalitas administrasi dari data fisik suku cadang
+                                    if (cleanLine.toLowerCase().includes('syahbandar') || cleanLine.toLowerCase().includes('btkp') || cleanLine.toLowerCase().includes('stempel')) {
+                                        adminViolationHtml += `<div class="admin-violation-banner">⚠️ ${esc(cleanLine)}</div>`;
+                                        return;
+                                    }
+
                                     let parts = cleanLine.split(':');
                                     if (parts.length > 1) {
                                         let certLabel = parts[0].trim();
                                         let itemsStr = parts.slice(1).join(':').trim(); 
                                         
-                                        componentStatusHtml += `<div style="flex: 1 1 calc(50% - 10px); min-width: 210px; background:#f8fafc; padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0;">
-                                            <span style="font-weight:800; color:var(--primary); font-size:10px; display:block; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:6px;">📄 ${esc(certLabel)}</span>
-                                            <div style="display:flex; flex-direction:column; gap:3px;">`;
+                                        componentStatusHtml += `<div class="cert-sub-card">
+                                            <span class="cert-sub-title">📄 ${esc(certLabel)}</span>`;
                                         
-                                        if (itemsStr.includes(',')) {
-                                            itemsStr.split(',').forEach(it => {
-                                                let cleanIt = it.replace(/\./g, '').trim(); 
-                                                if(cleanIt !== "" && cleanIt !== "-") {
-                                                    let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar');
-                                                    let icon = isAnomali ? '⚠️' : '🛠️';
-                                                    let textColor = isAnomali ? 'var(--error)' : '#334155';
-                                                    componentStatusHtml += `<span style="font-size:10px; color:${textColor}; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
-                                                        <span>${icon}</span> <span style="padding-top:1px;">${esc(cleanIt)}</span>
-                                                    </span>`;
-                                                }
-                                            });
-                                        } else {
-                                            let isAnomali = itemsStr.toLowerCase().includes('anomali') || itemsStr.toLowerCase().includes('tidak') || itemsStr.toLowerCase().includes('melanggar');
-                                            let icon = isAnomali ? '⚠️' : '🛠️';
-                                            let textColor = isAnomali ? 'var(--error)' : '#334155';
-                                            componentStatusHtml += `<span style="font-size:10px; color:${textColor}; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
-                                                <span>${icon}</span> <span style="padding-top:1px;">${esc(itemsStr)}</span>
-                                            </span>`;
-                                        }
-                                        componentStatusHtml += `</div></div>`;
+                                        let subItems = itemsStr.includes(',') ? itemsStr.split(',') : [itemsStr];
+                                        subItems.forEach(it => {
+                                            let cleanIt = it.replace(/\./g, '').trim(); 
+                                            if(cleanIt !== "" && cleanIt !== "-") {
+                                                let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar');
+                                                let isRenew = cleanIt.toLowerCase().includes('rn') || cleanIt.toLowerCase().includes('renew') || cleanIt.toLowerCase().includes('ganti');
+                                                
+                                                let badgeClass = "ok";
+                                                let badgeSign = "🛠️";
+                                                if(isAnomali) { badgeClass = "rn"; badgeSign = "⚠️"; }
+                                                else if(isRenew) { badgeClass = "rn"; badgeSign = "🔄"; }
+
+                                                componentStatusHtml += `<div class="component-item-row">
+                                                    <span>${badgeSign} ${esc(cleanIt.replace(/\(rn\)|\(ok\)/gi, ''))}</span>
+                                                    <span class="item-badge-status ${badgeClass}">${isAnomali?'Anomali':(isRenew?'RN':'OK')}</span>
+                                                </div>`;
+                                            }
+                                        });
+                                        componentStatusHtml += `</div>`;
                                     } else {
                                          let isAnomali = cleanLine.toLowerCase().includes('anomali') || cleanLine.toLowerCase().includes('tidak') || cleanLine.toLowerCase().includes('melanggar');
-                                         let icon = isAnomali ? '⚠️' : '🛠️';
                                          componentStatusHtml += `<div style="flex: 1 1 100%; font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px; padding:8px; background:#fff5f5; border-radius:6px; border:1px solid #fed7d7;">
-                                             <span>${icon}</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
+                                             <span>⚠️</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
                                          </div>`;
                                     }
                                 }
                             });
                             componentStatusHtml += `</div>`;
                         } else {
-                            componentStatusHtml = `<span class="badge-ok" style="font-size:10px; font-weight:700; color:#166534; background:#f0fdf4; padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0;">✅ TERVERIFIKASI (SESUAI SOP / TIDAK ADA ANOMALI MATERIAL)</span>`;
+                            componentStatusHtml = `<span class="badge-ok">✅ TERVERIFIKASI (SESUAI SOP / TIDAK ADA ANOMALI MATERIAL)</span>`;
                         }
                     } else {
                         componentStatusHtml = `<span style="color:var(--error); font-weight:600; font-size:10px;">⚠️ SERTIFIKAT TIDAK TERLAMPIR</span>`;
@@ -549,7 +544,12 @@
                         <td align="center" style="font-weight: 700; color: #64748b;">${sIdx++}</td>
                         <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
                         <td>${noCertHtml}</td>
-                        <td><div class="doc-val" style="background:#fff; min-height:34px; display:flex; align-items:flex-start; width:100%; border:none; padding:0;">${componentStatusHtml}</div></td>
+                        <td>
+                            <div class="doc-val" style="background:#fff; min-height:34px; display:flex; flex-direction:column; align-items:flex-start; width:100%; border:none; padding:0;">
+                                ${componentStatusHtml}
+                                ${adminViolationHtml}
+                            </div>
+                        </td>
                     </tr>`;
                 }
                 summaryHtml += `</tbody></table></div></div>`;
@@ -613,12 +613,9 @@
                 let rows = Array.isArray(json) ? json : (json.data || [json]);
                 let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
 
-                if (json.status === "processing" || !ourRow) {
-                    return; 
-                }
+                if (json.status === "processing" || !ourRow) return; 
 
-                clearInterval(pollingInterval);
-                clearInterval(timerInterval);
+                clearInterval(pollingInterval); clearInterval(timerInterval);
                 
                 document.getElementById('pollingCard').style.display = 'none';
                 document.getElementById('reportPanel').style.display = 'block';
@@ -627,9 +624,7 @@
                 btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 
                 const panel = document.getElementById('uploadPanel');
-                if(!panel.classList.contains('is-hidden')) {
-                    toggleUploadForm();
-                }
+                if(!panel.classList.contains('is-hidden')) toggleUploadForm();
 
                 let fullPayloadStr = ""; 
                 if(ourRow["Payload1"]) {
@@ -640,22 +635,19 @@
                 } else {
                     renderAuditReport(Array.isArray(json) ? json : json.data);
                 }
-                
                 lucide.createIcons();
                 
             } catch (e) {
-                console.error("Polling error / JSON parse error:", e);
-                clearInterval(pollingInterval);
-                clearInterval(timerInterval);
+                clearInterval(pollingInterval); clearInterval(timerInterval);
                 const btn = document.getElementById('submitBtn');
                 btn.disabled = false;
                 btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                showMessage("Koneksi polling gagal atau JSON terpotong. Cek log console (F12).", true);
+                showMessage("Koneksi polling gagal atau JSON terpotong.", true);
                 lucide.createIcons();
             }
         }
 
-        // --- SUBMIT PENGIRIMAN FILE ---
+        // --- SUBMIT FILE VIA FORM ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
