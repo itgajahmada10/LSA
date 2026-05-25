@@ -51,11 +51,6 @@
         .btn-submit:disabled { background-color: #9b8a9f; cursor: not-allowed; }
         #ui-message { display: none; margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
-        /* === POLLING / LOADING === */
-        .loader { border: 3px solid rgba(78, 43, 92, 0.3); border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
-        .loader-small { border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
         /* === RIGHT PANEL (LSA RESULTS DASHBOARD) === */
         .right-panel { flex: 1; min-width: 0; width: 100%; transition: all 0.4s ease; }
         
@@ -114,27 +109,27 @@
         .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
         .doc-val { background: #fbf9fc; padding: 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 600; font-size: 11px; }
         
-        /* NO SERTIFIKAT AKTUAL BADGE VERTIKAL */
+        /* NO SERTIFIKAT VERTICAL LAYOUT */
         .cert-vertical-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 5px 8px; border-radius: 5px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.01); }
-        .cert-badge-empty { font-weight: 500; color: var(--text-muted); font-style: italic; }
 
-        /* GRID SUB-CARD KOMPONEN (BUAT ANOMALI FISIK) */
-        .status-grid-container { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; padding: 2px 0; }
+        /* MODERN GRID CARDS FOR DYNAMIC DISPLAY */
+        .status-grid-container { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; padding: 2px 0; margin-top: 5px; }
         .cert-sub-card { flex: 1 1 calc(50% - 10px); min-width: 220px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 6px; }
+        .cert-sub-card.is-match { background: #f0fdf4; border-color: #bbf7d0; }
         .cert-sub-title { font-weight: 800; color: var(--primary); font-size: 11px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: block; }
-        .component-item-row { display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 600; color: #334155; background: #fff; padding: 4px 6px; border-radius: 4px; border: 1px solid #f1f5f9; }
+        .cert-sub-card.is-match .cert-sub-title { color: #166534; border-bottom-color: #bbf7d0; }
+        
+        .component-item-row { display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 600; color: #334155; background: #fff; padding: 5px 7px; border-radius: 4px; border: 1px solid #f1f5f9; }
         .item-badge-status { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; }
         .item-badge-status.rn { background: var(--bg-rn); border: 1px solid var(--border-rn); color: var(--text-rn); }
         .item-badge-status.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
         
-        /* BANNER VIOLATION ADMINISTRASI DOKUMEN (CAP SYAHBANDAR / BTKP) */
+        /* BANNER ERROR CAP SYAHBANDAR / BTKP */
         .admin-violation-banner { width: 100%; background: #fff5f5; border-left: 4px solid var(--error); border-radius: 4px; padding: 6px 10px; font-size: 10px; font-weight: 700; color: var(--error); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
 
-        /* BUKTI AKUNTABILITAS VERIFIKASI SOP (UNTUK JALUR SUCCESS/MATCH) */
-        .sop-verified-banner { width: 100%; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-        .sop-verified-title { color: #166534; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; }
-        .sop-verified-list { margin: 0; padding-left: 15px; color: #14532d; font-size: 10px; font-weight: 500; line-height: 1.5; display: flex; flex-direction: column; gap: 4px; }
+        /* HEADER BOX BANNER FOR MATCHED SYSTEMS */
+        .sop-header-badge { background: #dcfce7; border: 1px solid #bbf7d0; color: #166534; font-weight: 800; font-size: 10px; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; margin-bottom: 4px; }
 
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
@@ -326,7 +321,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- CORE LOGIKA RENDER DENGAN TRANSPARANSI BUKTI PEMERIKSAAN SOP ---
+        // --- CORE RENDER ENGINE (TRANSPARENT SUB-CARDS ACCORDING TO MARITIME SOP) ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -348,7 +343,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // 1. Setup Top Bar Informasi Kapal
+            // 1. Setup Top Bar
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             for(let r of certRows) {
                 if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -366,7 +361,7 @@
             document.getElementById("val-owner").innerText = v_own;
             if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
-            // 2. Tab Penawaran Harga (Hanya Memunculkan Baris Yang Mengandung Anomali Saja)
+            // 2. Tab Penawaran Harga (Hanya Menampilkan Baris Anomali)
             let htmlPen = ""; let anomalyList = [];
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
@@ -379,7 +374,6 @@
                 let hasilStr = String(r.hasil_ai || "");
                 let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
 
-                // KETENTUAN LOCK MUTLAK USER: Buang status MATCH dari tabel penawaran
                 if (isWarn) {
                     let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
                     if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
@@ -409,7 +403,7 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
-            // 3. Tab Summary (Peta Validitas Berkas & Transparansi Hitungan Agar PIC Percaya)
+            // 3. Tab Summary (Peta Status Berkas Dengan Transparansi Bukti Sub-Cards)
             let criticalContainer = document.getElementById("critical-summary-container");
             let summaryHtml = "";
 
@@ -450,7 +444,8 @@
                             sistem: item.sistem,
                             no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
                             halaman: item.halaman || "-",
-                            temuan_rn: currentRnVal
+                            temuan_rn: currentRnVal,
+                            is_anomali_sistem: false
                         };
                     } else {
                         if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
@@ -464,6 +459,19 @@
                     }
                 });
 
+                // Deteksi apakah sistem ini masuk dalam daftar anomali besar di tab penawaran
+                penRows.forEach(r => {
+                    let hStr = String(r.hasil_ai).toLowerCase();
+                    let isAnomali = hStr.includes('⚠️') || hStr.includes('anomali') || hStr.includes('beda');
+                    if(isAnomali) {
+                        for(let k in uniqueSummaryMap) {
+                            if(String(r.keterangan).toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(String(r.keterangan).toLowerCase())) {
+                                uniqueSummaryMap[k].is_anomali_sistem = true;
+                            }
+                        }
+                    }
+                });
+
                 let sIdx = 1;
                 for (let key in uniqueSummaryMap) {
                     let item = uniqueSummaryMap[key];
@@ -471,7 +479,7 @@
                     if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
                     let isFound = noCert !== "-";
                     
-                    // Render Nomor Sertifikat Secara Vertikal Terpisah
+                    // Render Badge Nomor Sertifikat Secara Terpisah Ke Bawah
                     let noCertHtml = `<div class="cert-vertical-container">`;
                     if (isFound) {
                         noCert.split(',').forEach(num => {
@@ -485,6 +493,7 @@
                     let rnFromAI = String(item.temuan_rn || "-").trim();
                     let componentStatusHtml = "";
                     let adminViolationHtml = "";
+                    let isSystemMatch = !item.is_anomali_sistem;
                     
                     if (isFound) {
                         if (rnFromAI !== "-" && rnFromAI !== "") {
@@ -494,11 +503,16 @@
 
                             componentStatusHtml = `<div class="status-grid-container">`;
                             
+                            // JIKA SYSTEM MATCH (AMAN), TAMBAHKAN BADGE LEGALITAS SOP ATAS KOTAK
+                            if(isSystemMatch) {
+                                componentStatusHtml = `<div class="sop-header-badge">✅ Verified Match (SOP Compliant)</div>` + componentStatusHtml;
+                            }
+
                             rnFromAI.split(/\\n|\n/).forEach(line => {
                                 let cleanLine = line.trim();
                                 if(cleanLine !== "" && cleanLine !== "-") {
                                     
-                                    // FILTER: Pisahkan info cap syahbandar dari kotak status material fisik
+                                    // FILTER: Pisahkan info cap syahbandar/BTKP administrasi dari baris fisik material
                                     if (cleanLine.toLowerCase().includes('syahbandar') || cleanLine.toLowerCase().includes('btkp') || cleanLine.toLowerCase().includes('stempel')) {
                                         adminViolationHtml += `<div class="admin-violation-banner">⚠️ ${esc(cleanLine)}</div>`;
                                         return;
@@ -509,14 +523,17 @@
                                         let certLabel = parts[0].trim();
                                         let itemsStr = parts.slice(1).join(':').trim(); 
                                         
-                                        componentStatusHtml += `<div class="cert-sub-card">
+                                        // SUB-CARD: Berubah warna hijau soft jika sistem bersangkutan berstatus MATCH/AMAN
+                                        let cardClass = isSystemMatch ? "cert-sub-card is-match" : "cert-sub-card";
+
+                                        componentStatusHtml += `<div class="${cardClass}">
                                             <span class="cert-sub-title">📄 ${esc(certLabel)}</span>`;
                                         
                                         let subItems = itemsStr.includes(',') ? itemsStr.split(',') : [itemsStr];
                                         subItems.forEach(it => {
                                             let cleanIt = it.replace(/\./g, '').trim(); 
                                             if(cleanIt !== "" && cleanIt !== "-") {
-                                                let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar');
+                                                let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar') || cleanIt.toLowerCase().includes('kurang');
                                                 let isRenew = cleanIt.toLowerCase().includes('rn') || cleanIt.toLowerCase().includes('renew') || cleanIt.toLowerCase().includes('ganti');
                                                 
                                                 let badgeClass = "ok";
@@ -541,29 +558,7 @@
                             });
                             componentStatusHtml += `</div>`;
                         } else {
-                            // SOLUTIONS ANTI-BINGUNG: JIKA STATUS "MATCH" (-), TAMPILKAN POIN TRANSPARANSI PEMBUKTIAN SOP AGAR PIC PERCAYA 100%
-                            let buktiSopText = "";
-                            let namaSistem = item.sistem.toLowerCase();
-                            
-                            if (namaSistem.includes("liferaft")) {
-                                buktiSopText = `<li><b>SOP-01 (Kapasitas Liferaft):</b> 2 Unit Sertifikat Terlampir Berkapasitas Pas Berdasarkan Manifes Kapal.</li>
-                                                <li><b>SOP-01 (Kalkulasi Suku Cadang):</b> Total Kuantitas Anti-Seasickness Terverifikasi Akumulatif Tembus 120 Pcs Berdasarkan Rumus Multi-Halaman ($2 \\times 10 \\times 6$).</li>`;
-                            } else if (namaSistem.includes("fire extinguisher") || namaSistem.includes("pmk")) {
-                                buktiSopText = `<li><b>SOP-03 (Akumulasi Volume):</b> Total Unit Pengerjaan Fisik CO2/Dry Powder Cocok Berdasarkan Rumus Akumulatif (Inspection 5 + Refill 3 = Total 8 Unit).</li>
-                                                <li><b>SOP-03 (Kesesuaian Kode Kerja):</b> Kode Penanda Pengerjaan Tahunan di Sertifikat Terverifikasi Singkron Horizontal dengan Surat Jalan.</li>`;
-                            } else {
-                                buktiSopText = `<li><b>SOP-00 (Validasi BTKP):</b> Tanda Pengesahan Unit Terlampir Sah Sesuai SOP.</li>
-                                                <li><b>SOP-00 (Masa Berlaku):</b> Expired Date Berkas Masih Aktif di Bawah Batas Toleransi 1 Tahun Berjalan.</li>`;
-                            }
-
-                            componentStatusHtml = `<div class="sop-verified-banner">
-                                <span class="sop-verified-title">
-                                    <span>✅</span> VERIFIED MATCH (PATUH ATURAN SOP MARITIM)
-                                </span>
-                                <ul class="sop-verified-list">
-                                    ${buktiSopText}
-                                </ul>
-                            </div>`;
+                            componentStatusHtml = `<div class="sop-verified-banner"><span class="sop-verified-title">✅ VERIFIED MATCH (PATUH ATURAN SOP MARITIM)</span></div>`;
                         }
                     } else {
                         componentStatusHtml = `<span style="color:var(--error); font-weight:600; font-size:10px;">⚠️ SERTIFIKAT TIDAK TERLAMPIR</span>`;
@@ -676,7 +671,7 @@
             }
         }
 
-        // --- SUBMIT PENGIRIMAN FILE FORM ---
+        // --- SUBMIT FILE PENGIRIMAN ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
