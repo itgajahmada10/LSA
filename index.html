@@ -3,284 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7 Pro Dashboard</title>
+    <title>Waruna LSA Audit — Enterprise Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        /* === CORE VARIABLES (MANUALBOOK UI + LSA TABLES) === */
+        /* === MODERN SaaS COLOR PALETTE === */
         :root { 
-            --primary: #4e2b5c; 
-            --primary-hover: #3b1e47; 
-            --primary-light: #fbf9fc;
-            --bg-card: #ffffff; 
-            --border-color: #e8dee8; 
-            --text-main: #1e293b; 
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-light: #e2e8f0;
+            --border-dark: #cbd5e1;
+            --primary: #4f46e5; /* Indigo modern */
+            --primary-hover: #4338ca;
+            --primary-soft: #e0e7ff;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --success: #15803d; 
-            --error: #b91c1c; 
-            --warning: #b45309;
-            /* LSA Badges & Boxes */
-            --bg-vendor: #fef9c3; 
-            --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; 
-            --border-system: #7dd3fc;
-            --bg-code: #f0fdf4; 
-            --border-code: #86efac;     
-            --bg-rn: #fae8ff;
-            --border-rn: #e9d5ff;
-            --text-rn: #701a75;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
         }
 
-        /* === STRUCTURAL LAYOUT === */
-        body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
+        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.5; }
         * { box-sizing: border-box; }
-        .main-container { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; max-width: 1500px; margin: 0 auto; align-items: flex-start; }
-        
-        /* === LEFT PANEL (FORM UPLOAD) === */
-        .left-panel { flex: 1; min-width: 320px; max-width: 380px; position: sticky; top: 30px; }
-        .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
-        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
-        .upload-section { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #b59ebc; background: #fbf9fc; transition: 0.3s;}
-        input[type="file"] { width: 100%; padding: 8px; background-color: #fff; border-radius: 6px; border: 1px solid #ccc; font-size: 11px; cursor: pointer;}
-        .btn-submit { background-color: var(--primary); color: white; border: none; padding: 15px; width: 100%; font-size: 14px; font-family: 'Poppins', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; text-transform: uppercase; }
-        .btn-submit:hover { background-color: var(--primary-hover); }
-        .btn-submit:disabled { background-color: #9b8a9f; cursor: not-allowed; }
-        #ui-message { display: none; margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
-        /* === POLLING / LOADING === */
-        .loader { border: 3px solid rgba(78, 43, 92, 0.3); border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
-        .loader-small { border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
+        /* === VIEW CONTROLLERS === */
+        #view-upload { display: block; max-width: 650px; margin: 80px auto; padding: 40px; background: var(--bg-surface); border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid var(--border-light); }
+        #view-loading { display: none; text-align: center; margin: 120px auto; }
+        #view-dashboard { display: none; max-width: 1500px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === UPLOAD FORM === */
+        .app-title { text-align: center; font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .app-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 500; }
+        .upload-group { margin-bottom: 20px; padding: 15px; border: 1px dashed var(--border-dark); border-radius: 10px; background: #f1f5f9; transition: 0.2s; }
+        .upload-group:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .upload-label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+        .file-input { width: 100%; padding: 10px; background: #fff; border: 1px solid var(--border-light); border-radius: 6px; cursor: pointer; font-size: 12px; }
+        
+        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; border: none; border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
+        .btn-main:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3); }
+        .btn-main:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+        #ui-message { display: none; margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 600; text-align: center; }
+
+        /* === SPINNER === */
+        .spinner { width: 45px; height: 45px; border: 4px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* === RIGHT PANEL (LSA RESULTS DASHBOARD) === */
-        .right-panel { flex: 3; min-width: 850px; width: 100%; }
+        /* === DASHBOARD HEADER === */
+        .dash-header { background: var(--bg-surface); padding: 20px 25px; border-radius: 12px; border: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .ship-info-grid { display: flex; gap: 30px; }
+        .info-col { display: flex; flex-direction: column; }
+        .info-title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .info-value { font-size: 16px; font-weight: 800; font-family: 'Poppins', sans-serif; color: var(--text-main); }
         
-        .top-info-bar { background: #fbf9fc; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .ship-info { display: flex; gap: 25px; align-items: center; }
-        .info-box { display: flex; flex-direction: column; }
-        .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
-        .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
+        .header-actions { display: flex; gap: 10px; }
+        .btn-outline { padding: 10px 16px; border: 1px solid var(--border-dark); background: white; color: var(--text-main); font-weight: 600; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-outline:hover { background: var(--bg-body); border-color: var(--text-muted); }
+        .btn-solid { padding: 10px 16px; background: var(--text-main); color: white; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-solid:hover { background: black; }
+
+        /* === HORIZONTAL TABS (MODERN UX) === */
+        .tabs-container { display: flex; border-bottom: 2px solid var(--border-light); margin-bottom: 25px; gap: 5px; overflow-x: auto; }
+        .tab-btn { background: transparent; border: none; padding: 14px 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
         
-        /* Modern Action Buttons */
-        .action-buttons { display: flex; gap: 10px; }
-        .btn-modern { padding: 8px 15px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; border: 1px solid var(--primary); }
-        .btn-simple { background: white; color: var(--primary); }
-        .btn-simple:hover { background: #fbf9fc; }
-        .btn-full { background: var(--primary); color: white; }
-        .btn-full:hover { background: var(--primary-hover); }
+        .filter-btn { margin-left: auto; border: 1px solid var(--danger-border); background: white; color: var(--danger); border-radius: 8px; padding: 8px 16px; margin-bottom: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .filter-btn:hover { background: var(--danger-bg); }
+        .filter-btn.active { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* TABS LAYOUT */
-        .main-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
-        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 30px; }
-        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 12px; }
-        .nav-item:hover { border-color: var(--primary); background: #fbf9fc; }
-        .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .filter-btn { color: var(--error); border-color: var(--error); justify-content: center; margin-top: 10px; }
-        .filter-btn.active { background: var(--error); color: #fff; }
+        /* === TAB CONTENT === */
+        .tab-content { display: none; background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-light); padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-        .content-card.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* SUMMARY STYLES (Identik dengan LSA Lama) */
-        .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 5px solid var(--error); }
-        .critical-title { color: var(--error); font-size: 14px; font-weight: 800; margin-top: 0; margin-bottom: 5px; }
-        .critical-subtitle { font-size: 11px; color: #991b1b; margin-top: 0; margin-bottom: 15px; font-style: italic; }
-        .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 11px; line-height: 1.6; font-weight: 500; }
-        .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px; border-left: 5px solid var(--success); }
-
-        /* TABLES STYLES (Identik dengan LSA Lama) */
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
-        td { border: 1px solid var(--border-color); padding: 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
+        /* === SUMMARIES === */
+        .alert-box { padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .alert-error { background: var(--danger-bg); border: 1px solid var(--danger-border); border-left: 5px solid var(--danger); }
+        .alert-success { background: var(--success-bg); border: 1px solid var(--success-border); border-left: 5px solid var(--success); }
+        .alert-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; margin: 0; }
+        .alert-list { margin: 0; padding-left: 20px; font-size: 12px; line-height: 1.6; }
         
-        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
-        .group-header td { background-color: #e2e8f0; font-weight: 800; color: #1e293b; font-size: 11px; padding: 10px 15px; }
+        /* === MODERN TABLES === */
+        .table-wrapper { width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-light); }
+        table { width: 100%; min-width: 1000px; border-collapse: collapse; text-align: left; }
+        th { background: #f1f5f9; color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 16px; border-bottom: 2px solid var(--border-light); }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        tbody tr:hover { background: #f8fafc; }
         
-        /* DATA CONTAINERS (Identik dengan LSA Lama) */
-        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 4px 6px; border-radius: 3px; margin-bottom: 4px; font-weight: 700; color: #713f12; font-size: 11px; }
-        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 4px 6px; border-radius: 3px; margin-bottom: 4px; font-weight: 600; color: #0369a1; font-size: 10px; }
-        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 4px 6px; border-radius: 3px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
+        .group-header td { background: #e2e8f0; font-weight: 700; font-size: 11px; color: var(--text-main); }
         
-        .badge-rn { background-color: var(--bg-rn); border: 1px solid var(--border-rn); color: var(--text-rn); font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
-        .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
-        .doc-val { background: #fbf9fc; padding: 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 600; font-size: 11px; }
+        /* Typography helpers inside table */
+        .t-title { font-weight: 700; color: var(--text-main); font-size: 12px; margin-bottom: 4px; }
+        .t-sub { font-size: 10px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; }
+        .code-badge { background: var(--primary-soft); color: var(--primary); font-family: monospace; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px;}
         
-        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
-        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
+        /* Status Badges */
+        .badge { display: inline-flex; align-items: center; px: 10px; py: 4px; border-radius: 9999px; font-size: 10px; font-weight: 700; padding: 4px 10px; }
+        .b-match { background: var(--success-bg); color: #065f46; border: 1px solid var(--success-border); }
+        .b-anomali { background: var(--danger-bg); color: #991b1b; border: 1px solid var(--danger-border); }
+        .b-rn { background: #f3e8ff; color: #701a75; border: 1px solid #e9d5ff; }
 
-        .explanation-row td { background-color: #fbf9fc; border-top: none; padding: 8px 15px; }
-        .ai-note { padding: 8px 12px; border-radius: 6px; font-size: 11px; line-height: 1.5; font-weight: 500; }
-        .ai-note.err { background: #fef2f2; border-left: 4px solid var(--error); color: var(--error); }
-        .ai-note.ok { background: #f0fdf4; border-left: 4px solid var(--success); color: var(--success); }
+        /* Notes Box (inside tables) */
+        .ai-note-box { padding: 10px 14px; border-radius: 8px; font-size: 11px; margin-top: 6px; }
+        .note-err { background: var(--danger-bg); color: #991b1b; border: 1px solid var(--danger-border); }
+        .note-ok { background: var(--success-bg); color: #065f46; border: 1px solid var(--success-border); }
 
-        body.filter-anomali .row-match { display: none !important; }
+        body.filter-on .row-match { display: none !important; }
 
         /* === PRINT STYLES === */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
-            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .sidebar, .action-buttons, .filter-btn, .header, form { display: none !important; }
-            .main-container { display: block; max-width: 100%; gap: 0; }
-            .right-panel { display: block; width: 100%; min-width: 0; }
-            .card-box { padding: 0; border: none; box-shadow: none; }
-            .main-layout { display: block; }
-            .content-card { display: block !important; margin-bottom: 30px; border: none; }
-            table { font-size: 9px; page-break-inside: auto; }
+            body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #view-upload, #view-loading, .header-actions, .tabs-container, .filter-btn { display: none !important; }
+            #view-dashboard { display: block; max-width: 100%; margin: 0; padding: 0; box-shadow: none; }
+            .dash-header { border: none; box-shadow: none; border-bottom: 2px solid black; border-radius: 0; padding: 0 0 15px 0; }
+            .tab-content { display: block !important; border: none; box-shadow: none; padding: 0; margin-bottom: 30px; }
+            .table-wrapper { border: none; overflow: visible; }
+            table { min-width: 0; font-size: 10px; }
+            th { padding: 8px; font-size: 9px; }
+            td { padding: 8px; }
             tr, td, th { page-break-inside: avoid; }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
+
+    <div id="view-upload">
+        <div class="app-title"><i data-lucide="anchor" style="color:var(--primary); margin-right:8px; vertical-align:-3px;"></i>Smart Audit LSA</div>
+        <div class="app-subtitle">V8.2 Pro Enterprise Edition</div>
         
-        <div class="left-panel">
-            <div class="card-box">
-                <div class="header">
-                    <h2><i data-lucide="shield-check"></i> Verification</h2>
-                    <p style="color: #666; font-size: 12px; font-weight:500;">AI LSA System</p>
-                </div>
-                <form id="auditForm">
-                    <div class="upload-section">
-                        <label><i data-lucide="file-text" style="width:14px; vertical-align:-2px;"></i> 1. Quotation Document</label>
-                        <input type="file" id="quotationFile" accept=".pdf" required>
-                    </div>
-                    <div class="upload-section">
-                        <label><i data-lucide="file-badge" style="width:14px; vertical-align:-2px;"></i> 2. Certificate Report</label>
-                        <input type="file" id="certFile" accept=".pdf" required>
-                    </div>
-                    <div class="upload-section">
-                        <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional)</label>
-                        <input type="file" id="deliveryFile" accept=".pdf">
-                    </div>
-                    <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
-                    <div id="ui-message"></div>
-                </form>
-            </div>
-        </div>
-
-        <div class="right-panel">
+        <form id="auditForm">
+            <div id="ui-message"></div>
             
-            <div id="pollingCard" class="card-box" style="display: none; text-align: center; padding: 60px 20px;">
-                <div class="loader"></div>
-                <h2>Analyzing...</h2>
-                <div id="loading-txt" style="color: #666; font-size: 13px; font-weight: 600; margin-bottom: 10px;">(Waiting time: <b>0</b> seconds)</div>
-                <p style="color: #666; font-size: 11px;">Performing Triangulation Data via N8N Architecture</p>
+            <div class="upload-group">
+                <label class="upload-label"><i data-lucide="file-text" style="width:16px;"></i> 1. Quotation Document</label>
+                <input type="file" id="quotationFile" class="file-input" accept=".pdf" required>
+            </div>
+            <div class="upload-group">
+                <label class="upload-label"><i data-lucide="file-badge" style="width:16px;"></i> 2. Certificate Report</label>
+                <input type="file" id="certFile" class="file-input" accept=".pdf" required>
+            </div>
+            <div class="upload-group">
+                <label class="upload-label"><i data-lucide="package-check" style="width:16px;"></i> 3. Delivery Order <span style="font-weight:400; text-transform:none;">(Optional)</span></label>
+                <input type="file" id="deliveryFile" class="file-input" accept=".pdf">
             </div>
 
-            <div id="reportPanel" class="card-box" style="display: none;">
-                
-                <div class="top-info-bar">
-                    <div class="ship-info">
-                        <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
-                        <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
-                        <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
-                        <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
-                    </div>
-                    <div class="action-buttons">
-                        <button onclick="downloadHTML()" class="btn-modern btn-simple"><i data-lucide="download" style="width:16px;"></i> Save HTML</button>
-                        <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
-                    </div>
+            <button type="submit" id="submitBtn" class="btn-main">
+                <i data-lucide="zap"></i> Run AI Triangulation
+            </button>
+        </form>
+    </div>
+
+    <div id="view-loading">
+        <div class="spinner"></div>
+        <h2 style="margin:0 0 8px 0; font-family:'Poppins', sans-serif;">Analyzing Documents...</h2>
+        <div id="loading-txt" style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 10px;">(Time elapsed: <b>0</b>s)</div>
+        <p style="color: var(--text-muted); font-size: 12px; max-width: 400px; margin: 0 auto;">N8N Paralel Architecture is extracting and cross-checking physical & commercial compliance.</p>
+    </div>
+
+    <div id="view-dashboard">
+        
+        <div class="dash-header">
+            <div class="ship-info-grid">
+                <div class="info-col">
+                    <span class="info-title">Vessel Name</span>
+                    <span class="info-value" id="val-vessel">-</span>
                 </div>
-
-                <div class="main-layout">
-                    <aside class="sidebar">
-                        <div class="nav-item active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</div>
-                        <div class="nav-item" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</div>
-                        <div class="nav-item" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</div>
-                        <div class="nav-item filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</div>
-                    </aside>
-
-                    <main class="content-area">
-                        <div id="tab-summary" class="content-card active">
-                            <div id="critical-summary-container"></div>
-                        </div>
-
-                        <div id="tab-penawaran" class="content-card">
-                            <div class="table-responsive">
-                                <table>
-                                    <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK</td></tr>
-                                    <tr>
-                                        <th width="4%" style="text-align:center;">NO</th>
-                                        <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                                        <th width="13%">QUOTATION (QTY)</th>
-                                        <th width="15%">CERTIFICATE (QTY)</th>
-                                        <th width="8%" style="text-align:center;">DO (QTY)</th>
-                                        <th width="15%" style="text-align:center;">AUDIT STATUS</th>
-                                    </tr>
-                                    <tbody id="body-penawaran"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div id="tab-sertifikat" class="content-card">
-                            <div class="table-responsive">
-                                <table>
-                                    <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
-                                    <tr>
-                                        <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
-                                        <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
-                                        <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
-                                    </tr>
-                                    <tbody id="body-sertifikat"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </main>
+                <div class="info-col">
+                    <span class="info-title">IMO Number</span>
+                    <span class="info-value" id="val-imo">-</span>
                 </div>
-
+                <div class="info-col">
+                    <span class="info-title">Call Sign</span>
+                    <span class="info-value" id="val-call">-</span>
+                </div>
+                <div class="info-col">
+                    <span class="info-title">Owner</span>
+                    <span class="info-value" id="val-owner">-</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" onclick="resetApp()"><i data-lucide="plus-circle" style="width:16px;"></i> New Audit</button>
+                <button class="btn-outline" onclick="downloadHTML()"><i data-lucide="download" style="width:16px;"></i> Save HTML</button>
+                <button class="btn-solid" onclick="window.print()"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
             </div>
         </div>
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
+            <button class="tab-btn" onclick="switchTab('tab-quotation', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
+            <button class="tab-btn" onclick="switchTab('tab-certificates', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
+            
+            <button class="filter-btn" id="filterBtn" onclick="toggleFilter()"><i data-lucide="alert-triangle" style="width:16px;"></i> Show Only Anomalies</button>
+        </div>
+
+        <div id="tab-summary" class="tab-content active">
+            <div id="summary-alert-container"></div>
+            <div id="summary-table-container"></div>
+        </div>
+
+        <div id="tab-quotation" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%" style="text-align:center;">No</th>
+                            <th width="40%">Inspection Point (Item | System)</th>
+                            <th width="12%">Quotation Qty</th>
+                            <th width="15%">Certificate Qty</th>
+                            <th width="10%" style="text-align:center;">DO Qty</th>
+                            <th width="18%">Audit Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-quotation"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-certificates" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="3%" style="text-align:center;">No</th>
+                            <th width="15%">Report Name</th>
+                            <th width="12%">Cert No</th>
+                            <th width="12%">Ship Name</th>
+                            <th width="15%">Owner</th>
+                            <th width="8%" style="text-align:center;">IMO</th>
+                            <th width="5%" style="text-align:center;">Class</th>
+                            <th width="8%">Date</th>
+                            <th width="10%">Sign</th>
+                            <th width="12%">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-certificates"></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
         lucide.createIcons();
         
-        // --- KONFIGURASI WEBHOOK n8n ---
         const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         
         let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
 
-        // --- INTERAKSI UI ---
+        // --- UI Interactions ---
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
             el.innerHTML = msg; 
             el.style.display = 'block';
-            el.style.backgroundColor = isError ? '#fdedec' : '#e9f7ef';
-            el.style.color = isError ? '#c0392b' : '#1e8449';
-            el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
+            el.style.backgroundColor = isError ? 'var(--danger-bg)' : 'var(--success-bg)';
+            el.style.color = isError ? '#991b1b' : '#065f46';
+            el.style.border = `1px solid ${isError ? 'var(--danger-border)' : 'var(--success-border)'}`;
         }
 
         function switchTab(tabId, el) {
-            document.querySelectorAll('.nav-item:not(.filter-btn)').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
-            document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
         }
 
-        function toggleFilter(el) {
+        function toggleFilter() {
             isFilter = !isFilter;
+            const btn = document.getElementById('filterBtn');
             if(isFilter) {
-                el.classList.add('active'); document.body.classList.add('filter-anomali');
+                btn.classList.add('active'); document.body.classList.add('filter-on');
+                btn.innerHTML = '<i data-lucide="filter-x" style="width:16px;"></i> Show All Items';
             } else {
-                el.classList.remove('active'); document.body.classList.remove('filter-anomali');
+                btn.classList.remove('active'); document.body.classList.remove('filter-on');
+                btn.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Show Only Anomalies';
             }
+            lucide.createIcons();
+        }
+
+        function resetApp() {
+            document.getElementById('auditForm').reset();
+            document.getElementById('view-dashboard').style.display = 'none';
+            document.getElementById('view-upload').style.display = 'block';
+            if(isFilter) toggleFilter();
         }
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
         function downloadHTML() {
             var clone = document.documentElement.cloneNode(true);
-            var u = clone.querySelector('.left-panel'); if(u) u.parentNode.removeChild(u);
-            var actionBtns = clone.querySelector('.action-buttons'); if(actionBtns) actionBtns.parentNode.removeChild(actionBtns);
+            var u = clone.querySelector('#view-upload'); if(u) u.parentNode.removeChild(u);
+            var l = clone.querySelector('#view-loading'); if(l) l.parentNode.removeChild(l);
+            var ha = clone.querySelector('.header-actions'); if(ha) ha.parentNode.removeChild(ha);
             
-            var rp = clone.querySelector('.right-panel');
-            if(rp) rp.style.width = '100%';
-
             var htmlContent = clone.outerHTML;
             var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
             var url = URL.createObjectURL(blob);
@@ -288,7 +307,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- RENDER TABEL & LOGIKA MAPPING (IDENTIK DENGAN LSA LAMA & MT CHIRA) ---
+        // --- Data Rendering ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -300,6 +319,8 @@
             }
 
             if (!parsed || !parsed.tabel_audit) {
+                document.getElementById('view-loading').style.display = 'none';
+                document.getElementById('view-upload').style.display = 'block';
                 showMessage("Format data JSON tidak dikenali oleh sistem.", true);
                 return;
             }
@@ -310,7 +331,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // 1. Setup Top Bar
+            // 1. Populate Top Bar
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             for(let r of certRows) {
                 if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -328,7 +349,7 @@
             document.getElementById("val-owner").innerText = v_own;
             if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
-            // 2. Tab Penawaran (Quotation)
+            // 2. Render Quotation Table
             let htmlPen = ""; let anomalyList = [];
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
@@ -336,7 +357,7 @@
 
                 let aliasParts = rawAlias.split(" - ");
                 let itemCode = aliasParts[0] || "-";
-                let systemName = aliasParts.slice(1).join(" - ") || "-";
+                let systemName = aliasParts.slice(1).join(" - ") || "General Item";
                 
                 let hasilStr = String(r.hasil_ai || "");
                 let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
@@ -351,67 +372,75 @@
                 let certQty = String(r.di_sertifikat || "-").trim();
                 let badgeHtml = esc(certQty);
                 if (certQty.toUpperCase().includes("(RN)")) {
-                    badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge-rn">RN</span>`;
+                    badgeHtml = `${esc(certQty.replace(/\(RN\)/gi, ''))} <span class="badge b-rn">RN</span>`;
                 } else if (certQty.toUpperCase().includes("(OK)")) {
-                    badgeHtml = `${esc(certQty.replace(/\(OK\)/gi, ''))} <span class="badge-ok">OK</span>`;
+                    badgeHtml = `${esc(certQty.replace(/\(OK\)/gi, ''))} <span class="badge b-match">OK</span>`;
                 }
 
                 htmlPen += `<tr class="${rowClass}">
-                    <td align="center"><b>${idx + 1}</b></td>
+                    <td align="center" style="color:var(--text-muted); font-weight:600;">${idx + 1}</td>
                     <td>
-                        <div class="box-vendor">${esc(r.keterangan)}</div>
-                        <div class="box-system">${esc(systemName)}</div>
-                        <div class="box-code">${esc(itemCode)}</div>
+                        <div class="t-title">${esc(r.keterangan)}</div>
+                        <div class="t-sub"><span class="code-badge">${esc(itemCode)}</span> ${esc(systemName)}</div>
                     </td>
-                    <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                    <td><div class="doc-val">${badgeHtml}</div></td>
-                    <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                    <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
+                    <td><div style="font-weight:600;">${esc(r.di_penawaran)}</div></td>
+                    <td><div style="font-weight:600;">${badgeHtml}</div></td>
+                    <td align="center"><div style="font-weight:600;">${esc(r.di_do)}</div></td>
+                    <td>
+                        <div style="margin-bottom:6px;">
+                            ${isWarn ? '<span class="badge b-anomali">⚠️ ANOMALI</span>' : '<span class="badge b-match">✅ MATCH</span>'}
+                        </div>
+                    </td>
                 </tr>`;
 
+                // Sub-row for explanation
                 if (hasilStr.trim() !== "") {
                     let cleanReason = hasilStr.replace(/✅ MATCH[:]?|⚠️ ANOMALI[:]?/gi, '').trim();
                     if(cleanReason.startsWith(':') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
                     if(cleanReason !== "") {
-                        htmlPen += `<tr class="explanation-row ${rowClass}">
-                            <td></td>
-                            <td colspan="5"><div class="ai-note ${isWarn ? 'err' : 'ok'}"><b>${isWarn ? '⚠️ AI Evaluation:' : '✅ AI Evaluation:'}</b> ${esc(cleanReason)}</div></td>
+                        htmlPen += `<tr class="${rowClass}">
+                            <td style="border-top:none; padding-top:0;"></td>
+                            <td colspan="5" style="border-top:none; padding-top:0; padding-bottom:20px;">
+                                <div class="ai-note-box ${isWarn ? 'note-err' : 'note-ok'}">
+                                    <b>${isWarn ? '🚨 AI Evaluation:' : '💡 AI Note:'}</b> ${esc(cleanReason)}
+                                </div>
+                            </td>
                         </tr>`;
                     }
                 }
             });
-            document.getElementById("body-penawaran").innerHTML = htmlPen;
+            document.getElementById("body-quotation").innerHTML = htmlPen;
 
-            // 3. Tab Summary
-            let criticalContainer = document.getElementById("critical-summary-container");
-            let summaryHtml = "";
-
+            // 3. Render Summary Tab
+            let alertHtml = "";
             if (anomalyList.length > 0) {
-                let listHtml = anomalyList.map(issue => `<li>${issue}</li>`).join('');
-                summaryHtml += `<div class="critical-summary">
-                    <h4 class="critical-title">⚠️ Buyer Attention Required (Anomali Ditemukan)</h4>
-                    <p class="critical-subtitle">Daftar masalah ketidakpatuhan fisik / komersial berdasarkan ketentuan regulasi maritim & SOP LSA:</p>
-                    <ol class="critical-list">${listHtml}</ol>
+                let listHtml = anomalyList.map(issue => `<li style="margin-bottom:6px;">${issue}</li>`).join('');
+                alertHtml = `<div class="alert-box alert-error">
+                    <h4 class="alert-title" style="color:#991b1b;"><i data-lucide="alert-octagon" style="width:18px; vertical-align:-3px; margin-right:5px;"></i> Action Required: Anomalies Found</h4>
+                    <ul class="alert-list" style="color:#7f1d1d;">${listHtml}</ul>
                 </div>`;
             } else {
-                summaryHtml += `<div class="success-summary">
-                    <h4 class="critical-title" style="color: var(--success);">✅ Audit Completed: All Core Parameters Match</h4>
-                    <p style="margin:0; font-size:12px; color:#166534; font-weight:500;">Semua kesesuaian fisik dinyatakan patuh terhadap SOP.</p>
+                alertHtml = `<div class="alert-box alert-success">
+                    <h4 class="alert-title" style="color:#065f46;"><i data-lucide="check-circle" style="width:18px; vertical-align:-3px; margin-right:5px;"></i> Audit Completed: Clear</h4>
+                    <p style="margin:0; font-size:12px; color:#065f46;">All physical and commercial requirements are compliant with SOP.</p>
                 </div>`;
             }
+            document.getElementById("summary-alert-container").innerHTML = alertHtml;
 
+            let summaryTableHtml = "";
             if (parsed.summary_sertifikat && parsed.summary_sertifikat.length > 0) {
-                summaryHtml += `<div style="margin: 20px;">
-                    <h4 style="color: var(--primary); font-size: 13px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 5px;">📑 Peta Status Material & Validitas Sertifikasi</h4>
-                    <div class="table-responsive">
-                        <table>
+                summaryTableHtml = `<h3 style="font-family:'Poppins', sans-serif; font-size:14px; margin-bottom:15px; color:var(--text-main);">📑 Status Material & Certification Mapping</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
                             <tr>
-                                <th width="5%" style="text-align:center;">NO</th>
-                                <th width="30%">KATEGORI SISTEM KESELAMATAN</th>
-                                <th width="25%">NOMOR SERTIFIKAT AKTUAL</th>
-                                <th width="40%">HASIL TEMUAN AUDIT & STATUS MATERIAL</th> 
+                                <th width="5%" style="text-align:center;">No</th>
+                                <th width="30%">Safety System Category</th>
+                                <th width="25%">Actual Cert. Numbers</th>
+                                <th width="40%">Audit Findings & Material Status</th> 
                             </tr>
-                        <tbody>`;
+                        </thead>
+                    <tbody>`;
                 
                 let uniqueSummaryMap = {};
                 parsed.summary_sertifikat.forEach(item => {
@@ -419,12 +448,7 @@
                     let currentRnVal = item.temuan_rn || item.material_rn || "-";
                     
                     if(!uniqueSummaryMap[key]) {
-                        uniqueSummaryMap[key] = {
-                            sistem: item.sistem,
-                            no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
-                            halaman: item.halaman || "-",
-                            temuan_rn: currentRnVal
-                        };
+                        uniqueSummaryMap[key] = { sistem: item.sistem, no_sertifikat: item.certificate_no || item.no_sertifikat || "-", temuan_rn: currentRnVal };
                     } else {
                         if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
                             uniqueSummaryMap[key].no_sertifikat = item.certificate_no || item.no_sertifikat;
@@ -443,18 +467,14 @@
                     let noCert = String(item.no_sertifikat).trim();
                     if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
                     let isFound = noCert !== "-";
-                    let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
                     
                     let rnFromAI = String(item.temuan_rn || "-").trim();
-                    let componentStatusHtml = `<span style="color:#94a3b8; font-size:10px; font-style:italic;">Menunggu Integrasi Berkas Berlangsung</span>`;
+                    let componentStatusHtml = `<span style="font-size:11px; font-style:italic; color:var(--text-muted);">Waiting for data...</span>`;
                     
                     if (isFound) {
                         if (rnFromAI !== "-" && rnFromAI !== "") {
-                            rnFromAI = rnFromAI.replace(/(.)(Sertifikat\s+[a-zA-Z0-9/_-]+:|[0-9]{3,}[a-zA-Z0-9/_-]+:|CertNo\s+[a-zA-Z0-9/_-]+:)/gi, function(match, p1, p2) {
-                                return p1 === '\n' ? match : p1 + '\n' + p2;
-                            });
-
-                            componentStatusHtml = `<div style="display:flex; flex-direction:column; gap:12px; padding: 4px 0; width:100%;">`;
+                            rnFromAI = rnFromAI.replace(/(.)(Sertifikat\s+[a-zA-Z0-9/_-]+:|[0-9]{3,}[a-zA-Z0-9/_-]+:|CertNo\s+[a-zA-Z0-9/_-]+:)/gi, function(m, p1, p2) { return p1 === '\n' ? m : p1 + '\n' + p2; });
+                            componentStatusHtml = `<div style="display:flex; flex-direction:column; gap:12px;">`;
                             
                             rnFromAI.split(/\\n|\n/).forEach(line => {
                                 let cleanLine = line.trim();
@@ -464,58 +484,49 @@
                                         let certLabel = parts[0].trim();
                                         let itemsStr = parts.slice(1).join(':').trim(); 
                                         
-                                        componentStatusHtml += `<div style="display:flex; flex-direction:column; gap:4px; border-bottom:1px solid #e2e8f0; padding-bottom:8px; width:100%;">
-                                            <span style="font-weight:800; color:var(--primary); font-size:11px;">📄 ${esc(certLabel)}:</span>
-                                            <div style="display:flex; flex-direction:column; gap:4px; padding-left: 6px; margin-top:2px;">`;
+                                        componentStatusHtml += `<div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid var(--border-light);">
+                                            <span style="font-weight:700; color:var(--primary); font-size:11px; margin-bottom:6px; display:block;">📄 ${esc(certLabel)}:</span>
+                                            <div style="display:flex; flex-direction:column; gap:4px;">`;
                                         
-                                        if (itemsStr.includes(',')) {
-                                            itemsStr.split(',').forEach(it => {
-                                                let cleanIt = it.replace(/\./g, '').trim(); 
-                                                if(cleanIt !== "" && cleanIt !== "-") {
-                                                    let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar');
-                                                    let icon = isAnomali ? '⚠️' : '🛠️';
-                                                    componentStatusHtml += `<span style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
-                                                        <span>${icon}</span> <span style="padding-top:1px;">${esc(cleanIt)}</span>
-                                                    </span>`;
-                                                }
-                                            });
-                                        } else {
-                                            let isAnomali = itemsStr.toLowerCase().includes('anomali') || itemsStr.toLowerCase().includes('tidak') || itemsStr.toLowerCase().includes('melanggar');
-                                            let icon = isAnomali ? '⚠️' : '🛠️';
-                                            componentStatusHtml += `<span style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px;">
-                                                <span>${icon}</span> <span style="padding-top:1px;">${esc(itemsStr)}</span>
-                                            </span>`;
-                                        }
+                                        let subItems = itemsStr.includes(',') ? itemsStr.split(',') : [itemsStr];
+                                        subItems.forEach(it => {
+                                            let cleanIt = it.replace(/\./g, '').trim(); 
+                                            if(cleanIt !== "" && cleanIt !== "-") {
+                                                let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak');
+                                                componentStatusHtml += `<span style="font-size:11px; font-weight:500; color:var(--text-main); display:flex; align-items:flex-start; gap:6px;">
+                                                    <span>${isAnomali ? '⚠️' : '🔹'}</span> <span style="padding-top:1px;">${esc(cleanIt)}</span>
+                                                </span>`;
+                                            }
+                                        });
                                         componentStatusHtml += `</div></div>`;
                                     } else {
-                                         let isAnomali = cleanLine.toLowerCase().includes('anomali') || cleanLine.toLowerCase().includes('tidak') || cleanLine.toLowerCase().includes('melanggar');
-                                         let icon = isAnomali ? '⚠️' : '🛠️';
-                                         componentStatusHtml += `<div style="font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
-                                             <span>${icon}</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
+                                         let isAnomali = cleanLine.toLowerCase().includes('anomali') || cleanLine.toLowerCase().includes('tidak');
+                                         componentStatusHtml += `<div style="font-size:11px; font-weight:500; color:var(--text-main); display:flex; align-items:flex-start; gap:6px; padding:6px; background:#f8fafc; border-radius:6px; border:1px solid var(--border-light);">
+                                             <span>${isAnomali ? '⚠️' : '🔹'}</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
                                          </div>`;
                                     }
                                 }
                             });
                             componentStatusHtml += `</div>`;
                         } else {
-                            componentStatusHtml = `<span class="badge-ok" style="font-size:10px; font-weight:700; color:#166534; background:#f0fdf4; padding:2px 6px; border-radius:3px; border:1px solid #bbf7d0;">✅ TERVERIFIKASI (SESUAI SOP / TIDAK ADA ANOMALI MATERIAL)</span>`;
+                            componentStatusHtml = `<span class="badge b-match">✅ NO ANOMALIES FOUND</span>`;
                         }
                     } else {
-                        componentStatusHtml = `<span style="color:var(--error); font-weight:600; font-size:10px;">⚠️ SERTIFIKAT TIDAK TERLAMPIR</span>`;
+                        componentStatusHtml = `<span class="badge b-anomali">⚠️ NO CERTIFICATE ATTACHED</span>`;
                     }
                     
-                    summaryHtml += `<tr>
-                        <td align="center" style="font-weight: 700; color: #64748b;">${sIdx++}</td>
-                        <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
-                        <td><div class="doc-val" style="${valClass}">${esc(noCert)}</div></td>
-                        <td><div class="doc-val" style="background:#fff; min-height:34px; display:flex; align-items:flex-start; width:100%; border:none; padding:0;">${componentStatusHtml}</div></td>
+                    summaryTableHtml += `<tr>
+                        <td align="center" style="font-weight:600; color:var(--text-muted);">${sIdx++}</td>
+                        <td style="font-weight:700; color:var(--text-main);">${esc(item.sistem)}</td>
+                        <td><div style="font-weight:600; color: ${isFound ? 'var(--primary)' : 'var(--text-muted)'};">${esc(noCert)}</div></td>
+                        <td>${componentStatusHtml}</td>
                     </tr>`;
                 }
-                summaryHtml += `</tbody></table></div></div>`;
+                summaryTableHtml += `</tbody></table></div>`;
             }
-            criticalContainer.innerHTML = summaryHtml;
+            document.getElementById("summary-table-container").innerHTML = summaryTableHtml;
 
-            // 4. Tab Sertifikat
+            // 4. Render Certificates Tab
             let htmlCert = ""; let certGroups = {};
             certRows.forEach(r => {
                 let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
@@ -524,69 +535,59 @@
 
             let gIdx = 1;
             for (let cNo in certGroups) {
-                let groupWarn = certGroups[cNo].some(r => {
-                    let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
-                });
-                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
+                let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
+                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="10">🛡️ CERTIFICATE NO: ${esc(cNo)}</td></tr>`;
                 
                 certGroups[cNo].forEach(r => {
                     let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
                     String(r.di_sertifikat).split('|').forEach(p => {
                         let kv = p.split(':'); if(kv.length < 2) return;
-                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+                        let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
                         if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
                         if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
-                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
-                        if(k.includes("sign")) d.sign=v;
+                        if(k.includes("date")) d.date=v; if(k.includes("sign")) d.sign=v;
                     });
                     
                     let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
                     htmlCert += `<tr class="${rowClass}">
-                        <td align="center">${gIdx++}</td>
-                        <td><b>${esc(r.keterangan)}</b></td>
-                        <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
-                        <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
-                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
-                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ BEDA':'✅ OK'}</td>
+                        <td align="center" style="color:var(--text-muted); font-weight:600;">${gIdx++}</td>
+                        <td><b style="color:var(--text-main);">${esc(r.keterangan)}</b></td>
+                        <td style="font-weight:600;">${esc(cNo)}</td>
+                        <td>${esc(d.ship)}</td>
+                        <td>${esc(d.owner)}</td>
+                        <td align="center" style="font-weight:600;">${esc(d.imo)}</td>
+                        <td align="center">${esc(d.cls)}</td>
+                        <td>${esc(d.date)}</td>
+                        <td>${esc(d.sign)}</td>
+                        <td>${isWarn ? '<span class="badge b-anomali">⚠️ DISCREPANCY</span>' : '<span class="badge b-match">✅ VALID</span>'}</td>
                     </tr>`;
                 });
             }
-            document.getElementById("body-sertifikat").innerHTML = htmlCert;
+            document.getElementById("body-certificates").innerHTML = htmlCert;
+            lucide.createIcons();
+            
+            // Switch view
+            document.getElementById('view-loading').style.display = 'none';
+            document.getElementById('view-dashboard').style.display = 'block';
         }
 
-        // --- SISTEM POLLING ANTI-CACHE ---
+        // --- Polling System ---
         async function checkStatus(jobId) {
             try {
-                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, {
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
-                
+                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } });
                 let text = await res.text();
                 if(!text || text.trim().charAt(0) === "<") return;
                 
                 let json = JSON.parse(text);
-                console.log(`[Polling n8n] Cek Job ID: ${jobId}`, json);
-
                 let rows = Array.isArray(json) ? json : (json.data || [json]);
                 let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
 
-                if (json.status === "processing" || !ourRow) {
-                    return; 
-                }
+                if (json.status === "processing" || !ourRow) return; 
 
-                // DATA DITEMUKAN: Stop interval, ubah tampilan
-                clearInterval(pollingInterval);
-                clearInterval(timerInterval);
+                clearInterval(pollingInterval); clearInterval(timerInterval);
                 
-                document.getElementById('pollingCard').style.display = 'none';
-                document.getElementById('reportPanel').style.display = 'block';
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                
-                // Mencegah terpotongnya JSON dari struktur Google Sheet
                 let fullPayloadStr = ""; 
                 if(ourRow["Payload1"]) {
                     for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
@@ -597,21 +598,16 @@
                     renderAuditReport(Array.isArray(json) ? json : json.data);
                 }
                 
-                lucide.createIcons();
-                
             } catch (e) {
-                console.error("Polling error / JSON parse error:", e);
-                clearInterval(pollingInterval);
-                clearInterval(timerInterval);
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                showMessage("Koneksi polling gagal atau JSON terpotong. Cek log console (F12).", true);
-                lucide.createIcons();
+                clearInterval(pollingInterval); clearInterval(timerInterval);
+                document.getElementById('view-loading').style.display = 'none';
+                document.getElementById('view-upload').style.display = 'block';
+                document.getElementById('submitBtn').disabled = false;
+                showMessage("Koneksi polling gagal atau JSON terpotong. Cek console browser.", true);
             }
         }
 
-        // --- SUBMIT PENGIRIMAN FILE ---
+        // --- Form Submit ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
@@ -619,9 +615,10 @@
             const errorBox = document.getElementById('ui-message');
             
             btn.disabled = true;
-            btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
             errorBox.style.display = 'none';
-            document.getElementById('reportPanel').style.display = 'none';
+            
+            document.getElementById('view-upload').style.display = 'none';
+            document.getElementById('view-loading').style.display = 'block';
 
             const fd = new FormData();
             fd.append('job_id', id);
@@ -634,20 +631,18 @@
                 const req = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
                 if (!req.ok) throw new Error("Connection to N8N failed.");
                 
-                document.getElementById('pollingCard').style.display = 'block';
-                
                 let startMs = Date.now();
                 timerInterval = setInterval(() => {
                     let s = Math.floor((Date.now() - startMs) / 1000);
-                    document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
+                    document.getElementById('loading-txt').innerHTML = `(Time elapsed: <b>${s}</b>s)`;
                 }, 1000);
 
                 pollingInterval = setInterval(() => checkStatus(id), 8000);
             } catch (err) {
+                document.getElementById('view-loading').style.display = 'none';
+                document.getElementById('view-upload').style.display = 'block';
                 showMessage(err.message, true);
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                lucide.createIcons();
             }
         };
     </script>
