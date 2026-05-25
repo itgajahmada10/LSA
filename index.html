@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7 Pro Dashboard</title>
+    <title>Waruna LSA Audit — V7 Pro Enterprise Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        /* === CORE VARIABLES (MANUALBOOK UI + LSA TABLES) === */
+        /* === CORE VARIABLES (MURNI WARNA V7 PRO) === */
         :root { 
             --primary: #4e2b5c; 
             --primary-hover: #3b1e47; 
@@ -34,11 +34,13 @@
         /* === STRUCTURAL LAYOUT === */
         body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
         * { box-sizing: border-box; }
-        .main-container { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; max-width: 1500px; margin: 0 auto; align-items: flex-start; }
+        .main-container { display: flex; gap: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         
-        /* === LEFT PANEL (FORM UPLOAD) === */
-        .left-panel { flex: 1; min-width: 320px; max-width: 380px; position: sticky; top: 30px; }
-        .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); }
+        /* === LEFT PANEL (FORM UPLOAD - BISA DI-MINIMIZE) === */
+        .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); }
+        .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
+        
+        .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
         label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
@@ -54,11 +56,11 @@
         .loader-small { border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* === RIGHT PANEL (LSA RESULTS DASHBOARD) === */
-        .right-panel { flex: 3; min-width: 850px; width: 100%; }
+        /* === RIGHT PANEL (LSA RESULTS DASHBOARD - LUAS MAKSIMAL) === */
+        .right-panel { flex: 1; min-width: 0; width: 100%; transition: all 0.4s ease; }
         
-        .top-info-bar { background: #fbf9fc; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .ship-info { display: flex; gap: 25px; align-items: center; }
+        .top-info-bar { background: #fbf9fc; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .ship-info { display: flex; gap: 25px; align-items: center; flex-wrap: wrap; }
         .info-box { display: flex; flex-direction: column; }
         .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
         .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
@@ -70,28 +72,31 @@
         .btn-simple:hover { background: #fbf9fc; }
         .btn-full { background: var(--primary); color: white; }
         .btn-full:hover { background: var(--primary-hover); }
+        .btn-toggle-view { border-color: #64748b; color: #64748b; background: white; }
+        .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
 
-        /* TABS LAYOUT */
-        .main-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
-        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 30px; }
-        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 12px; }
-        .nav-item:hover { border-color: var(--primary); background: #fbf9fc; }
-        .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .filter-btn { color: var(--error); border-color: var(--error); justify-content: center; margin-top: 10px; }
-        .filter-btn.active { background: var(--error); color: #fff; }
+        /* === HORIZONTAL TABS LAYOUT === */
+        .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; overflow-x: auto; }
+        .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; }
+        .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
-        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+        .filter-btn { margin-left: auto; color: var(--error); border: 1px solid var(--border-color); background: white; border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; margin-bottom: 6px; white-space: nowrap; }
+        .filter-btn:hover { background: #fef2f2; border-color: var(--error); }
+        .filter-btn.active { background: var(--error); color: #fff; border-color: var(--error); }
+
+        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* SUMMARY STYLES (Identik dengan LSA Lama) */
+        /* SUMMARY STYLES */
         .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 5px solid var(--error); }
         .critical-title { color: var(--error); font-size: 14px; font-weight: 800; margin-top: 0; margin-bottom: 5px; }
         .critical-subtitle { font-size: 11px; color: #991b1b; margin-top: 0; margin-bottom: 15px; font-style: italic; }
         .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 11px; line-height: 1.6; font-weight: 500; }
         .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px; border-left: 5px solid var(--success); }
 
-        /* TABLES STYLES (Identik dengan LSA Lama) */
+        /* TABLES STYLES */
         .table-responsive { width: 100%; overflow-x: auto; }
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
         th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
@@ -100,7 +105,7 @@
         .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
         .group-header td { background-color: #e2e8f0; font-weight: 800; color: #1e293b; font-size: 11px; padding: 10px 15px; }
         
-        /* DATA CONTAINERS (Identik dengan LSA Lama) */
+        /* DATA CONTAINERS */
         .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 4px 6px; border-radius: 3px; margin-bottom: 4px; font-weight: 700; color: #713f12; font-size: 11px; }
         .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 4px 6px; border-radius: 3px; margin-bottom: 4px; font-weight: 600; color: #0369a1; font-size: 10px; }
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 4px 6px; border-radius: 3px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
@@ -123,11 +128,10 @@
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .sidebar, .action-buttons, .filter-btn, .header, form { display: none !important; }
+            .left-panel, .tabs-container, .action-buttons, .filter-btn, .header, form { display: none !important; }
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
             .card-box { padding: 0; border: none; box-shadow: none; }
-            .main-layout { display: block; }
             .content-card { display: block !important; margin-bottom: 30px; border: none; }
             table { font-size: 9px; page-break-inside: auto; }
             tr, td, th { page-break-inside: avoid; }
@@ -137,7 +141,7 @@
 <body>
     <div class="main-container">
         
-        <div class="left-panel">
+        <div class="left-panel" id="uploadPanel">
             <div class="card-box">
                 <div class="header">
                     <h2><i data-lucide="shield-check"></i> Verification</h2>
@@ -171,7 +175,7 @@
                 <p style="color: #666; font-size: 11px;">Performing Triangulation Data via N8N Architecture</p>
             </div>
 
-            <div id="reportPanel" class="card-box" style="display: none;">
+            <div id="reportPanel" class="card-box">
                 
                 <div class="top-info-bar">
                     <div class="ship-info">
@@ -181,56 +185,57 @@
                         <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
                     </div>
                     <div class="action-buttons">
+                        <button onclick="toggleUploadForm()" class="btn-modern btn-toggle-view" id="toggleFormBtn" title="Minimize/Maximize Form">
+                            <i data-lucide="sidebar-close" id="toggleIcon" style="width:16px;"></i> <span id="toggleText">Hide Upload Form</span>
+                        </button>
                         <button onclick="downloadHTML()" class="btn-modern btn-simple"><i data-lucide="download" style="width:16px;"></i> Save HTML</button>
                         <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
                     </div>
                 </div>
 
-                <div class="main-layout">
-                    <aside class="sidebar">
-                        <div class="nav-item active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</div>
-                        <div class="nav-item" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</div>
-                        <div class="nav-item" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</div>
-                        <div class="nav-item filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</div>
-                    </aside>
-
-                    <main class="content-area">
-                        <div id="tab-summary" class="content-card active">
-                            <div id="critical-summary-container"></div>
-                        </div>
-
-                        <div id="tab-penawaran" class="content-card">
-                            <div class="table-responsive">
-                                <table>
-                                    <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK</td></tr>
-                                    <tr>
-                                        <th width="4%" style="text-align:center;">NO</th>
-                                        <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                                        <th width="13%">QUOTATION (QTY)</th>
-                                        <th width="15%">CERTIFICATE (QTY)</th>
-                                        <th width="8%" style="text-align:center;">DO (QTY)</th>
-                                        <th width="15%" style="text-align:center;">AUDIT STATUS</th>
-                                    </tr>
-                                    <tbody id="body-penawaran"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div id="tab-sertifikat" class="content-card">
-                            <div class="table-responsive">
-                                <table>
-                                    <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
-                                    <tr>
-                                        <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
-                                        <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
-                                        <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
-                                    </tr>
-                                    <tbody id="body-sertifikat"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </main>
+                <div class="tabs-container">
+                    <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
+                    <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
+                    <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
+                    <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
                 </div>
+
+                <main class="content-area">
+                    <div id="tab-summary" class="content-card active">
+                        <div id="critical-summary-container"></div>
+                    </div>
+
+                    <div id="tab-penawaran" class="content-card">
+                        <div class="table-responsive">
+                            <table>
+                                <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK</td></tr>
+                                <tr>
+                                    <th width="4%" style="text-align:center;">NO</th>
+                                    <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
+                                    <th width="13%">QUOTATION (QTY)</th>
+                                    <th width="15%">CERTIFICATE (QTY)</th>
+                                    <th width="8%" style="text-align:center;">DO (QTY)</th>
+                                    <th width="15%" style="text-align:center;">AUDIT STATUS</th>
+                                </tr>
+                                <tbody id="body-penawaran"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="tab-sertifikat" class="content-card">
+                        <div class="table-responsive">
+                            <table>
+                                <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
+                                <tr>
+                                    <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
+                                    <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
+                                    <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
+                                </tr>
+                                <tbody id="body-sertifikat"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
 
             </div>
         </div>
@@ -245,6 +250,24 @@
         
         let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
 
+        // --- FUNGSI TOGGLE HIDE / MINIMIZE PANEL UPLOAD ---
+        function toggleUploadForm() {
+            const panel = document.getElementById('uploadPanel');
+            const toggleText = document.getElementById('toggleText');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            panel.classList.toggle('is-hidden');
+            
+            if (panel.classList.contains('is-hidden')) {
+                toggleText.innerText = "Show Upload Form";
+                toggleIcon.setAttribute('data-lucide', 'sidebar-open');
+            } else {
+                toggleText.innerText = "Hide Upload Form";
+                toggleIcon.setAttribute('data-lucide', 'sidebar-close');
+            }
+            lucide.createIcons();
+        }
+
         // --- INTERAKSI UI ---
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
@@ -256,7 +279,7 @@
         }
 
         function switchTab(tabId, el) {
-            document.querySelectorAll('.nav-item:not(.filter-btn)').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
@@ -288,7 +311,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- RENDER TABEL & LOGIKA MAPPING (IDENTIK DENGAN LSA LAMA & MT CHIRA) ---
+        // --- RENDER TABEL & LOGIKA MAPPING ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -586,6 +609,12 @@
                 btn.disabled = false;
                 btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 
+                // OTOMATIS MIMINIME FORM UPLOAD SAAT HASIL KELUAR BIAR TABEL MAKSIMAL LEGA
+                const panel = document.getElementById('uploadPanel');
+                if(!panel.classList.contains('is-hidden')) {
+                    toggleUploadForm();
+                }
+
                 // Mencegah terpotongnya JSON dari struktur Google Sheet
                 let fullPayloadStr = ""; 
                 if(ourRow["Payload1"]) {
