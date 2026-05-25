@@ -107,8 +107,8 @@
                         <input type="file" id="certFile" accept=".pdf" required>
                     </div>
                     <div class="upload-section">
-                        <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order</label>
-                        <input type="file" id="deliveryFile" accept=".pdf" required>
+                        <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional)</label>
+                        <input type="file" id="deliveryFile" accept=".pdf">
                     </div>
                     <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
                     <div id="errorBox" style="margin-top:15px; display:none; color:red; font-size:12px; font-weight:bold; text-align:center;"></div>
@@ -321,7 +321,6 @@
             errorBox.style.display = 'none';
             document.getElementById('reportPanel').style.display = 'none';
 
-            // Payload dikonfigurasi mengikuti LSA, pastikan node n8n menangkap key ini.
             const fd = new FormData();
             fd.append('job_id', id);
             
@@ -331,6 +330,7 @@
             if (document.getElementById('certFile').files[0]) {
                 fd.append('Certificate', document.getElementById('certFile').files[0]);
             }
+            // Mencegah error jika field DO dibiarkan kosong
             if (document.getElementById('deliveryFile').files[0]) {
                 fd.append('Delivery_Order', document.getElementById('deliveryFile').files[0]);
             }
