@@ -51,7 +51,7 @@
         .btn-submit:disabled { background-color: #9b8a9f; cursor: not-allowed; }
         #ui-message { display: none; margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
-        /* === RIGHT PANEL (LSA RESULTS DASHBOARD) === */
+        /* === RIGHT PANEL === */
         .right-panel { flex: 1; min-width: 0; width: 100%; transition: all 0.4s ease; }
         
         .top-info-bar { background: #fbf9fc; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
@@ -70,7 +70,7 @@
         .btn-toggle-view { border-color: #64748b; color: #64748b; background: white; }
         .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
 
-        /* === HORIZONTAL TABS LAYOUT === */
+        /* === HORIZONTAL TABS === */
         .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; overflow-x: auto; }
         .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; }
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
@@ -109,12 +109,12 @@
         .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
         .doc-val { background: #fbf9fc; padding: 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 600; font-size: 11px; }
         
-        /* NO SERTIFIKAT VERTICAL LAYOUT */
+        /* BADGE NO SERTIFIKAT VERTIKAL */
         .cert-vertical-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 5px 8px; border-radius: 5px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.01); }
 
-        /* MODERN GRID CARDS FOR DYNAMIC DISPLAY */
-        .status-grid-container { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; padding: 2px 0; margin-top: 5px; }
+        /* GRID SUB-CARDS (SOP-01 COMPONENT SEGREGATION) */
+        .status-grid-container { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; padding: 2px 0; margin-top: 8px; }
         .cert-sub-card { flex: 1 1 calc(50% - 10px); min-width: 220px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 6px; }
         .cert-sub-card.is-match { background: #f0fdf4; border-color: #bbf7d0; }
         .cert-sub-title { font-weight: 800; color: var(--primary); font-size: 11px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: block; }
@@ -125,11 +125,13 @@
         .item-badge-status.rn { background: var(--bg-rn); border: 1px solid var(--border-rn); color: var(--text-rn); }
         .item-badge-status.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
         
-        /* BANNER ERROR CAP SYAHBANDAR / BTKP */
+        /* BANNER LEGALITAS AMINISTRASI (SOP-00) */
         .admin-violation-banner { width: 100%; background: #fff5f5; border-left: 4px solid var(--error); border-radius: 4px; padding: 6px 10px; font-size: 10px; font-weight: 700; color: var(--error); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
 
-        /* HEADER BOX BANNER FOR MATCHED SYSTEMS */
-        .sop-header-badge { background: #dcfce7; border: 1px solid #bbf7d0; color: #166534; font-weight: 800; font-size: 10px; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; margin-bottom: 4px; }
+        /* DESAIN KOTAK AKUNTABILITAS BARU BERWARNA HIJAU PASTEL (SOP WORD DISPLAY) */
+        .sop-verified-text-banner { width: 100%; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 4px; }
+        .sop-verified-text-title { color: #166534; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; }
+        .sop-verified-text-desc { color: #14532d; font-size: 10.5px; font-weight: 600; line-height: 1.4; margin: 0; }
 
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
@@ -321,7 +323,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- CORE RENDER ENGINE (TRANSPARENT SUB-CARDS ACCORDING TO MARITIME SOP) ---
+        // --- CORE ENGINE (SOP WORD DYNAMIC INTEGRATION) ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -361,7 +363,7 @@
             document.getElementById("val-owner").innerText = v_own;
             if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
-            // 2. Tab Penawaran Harga (Hanya Menampilkan Baris Anomali)
+            // 2. Tab Penawaran Harga (Hanya Memunculkan Baris Yang Mengandung Anomali)
             let htmlPen = ""; let anomalyList = [];
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
@@ -403,7 +405,7 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
-            // 3. Tab Summary (Peta Status Berkas Dengan Transparansi Bukti Sub-Cards)
+            // 3. Tab Summary (Peta Validitas Berkas + Sub-Cards Ter-Filter Murni Status RN)
             let criticalContainer = document.getElementById("critical-summary-container");
             let summaryHtml = "";
 
@@ -459,7 +461,7 @@
                     }
                 });
 
-                // Deteksi apakah sistem ini masuk dalam daftar anomali besar di tab penawaran
+                // Sinkronisasi silang status anomali dari tabel penawaran utama
                 penRows.forEach(r => {
                     let hStr = String(r.hasil_ai).toLowerCase();
                     let isAnomali = hStr.includes('⚠️') || hStr.includes('anomali') || hStr.includes('beda');
@@ -479,7 +481,7 @@
                     if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
                     let isFound = noCert !== "-";
                     
-                    // Render Badge Nomor Sertifikat Secara Terpisah Ke Bawah
+                    // Render Badge Nomor Sertifikat Terpisah Vertikal
                     let noCertHtml = `<div class="cert-vertical-container">`;
                     if (isFound) {
                         noCert.split(',').forEach(num => {
@@ -501,18 +503,14 @@
                                 return p1 === '\n' ? match : p1 + '\n' + p2;
                             });
 
-                            componentStatusHtml = `<div class="status-grid-container">`;
-                            
-                            // JIKA SYSTEM MATCH (AMAN), TAMBAHKAN BADGE LEGALITAS SOP ATAS KOTAK
-                            if(isSystemMatch) {
-                                componentStatusHtml = `<div class="sop-header-badge">✅ Verified Match (SOP Compliant)</div>` + componentStatusHtml;
-                            }
+                            let innerGridHtml = "";
+                            let hasValidRnComponent = false;
 
                             rnFromAI.split(/\\n|\n/).forEach(line => {
                                 let cleanLine = line.trim();
                                 if(cleanLine !== "" && cleanLine !== "-") {
                                     
-                                    // FILTER: Pisahkan info cap syahbandar/BTKP administrasi dari baris fisik material
+                                    // FILTER ADMINISTRASI: Singkirkan info cap syahbandar ke banner bawah
                                     if (cleanLine.toLowerCase().includes('syahbandar') || cleanLine.toLowerCase().includes('btkp') || cleanLine.toLowerCase().includes('stempel')) {
                                         adminViolationHtml += `<div class="admin-violation-banner">⚠️ ${esc(cleanLine)}</div>`;
                                         return;
@@ -523,12 +521,9 @@
                                         let certLabel = parts[0].trim();
                                         let itemsStr = parts.slice(1).join(':').trim(); 
                                         
-                                        // SUB-CARD: Berubah warna hijau soft jika sistem bersangkutan berstatus MATCH/AMAN
                                         let cardClass = isSystemMatch ? "cert-sub-card is-match" : "cert-sub-card";
+                                        let cardBodyItemsHtml = "";
 
-                                        componentStatusHtml += `<div class="${cardClass}">
-                                            <span class="cert-sub-title">📄 ${esc(certLabel)}</span>`;
-                                        
                                         let subItems = itemsStr.includes(',') ? itemsStr.split(',') : [itemsStr];
                                         subItems.forEach(it => {
                                             let cleanIt = it.replace(/\./g, '').trim(); 
@@ -536,29 +531,62 @@
                                                 let isAnomali = cleanIt.toLowerCase().includes('anomali') || cleanIt.toLowerCase().includes('tidak') || cleanIt.toLowerCase().includes('melanggar') || cleanIt.toLowerCase().includes('kurang');
                                                 let isRenew = cleanIt.toLowerCase().includes('rn') || cleanIt.toLowerCase().includes('renew') || cleanIt.toLowerCase().includes('ganti');
                                                 
-                                                let badgeClass = "ok";
-                                                let badgeSign = "🛠️";
-                                                if(isAnomali) { badgeClass = "rn"; badgeSign = "⚠️"; }
-                                                else if(isRenew) { badgeClass = "rn"; badgeSign = "🔄"; }
+                                                // STRICK FILTER REQUEST USER: Hanya tampilkan item yang berstatus RN atau Anomali saja!
+                                                if(isRenew || isAnomali) {
+                                                    hasValidRnComponent = true;
+                                                    let badgeClass = isAnomali ? "rn" : "rn";
+                                                    let badgeSign = isAnomali ? "⚠️" : "🔄";
+                                                    let statusText = isAnomali ? "Anomali" : "RN";
 
-                                                componentStatusHtml += `<div class="component-item-row">
-                                                    <span>${badgeSign} ${esc(cleanIt.replace(/\(rn\)|\(ok\)/gi, ''))}</span>
-                                                    <span class="item-badge-status ${badgeClass}">${isAnomali?'Anomali':(isRenew?'RN':'OK')}</span>
-                                                </div>`;
+                                                    cardBodyItemsHtml += `<div class="component-item-row">
+                                                        <span>${badgeSign} ${esc(cleanIt.replace(/\(rn\)|\(ok\)/gi, ''))}</span>
+                                                        <span class="item-badge-status ${badgeClass}">${statusText}</span>
+                                                    </div>`;
+                                                }
                                             }
                                         });
-                                        componentStatusHtml += `</div>`;
+
+                                        if(cardBodyItemsHtml !== "") {
+                                            innerGridHtml += `<div class="${cardClass}">
+                                                <span class="cert-sub-title">📄 ${esc(certLabel)}</span>
+                                                ${cardBodyItemsHtml}
+                                            </div>`;
+                                        }
                                     } else {
                                          let isAnomali = cleanLine.toLowerCase().includes('anomali') || cleanLine.toLowerCase().includes('tidak') || cleanLine.toLowerCase().includes('melanggar');
-                                         componentStatusHtml += `<div style="flex: 1 1 100%; font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px; padding:8px; background:#fff5f5; border-radius:6px; border:1px solid #fed7d7;">
+                                         innerGridHtml += `<div style="flex: 1 1 100%; font-size:10px; color:#334155; font-weight:600; display:flex; align-items:flex-start; gap:6px; padding:8px; background:#fff5f5; border-radius:6px; border:1px solid #fed7d7;">
                                              <span>⚠️</span> <span style="padding-top:1px;">${esc(cleanLine)}</span>
                                          </div>`;
                                     }
                                 }
                             });
-                            componentStatusHtml += `</div>`;
+
+                            // SATUKAN TEXT WORD SOP DENGAN KOTAK BADGE CARDS
+                            let textSopWord = "";
+                            let countCerts = noCert.split(',').length;
+                            let labelSistem = item.sistem.toLowerCase();
+
+                            if (isSystemMatch) {
+                                if (labelSistem.includes("liferaft")) {
+                                    textSopWord = `⚠️ ${countCerts} Unit Liferaft (${noCert}) telah diservis. Komponen RN (Food, Water, Batteries, First Aid, Anti-Seasickness) sesuai dengan kuantitas penawaran.`;
+                                } else if (labelSistem.includes("fire extinguisher") || labelSistem.includes("pmk")) {
+                                    textSopWord = `⚠️ ${countCerts} Unit Tabung Pemadam (${noCert}) telah diinspeksi. Akumulasi volume kode kerja gabungan (Inspection + Refill) cocok dengan penawaran.`;
+                                } else {
+                                    textSopWord = `⚠️ Berkas ${item.sistem} (${noCert}) telah divalidasi sah sesuai ketentuan stempel regulasi maritim.`;
+                                }
+
+                                componentStatusHtml += `<div class="sop-verified-text-banner">
+                                    <span class="sop-verified-text-title"><span>✅</span> AUDIT COMPLIANT (SOP WORD VERIFIED)</span>
+                                    <p class="sop-verified-text-desc">${textSopWord}</p>
+                                </div>`;
+                            }
+
+                            if(hasValidRnComponent || innerGridHtml !== "") {
+                                componentStatusHtml += `<div class="status-grid-container">${innerGridHtml}</div>`;
+                            }
+
                         } else {
-                            componentStatusHtml = `<div class="sop-verified-banner"><span class="sop-verified-title">✅ VERIFIED MATCH (PATUH ATURAN SOP MARITIM)</span></div>`;
+                            componentStatusHtml = `<div class="sop-verified-text-banner"><span class="sop-verified-text-title">✅ VERIFIED MATCH (PATUH ATURAN SOP MARITIM)</span></div>`;
                         }
                     } else {
                         componentStatusHtml = `<span style="color:var(--error); font-weight:600; font-size:10px;">⚠️ SERTIFIKAT TIDAK TERLAMPIR</span>`;
@@ -671,7 +699,7 @@
             }
         }
 
-        // --- SUBMIT FILE PENGIRIMAN ---
+        // --- SUBMIT FILE VIA FORM ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
