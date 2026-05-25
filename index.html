@@ -114,6 +114,11 @@
         .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
         .doc-val { background: #fbf9fc; padding: 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 600; font-size: 11px; }
         
+        /* CONTAINER BADGE VERTIKAL UNTUK NO SERTIFIKAT */
+        .cert-vertical-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .cert-badge-item { background: #fbf9fc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.01); text-align: left; }
+        .cert-badge-empty { font-weight: 500; color: var(--text-muted); font-style: italic; background: transparent; border: none; padding: 0; }
+
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
 
@@ -310,7 +315,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- RENDER DATA & PEMBUATAN INLINE FLEX GRID COMPACT CARD ---
+        // --- RENDER DATA & PEMBUATAN INLINE FLEX GRID ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -404,7 +409,7 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-            // 3. Tab Summary (OPTIMASI VISUAL ANTI BOROS RUANG)
+            // 3. Tab Summary
             let criticalContainer = document.getElementById("critical-summary-container");
             let summaryHtml = "";
 
@@ -465,7 +470,19 @@
                     let noCert = String(item.no_sertifikat).trim();
                     if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
                     let isFound = noCert !== "-";
-                    let valClass = isFound ? "font-weight: 700; color: var(--primary);" : "font-weight: 500; color: var(--text-muted); font-style: italic;";
+                    
+                    // ALTERNATIF CERDAS: Memecah string koma menjadi susunan box badge vertikal
+                    let noCertHtml = `<div class="cert-vertical-container">`;
+                    if (isFound) {
+                        noCert.split(',').forEach(num => {
+                            if(num.trim() !== "") {
+                                noCertHtml += `<div class="cert-badge-item">${esc(num.trim())}</div>`;
+                            }
+                        });
+                    } else {
+                        noCertHtml += `<div class="cert-badge-item cert-badge-empty">-</div>`;
+                    }
+                    noCertHtml += `</div>`;
                     
                     let rnFromAI = String(item.temuan_rn || "-").trim();
                     let componentStatusHtml = `<span style="color:#94a3b8; font-size:10px; font-style:italic;">Menunggu Integrasi Berkas Berlangsung</span>`;
@@ -476,7 +493,6 @@
                                 return p1 === '\n' ? match : p1 + '\n' + p2;
                             });
 
-                            // FIX: Menggunakan Flexbox Wrap Agar Sub-Card Berjejer Menyamping Mengisi Ruang Kosong
                             componentStatusHtml = `<div style="display:flex; flex-wrap:wrap; gap:10px; padding: 4px 0; width:100%;">`;
                             
                             rnFromAI.split(/\\n|\n/).forEach(line => {
@@ -487,7 +503,6 @@
                                         let certLabel = parts[0].trim();
                                         let itemsStr = parts.slice(1).join(':').trim(); 
                                         
-                                        // SUB-CARD MINI: Responsif ke samping
                                         componentStatusHtml += `<div style="flex: 1 1 calc(50% - 10px); min-width: 210px; background:#f8fafc; padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0;">
                                             <span style="font-weight:800; color:var(--primary); font-size:10px; display:block; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:6px;">📄 ${esc(certLabel)}</span>
                                             <div style="display:flex; flex-direction:column; gap:3px;">`;
@@ -533,7 +548,7 @@
                     summaryHtml += `<tr>
                         <td align="center" style="font-weight: 700; color: #64748b;">${sIdx++}</td>
                         <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
-                        <td><div class="doc-val" style="${valClass}">${esc(noCert)}</div></td>
+                        <td>${noCertHtml}</td>
                         <td><div class="doc-val" style="background:#fff; min-height:34px; display:flex; align-items:flex-start; width:100%; border:none; padding:0;">${componentStatusHtml}</div></td>
                     </tr>`;
                 }
@@ -611,7 +626,6 @@
                 btn.disabled = false;
                 btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 
-                // OTOMATIS MIMINIME PANEL FORM BEGITU HASIL SELESAI DI-LOAD
                 const panel = document.getElementById('uploadPanel');
                 if(!panel.classList.contains('is-hidden')) {
                     toggleUploadForm();
