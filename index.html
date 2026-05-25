@@ -17,7 +17,7 @@
             --text-main: #1e293b; 
             --text-muted: #64748b;
             
-            /* Status Level Colors */
+            /* 4 Level Status Colors */
             --status-pass-bg: #f0fdf4;
             --status-pass-border: #bbf7d0;
             --status-pass-text: #166534;
@@ -95,6 +95,7 @@
 
         .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* TABLES CORE STYLES */
         .table-responsive { width: 100%; overflow-x: auto; }
@@ -106,17 +107,41 @@
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
 
-        /* DATA RECONCILIATION CELLS ROW DESIGN */
-        .evidence-text-highlight { font-weight: 700; color: #334155; line-height: 1.4; display: block; }
-        .quotation-text-ref { font-weight: 600; color: var(--primary); line-height: 1.4; display: block; }
-        .admin-violation-inline { background: #fff5f5; color: var(--error); font-weight: 700; padding: 4px 8px; border-radius: 4px; border-left: 3px solid var(--error); margin-top: 5px; font-size: 10px; display: block; }
+        /* GRANULAR BULLET LIST STYLES (ANTI-NOISE) */
+        .granular-bullet-list { margin: 0; padding-left: 14px; list-style-type: disc; color: #334155; }
+        .granular-bullet-list li { margin-bottom: 4px; font-weight: 600; line-height: 1.4; font-size: 11px; }
+        .granular-bullet-list li strong { color: #0f172a; }
+        
+        /* Highlight khusus untuk item yang berstatus RN/Anomali di dalam list */
+        .text-highlight-rn { color: #701a75 !important; background: #fae8ff; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
+        .text-highlight-fail { color: #b91c1c !important; background: #fef2f2; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
 
-        /* Level 4 Status Cell Label Blocks */
+        .admin-violation-banner { width: 100%; background: #fff5f5; border-left: 4px solid var(--error); border-radius: 4px; padding: 6px 10px; font-size: 10.5px; font-weight: 700; color: var(--error); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+
+        /* Level 4 Status Badge Label Blocks */
         .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
         .cell-status-block.pass { background-color: var(--status-pass-bg); border-color: var(--status-pass-border); color: var(--status-pass-text); }
         .cell-status-block.partial { background-color: var(--status-partial-bg); border-color: var(--status-partial-border); color: var(--status-partial-text); }
         .cell-status-block.review { background-color: var(--status-review-bg); border-color: var(--status-review-border); color: var(--status-review-text); }
         .cell-status-block.fail { background-color: var(--status-fail-bg); border-color: var(--status-fail-border); color: var(--status-fail-text); }
+
+        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
+        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
+
+        body.filter-anomali .row-match { display: none !important; }
+
+        /* === PRINT STYLES === */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .left-panel, .tabs-container, .action-buttons, .filter-btn, .header, form { display: none !important; }
+            .main-container { display: block; max-width: 100%; gap: 0; }
+            .right-panel { display: block; width: 100%; min-width: 0; }
+            .card-box { padding: 0; border: none; box-shadow: none; }
+            .content-card { display: block !important; margin-bottom: 30px; border: none; }
+            table { font-size: 9px; page-break-inside: auto; }
+            tr, td, th { page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
@@ -183,15 +208,15 @@
                 <main class="content-area">
                     <div id="tab-summary" class="content-card active">
                         <div class="table-responsive">
-                            <table id="summary-reconciliation-table">
+                            <table id="reconciliation-executive-table">
                                 <thead>
-                                    <tr class="section-title"><td colspan="5">PETA REKONSILIASI KEPATUHAN BERKAS (RECONCILIATION TABLE)</td></tr>
+                                    <tr class="section-title"><td colspan="5">PETA REKONSILIASI KEPATUHAN BERKAS (SIDE-BY-SIDE RECONCILIATION TABLE)</td></tr>
                                     <tr>
                                         <th width="18%">Kategori</th>
-                                        <th width="20%">Sertifikat Aktual</th>
-                                        <th width="30%">Eviden Sertifikat</th>
-                                        <th width="20%">Quotation</th>
-                                        <th width="12%" style="text-align:center;">Status</th>
+                                        <th width="18%">Sertifikat Aktual</th>
+                                        <th width="32%">Eviden Sertifikat (Data PDF)</th>
+                                        <th width="20%">Quotation (Data Penawaran)</th>
+                                        <th width="12%" style="text-align:center;">Status Validasi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-reconciliation-summary"></tbody>
@@ -242,25 +267,9 @@
         
         let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
 
-        function toggleUploadForm() {
-            const panel = document.getElementById('uploadPanel');
-            const toggleText = document.getElementById('toggleText');
-            const toggleIcon = document.getElementById('toggleIcon');
-            panel.classList.toggle('is-hidden');
-            if (panel.classList.contains('is-hidden')) {
-                toggleText.innerText = "Show Upload Form";
-                toggleIcon.setAttribute('data-lucide', 'sidebar-open');
-            } else {
-                toggleText.innerText = "Hide Upload Form";
-                toggleIcon.setAttribute('data-lucide', 'sidebar-close');
-            }
-            lucide.createIcons();
-        }
-
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
-            el.innerHTML = msg; 
-            el.style.display = 'block';
+            el.innerHTML = msg; el.style.display = 'block';
             el.style.backgroundColor = isError ? '#fdedec' : '#e9f7ef';
             el.style.color = isError ? '#c0392b' : '#1e8449';
             el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
@@ -284,20 +293,7 @@
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-        function downloadHTML() {
-            var clone = document.documentElement.cloneNode(true);
-            var u = clone.querySelector('.left-panel'); if(u) u.parentNode.removeChild(u);
-            var actionBtns = clone.querySelector('.action-buttons'); if(actionBtns) actionBtns.parentNode.removeChild(actionBtns);
-            var rp = clone.querySelector('.right-panel'); if(rp) rp.style.width = '100%';
-
-            var htmlContent = clone.outerHTML;
-            var blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement("a"); a.href = url; a.download = currentShipName + ".html";
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        }
-
-        // --- NEW RECONCILIATION ENGINE MAPPER (MURNI MODEL RECONCILIATION TABLE) ---
+        // --- ENGINE RENDERING REKONSILIASI SIDE-BY-SIDE LIST ARRAY (SOP VER-10) ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -319,7 +315,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // Setup Top Bar Info
+            // Top Bar
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             for(let r of certRows) {
                 if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -335,7 +331,6 @@
             document.getElementById("val-imo").innerText = v_imo;
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
-            if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
             // Tab Penawaran Harga (Hanya Anomali)
             let htmlPen = ""; 
@@ -365,60 +360,15 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
-            // ==========================================
-            // BUILD 5-COLUMN RECONCILIATION TABLE SUMMARY
-            // ==========================================
-            let uniqueSummaryMap = {};
-            parsed.summary_sertifikat.forEach(item => {
-                let key = String(item.sistem).trim();
-                let currentRnVal = item.temuan_rn || item.material_rn || "-";
-                
-                if(!uniqueSummaryMap[key]) {
-                    uniqueSummaryMap[key] = {
-                        sistem: item.sistem,
-                        no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
-                        halaman: item.halaman || "-",
-                        temuan_rn: currentRnVal,
-                        is_anomali_sistem: false,
-                        is_partial: false,
-                        is_review: false
-                    };
-                } else {
-                    if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
-                        uniqueSummaryMap[key].no_sertifikat = item.certificate_no || item.no_sertifikat;
-                    }
-                    if (String(uniqueSummaryMap[key].temuan_rn).trim() === "-" || String(uniqueSummaryMap[key].temuan_rn).trim() === "") {
-                        uniqueSummaryMap[key].temuan_rn = currentRnVal;
-                    } else if (currentRnVal && currentRnVal !== "-" && uniqueSummaryMap[key].temuan_rn !== currentRnVal) {
-                        uniqueSummaryMap[key].temuan_rn += "\n" + currentRnVal;
-                    }
-                }
-            });
-
-            // Menganalisis tingkat keparahan untuk penentuan 4 Level Status dinamis
-            penRows.forEach(r => {
-                let hStr = String(r.hasil_ai).toLowerCase();
-                let isAnomali = hStr.includes('⚠️') || hStr.includes('anomali') || hStr.includes('beda');
-                if(isAnomali) {
-                    for(let k in uniqueSummaryMap) {
-                        if(String(r.keterangan).toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(String(r.keterangan).toLowerCase())) {
-                            if(hStr.includes('kurang') || hStr.includes('partial')) {
-                                uniqueSummaryMap[k].is_partial = true;
-                            } else if (hStr.includes('ambigu') || hStr.includes('review') || hStr.includes('periksa')) {
-                                uniqueSummaryMap[k].is_review = true;
-                            } else {
-                                uniqueSummaryMap[k].is_anomali_sistem = true;
-                            }
-                        }
-                    }
-                }
-            });
-
+            // ===============================================
+            // GENERATE 5-COLUMN GRANULAR SIDE-BY-SIDE SUMMARY
+            // ===============================================
             let reconciliationRowsHtml = "";
-            for (let key in uniqueSummaryMap) {
-                let item = uniqueSummaryMap[key];
-                let noCert = String(item.no_sertifikat).trim();
-                if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
+            let summaryList = parsed.summary_sertifikat || [];
+
+            summaryList.forEach(item => {
+                let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
+                if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 250) noCert = "-";
                 let isFound = noCert !== "-";
 
                 // 1. Kolom Nomor Sertifikat (Badge Layout)
@@ -432,77 +382,83 @@
                 }
                 certBadgeContainer += `</div>`;
 
-                // 2. Deteksi & Pemisahan Info Administrasi Cap Syahbandar
-                let cleanEvidenText = String(item.temuan_rn || "-").trim();
-                let adminViolationInlineHtml = "";
-                let tempLines = [];
+                // 2. Kolom Eviden Sertifikat (Memecah List Array Suku Cadang & Memisahkan SOP-00)
+                let certBulletItemsHtml = `<ul class="granular-bullet-list">`;
+                let adminViolationBannerHtml = "";
+                let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
                 
-                cleanEvidenText.split(/\\n|\n/).forEach(line => {
-                    let cLine = line.trim();
-                    if(cLine.toLowerCase().includes('syahbandar') || cLine.toLowerCase().includes('btkp') || cLine.toLowerCase().includes('stempel')) {
-                        adminViolationInlineHtml += `<span class="admin-violation-inline">⚠️ ${esc(cLine)}</span>`;
-                        item.is_anomali_sistem = true; // Langsung lempar ke FAIL jika stempel krusial melanggar SOP
-                    } else {
-                        if(cLine !== "" && cLine !== "-") tempLines.push(cLine);
-                    }
-                });
-                
-                let finalEvidenText = tempLines.join(', ').replace(/sertifikat\s+[0-9]+:/gi, '').trim();
-                if(finalEvidenText.startsWith(':') || finalEvidenText.startsWith(',')) finalEvidenText = finalEvidenText.substring(1).trim();
-
-                // 3. Menghitung Dinamis 4 Level Status (PASS / PARTIAL / REVIEW / FAIL)
-                let statusClass = "pass";
-                let statusLabel = "PASS";
-
-                if (!isFound) {
-                    statusClass = "fail"; statusLabel = "FAIL";
-                    finalEvidenText = "BERKAS SERTIFIKAT TIDAK TERLAMPIR DI PDF COMBINED";
-                } else if (item.is_anomali_sistem) {
-                    statusClass = "fail"; statusLabel = "FAIL";
-                } else if (item.is_partial) {
-                    statusClass = "partial"; statusLabel = "PARTIAL";
-                } else if (item.is_review || adminViolationInlineHtml !== "") {
-                    statusClass = "review"; statusLabel = "REVIEW";
+                if (typeof rawEvidenArray === 'string') {
+                    rawEvidenArray = rawEvidenArray.split('\n');
                 }
 
-                // Pengisian teks fallback otomatis jika statusnya sukses (Clean Match)
-                let lowSistem = item.sistem.toLowerCase();
-                let quotationRefText = "Sesuai rincian spesifikasi pengadaan";
-                
-                if (statusLabel === "PASS") {
-                    if (lowSistem.includes("liferaft")) {
-                        finalEvidenText = "Kuantitas material RN (Food, Water, Battery, Anti-Seasickness, HRU) terverifikasi sinkron penuh.";
-                        quotationRefText = "Annual Inspection of Liferaft & Supply Material";
-                    } else if (lowSistem.includes("fire") || lowSistem.includes("pmk")) {
-                        finalEvidenText = "Akumulasi volume unit kerja (5 Inspection + 3 Refill = Total 8 Unit) cocok akurat.";
-                        quotationRefText = "Gabungan Paket Pengerjaan Inspection & Refill PMK";
-                    } else {
-                        finalEvidenText = "Seluruh klausa standardisasi fungsional material dinyatakan lolos uji.";
-                        quotationRefText = "Pekerjaan Sertifikasi Alokasi Logistik LSA/FFA";
-                    }
-                } else {
-                    // Cari referensi nama barang di penawaran yang memicu ketidakcocokan
-                    penRows.forEach(r => {
-                        if(String(r.keterangan).toLowerCase().includes(lowSistem) || lowSistem.includes(String(r.keterangan).toLowerCase())) {
-                            quotationRefText = r.keterangan + ` (${r.di_penawaran})`;
+                if (Array.isArray(rawEvidenArray) && rawEvidenArray.length > 0) {
+                    rawEvidenArray.forEach(line => {
+                        let cleanLine = line.trim();
+                        if (cleanLine !== "" && cleanLine !== "-") {
+                            // Cek apakah mengandung penanda anomali legalitas cap syahbandar
+                            if (cleanLine.toLowerCase().includes("syahbandar") || cleanLine.toLowerCase().includes("btkp") || cleanLine.toLowerCase().includes("anomali legalitas") || cleanLine.toLowerCase().includes("stempel")) {
+                                adminViolationBannerHtml += `<div class="admin-violation-banner">⚠️ ${esc(cleanLine.replace(/⚠️ ANOMALI LEGALITAS:/gi, ''))}</div>`;
+                            } else {
+                                // Beri warna background khusus jika teks mengandung kata kunci krusial (RN/Anomali)
+                                let renderedLine = esc(cleanLine);
+                                if (cleanLine.toLowerCase().includes("rn") || cleanLine.toLowerCase().includes("renew") || cleanLine.toLowerCase().includes("ganti")) {
+                                    renderedLine = `<span class="text-highlight-rn">${renderedLine}</span>`;
+                                } else if (cleanLine.toLowerCase().includes("kurang") || cleanLine.toLowerCase().includes("anomali")) {
+                                    renderedLine = `<span class="text-highlight-fail">${renderedLine}</span>`;
+                                }
+                                certBulletItemsHtml += `<li>${renderedLine}</li>`;
+                            }
                         }
                     });
+                } else {
+                    certBulletItemsHtml += `<li>-</li>`;
+                }
+                certBulletItemsHtml += `</ul>`;
+
+                // 3. Kolom Referensi Quotation (Memecah List Array Penawaran)
+                let quotBulletItemsHtml = `<ul class="granular-bullet-list">`;
+                let rawQuotArray = item.referensi_quotation || [];
+                
+                if (typeof rawQuotArray === 'string') {
+                    rawQuotArray = rawQuotArray.split('\n');
                 }
 
-                reconciliationRowsHtml += `<tr>
+                if (Array.isArray(rawQuotArray) && rawQuotArray.length > 0) {
+                    rawQuotArray.forEach(line => {
+                        let cleanLine = line.trim();
+                        if (cleanLine !== "" && cleanLine !== "-") {
+                            quotBulletItemsHtml += `<li><strong>${esc(cleanLine)}</strong></li>`;
+                        }
+                    });
+                } else {
+                    quotBulletItemsHtml += `<li>Sesuai penawaran terlampir</li>`;
+                }
+                quotBulletItemsHtml += `</ul>`;
+
+                // 4. Penentuan Blok Label Status 4 Level (PASS / PARTIAL / REVIEW / FAIL)
+                let currentStatus = String(item.status || "PASS").toUpperCase();
+                let statusClass = "pass";
+                if (currentStatus === "FAIL") statusClass = "fail";
+                else if (currentStatus === "PARTIAL") statusClass = "partial";
+                else if (currentStatus === "REVIEW") statusClass = "review";
+
+                let rowClass = (currentStatus === "PASS") ? "row-match" : "row-anomali";
+
+                reconciliationRowsHtml += `<tr class="${rowClass}">
                     <td><b>${esc(item.sistem)}</b></td>
                     <td>${certBadgeContainer}</td>
                     <td>
-                        <span class="evidence-text-highlight">${esc(finalEvidenText || "Semua komponen tervalidasi patuh SOP")}</span>
-                        ${adminViolationInlineHtml}
+                        ${certBulletItemsHtml}
+                        ${adminViolationBannerHtml}
                     </td>
-                    <td><span class="quotation-text-ref">📋 ${esc(quotationRefText)}</span></td>
+                    <td>${quotBulletItemsHtml}</td>
                     <td align="center" style="vertical-align: middle;">
-                        <span class="cell-status-block ${statusClass}">${statusLabel}</span>
+                        <span class="cell-status-block ${statusClass}">${currentStatus}</span>
                     </td>
                 </tr>`;
-            }
-            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml;
+            });
+
+            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<tr><td colspan="5" align="center" style="padding:30px; font-weight:700; color:var(--success);">✅ DATA JSON REKONSILIASI KOSONG ATAU BELUM TERHUBUNG</td></tr>`;
 
             // Tab Certificate Registry
             let htmlCert = ""; let certGroups = {};
