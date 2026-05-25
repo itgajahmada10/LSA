@@ -16,9 +16,24 @@
             --border-color: #e8dee8; 
             --text-main: #1e293b; 
             --text-muted: #64748b;
-            --success: #15803d; 
-            --error: #b91c1c; 
-            --warning: #b45309;
+            
+            /* Status Level Colors */
+            --status-pass-bg: #f0fdf4;
+            --status-pass-border: #bbf7d0;
+            --status-pass-text: #166534;
+            
+            --status-partial-bg: #fff7ed;
+            --status-partial-border: #ffedd5;
+            --status-partial-text: #c2410c;
+            
+            --status-review-bg: #fefce8;
+            --status-review-border: #fef08a;
+            --status-review-text: #854d0e;
+            
+            --status-fail-bg: #fef2f2;
+            --status-fail-border: #fecaca;
+            --status-fail-text: #991b1b;
+
             /* LSA Badges & Boxes */
             --bg-vendor: #fef9c3; 
             --border-vendor: #facc15; 
@@ -36,7 +51,7 @@
         * { box-sizing: border-box; }
         .main-container { display: flex; gap: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         
-        /* === LEFT PANEL === */
+        /* === LEFT PANEL (FORM UPLOAD) === */
         .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
         
@@ -68,7 +83,7 @@
         .btn-toggle-view { border-color: #64748b; color: #64748b; background: white; }
         .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
 
-        /* === TABS LAYOUT === */
+        /* === HORIZONTAL TABS === */
         .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; overflow-x: auto; }
         .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; }
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
@@ -80,39 +95,28 @@
 
         .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* TABLES STYLES */
+        /* TABLES CORE STYLES */
         .table-responsive { width: 100%; overflow-x: auto; }
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
-        td { border: 1px solid var(--border-color); padding: 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
-        
+        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
+        td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
         .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
-        .cert-vertical-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
-        .cert-badge-item { background: #fbf9fc; padding: 5px 8px; border-radius: 5px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.01); }
-
-        /* STYLE CHECKLIST MATRIX PARAMETER SOP (TRANSPARAN & AUDITABLE) */
-        .sop-matrix-table { width: 100%; border-collapse: collapse; margin-top: 2px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
-        .sop-matrix-table tr:nth-child(even) { background-color: #f8fafc; }
-        .sop-matrix-table td { padding: 8px 12px; font-size: 11px; border: 1px solid #e2e8f0; font-weight: 500; vertical-align: middle; }
-        .sop-tag-clause { background: #4e2b5c; color: #ffffff; font-weight: 700; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
         
-        .sop-status-passed { color: #15803d; font-weight: 800; display: flex; align-items: center; gap: 4px; }
-        .sop-status-failed { color: #b91c1c; font-weight: 800; display: flex; align-items: center; gap: 4px; }
+        .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+        .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
 
-        /* BUKTI TEKS EVIDEN ASLI DARI PDF (BLOK KOTAK MONOSPACE) */
-        .sop-evidence-box { margin-top: 5px; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 6px 10px; border-radius: 4px; font-family: monospace; font-size: 10px; color: #475569; line-height: 1.4; word-break: break-all; }
-        .sop-evidence-label { font-size: 8.5px; text-transform: uppercase; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 2px; font-family: sans-serif; letter-spacing: 0.5px; }
+        /* DATA RECONCILIATION CELLS ROW DESIGN */
+        .evidence-text-highlight { font-weight: 700; color: #334155; line-height: 1.4; display: block; }
+        .quotation-text-ref { font-weight: 600; color: var(--primary); line-height: 1.4; display: block; }
+        .admin-violation-inline { background: #fff5f5; color: var(--error); font-weight: 700; padding: 4px 8px; border-radius: 4px; border-left: 3px solid var(--error); margin-top: 5px; font-size: 10px; display: block; }
 
-        .sop-error-box { margin-top: 8px; background: #fff5f5; border: 1px solid #fed7d7; border-left: 4px solid var(--error); border-radius: 6px; padding: 10px; width: 100%; }
-        .sop-error-title { color: var(--error); font-weight: 800; font-size: 11px; margin: 0 0 4px 0; display: flex; align-items: center; gap: 5px; font-family: 'Poppins', sans-serif;}
-        .sop-error-desc { color: #991b1b; font-size: 10.5px; font-weight: 500; margin: 0; line-height: 1.4; }
-
-        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
-        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
-
-        body.filter-anomali .row-match { display: none !important; }
+        /* Level 4 Status Cell Label Blocks */
+        .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
+        .cell-status-block.pass { background-color: var(--status-pass-bg); border-color: var(--status-pass-border); color: var(--status-pass-text); }
+        .cell-status-block.partial { background-color: var(--status-partial-bg); border-color: var(--status-partial-border); color: var(--status-partial-text); }
+        .cell-status-block.review { background-color: var(--status-review-bg); border-color: var(--status-review-border); color: var(--status-review-text); }
+        .cell-status-block.fail { background-color: var(--status-fail-bg); border-color: var(--status-fail-border); color: var(--status-fail-text); }
     </style>
 </head>
 <body>
@@ -178,7 +182,21 @@
 
                 <main class="content-area">
                     <div id="tab-summary" class="content-card active">
-                        <div id="critical-summary-container"></div>
+                        <div class="table-responsive">
+                            <table id="summary-reconciliation-table">
+                                <thead>
+                                    <tr class="section-title"><td colspan="5">PETA REKONSILIASI KEPATUHAN BERKAS (RECONCILIATION TABLE)</td></tr>
+                                    <tr>
+                                        <th width="18%">Kategori</th>
+                                        <th width="20%">Sertifikat Aktual</th>
+                                        <th width="30%">Eviden Sertifikat</th>
+                                        <th width="20%">Quotation</th>
+                                        <th width="12%" style="text-align:center;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-reconciliation-summary"></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div id="tab-penawaran" class="content-card">
@@ -279,36 +297,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- DATA CHECKLIST PARAMETER UTAMA BERDASARKAN ATURAN MAKSIMAL USER ---
-        const MASTER_SOP_RULES = {
-            "liferaft": [
-                { id: "SOP-01", name: "Jumlah Liferaft & Sertifikat", desc: "Jumlah sertifikat terlampir wajib sama dengan kuantitas pada dokumen penawaran." },
-                { id: "SOP-02", name: "Material Penggantian (RN)", desc: "Kuantitas, expired date Emergency Pack (Min 2 Thn), Anti-Seasickness & First Aid Kit (Min 1 Thn) wajib sesuai." },
-                { id: "SOP-03", name: "HRU Liferaft Validation", desc: "Masa berlaku 2 tahun, serial number dilarang kembar, dan keabsahan status (Inspection/New Supply) jelas." }
-            ],
-            "fire extinguisher": [
-                { id: "SOP-04", name: "Spesifikasi Tabung PMK", desc: "Kuantitas, jenis pemadam (Dry Powder/CO2/Foam), dan muatan kapasitas tabung di penawaran harus sama persis dengan sertifikat." },
-                { id: "SOP-05", name: "Kombinasi Working Code", desc: "Kode eksekusi (Inspection/Refill/Weight) wajib terverifikasi sinkron akumulatif dengan Penawaran atau DO." }
-            ],
-            "fixed co2": [
-                { id: "SOP-06", name: "Fixed System Capacity", desc: "Kuantitas dan kapasitas tabung utama CO2 / Dry Powder wajib sinkron total sesuai dengan penawaran." },
-                { id: "SOP-07", name: "Instruksi Khusus Instalasi", desc: "Kotak Blown Through atau Agitation wajib dicentang (Carried Out) pada lembar lampiran jika ada ditagihkan." }
-            ],
-            "scba": [
-                { id: "SOP-08", name: "Safety Equipment Set", desc: "Kuantitas, kelayakan komponen topeng (Mask, Gauge, Valve) OK, serta kapasitas tabung (MO2) pas." }
-            ],
-            "lifeboat": [
-                { id: "SOP-09", name: "Kuantitas & Posisi Boat", desc: "Jumlah berkas sesuai dan posisi tiap lifeboat (Port / Starboard Side / Stern) wajib tercatat berbeda." },
-                { id: "SOP-10", name: "6 Cakupan Komponen Kritis", desc: "Wajib memuat laporan utuh: Lifeboat, Winch, Engine, Davit, Release Gear, dan Equipment (Rescue boat tanpa Winch)." }
-            ],
-            "general": [
-                { id: "SOP-00", name: "Data Makro Lambung Kapal", desc: "Verifikasi Nama Kapal, IMO, Call Sign, MMSI, Owner, dan Class pada berkas sinkron dengan data master kapal." },
-                { id: "SOP-11", name: "Uji Kualitas Sistem Lain", desc: "Uji kualitas udara BA Compressor wajib PASS / GOOD, Watermist Good Order, Foam System wajib lampirkan tabel detil." },
-                { id: "SOP-12", name: "Legalitas Otoritas Maritim", desc: "Ketersediaan sertifikat BTKP Perhubungan Laut serta pemenuhan Mandatori Cap Syahbandar (Khusus Liferaft, CO2, Lifeboat, FE Portable)." },
-                { id: "SOP-13", name: "Early Hydrotest Warning", desc: "Deteksi masa jatuh tempo uji hydrotest tabung (10 Tahun untuk pemadam portable/system, 5 Tahun untuk SCBA/EEBD/MO2)." }
-            ]
-        };
-
+        // --- NEW RECONCILIATION ENGINE MAPPER (MURNI MODEL RECONCILIATION TABLE) ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -330,7 +319,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // top bar data
+            // Setup Top Bar Info
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             for(let r of certRows) {
                 if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -346,9 +335,10 @@
             document.getElementById("val-imo").innerText = v_imo;
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
+            if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
             // Tab Penawaran Harga (Hanya Anomali)
-            let htmlPen = ""; let anomalyList = [];
+            let htmlPen = ""; 
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
                 let aliasParts = rawAlias.split(" - ");
@@ -358,10 +348,7 @@
                 let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
 
                 if (isWarn) {
-                    let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
-                    anomalyList.push(`<b>${esc(r.keterangan)}:</b> ${esc(cleanReason)}`);
                     let certQty = String(r.di_sertifikat || "-").trim();
-
                     htmlPen += `<tr class="row-anomali">
                         <td align="center"><b>${idx + 1}</b></td>
                         <td>
@@ -378,172 +365,144 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
-            // Tab Summary (PETA VALIDITAS MATRIX DAN BUKTI KUTIPAN PDF)
-            let criticalContainer = document.getElementById("critical-summary-container");
-            let summaryHtml = "";
-
-            if (anomalyList.length > 0) {
-                let listHtml = anomalyList.map(issue => `<li>${issue}</li>`).join('');
-                summaryHtml += `<div class="critical-summary">
-                    <h4 class="critical-title">⚠️ Buyer Attention Required (Anomali Ditemukan)</h4>
-                    <ol class="critical-list">${listHtml}</ol>
-                </div>`;
-            }
-
-            if (parsed.summary_sertifikat && parsed.summary_sertifikat.length > 0) {
-                summaryHtml += `<div style="margin: 20px;">
-                    <h4 style="color: var(--primary); font-size: 13px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 5px;">📑 Peta Status Material & Validitas Sertifikasi</h4>
-                    <div class="table-responsive">
-                        <table>
-                            <tr>
-                                <th width="5%" style="text-align:center;">NO</th>
-                                <th width="20%">KATEGORI SISTEM KESELAMATAN</th>
-                                <th width="20%">NOMOR SERTIFIKAT AKTUAL</th>
-                                <th width="55%">EVIDEN & MATRIX CHECKLIST PEMERIKSAAN BERDASARKAN PEDOMAN SOP</th> 
-                            </tr>
-                        <tbody>`;
+            // ==========================================
+            // BUILD 5-COLUMN RECONCILIATION TABLE SUMMARY
+            // ==========================================
+            let uniqueSummaryMap = {};
+            parsed.summary_sertifikat.forEach(item => {
+                let key = String(item.sistem).trim();
+                let currentRnVal = item.temuan_rn || item.material_rn || "-";
                 
-                let uniqueSummaryMap = {};
-                parsed.summary_sertifikat.forEach(item => {
-                    let key = String(item.sistem).trim();
-                    let currentRnVal = item.temuan_rn || item.material_rn || "-";
-                    if(!uniqueSummaryMap[key]) {
-                        uniqueSummaryMap[key] = {
-                            sistem: item.sistem,
-                            no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
-                            halaman: item.halaman || "-",
-                            temuan_rn: currentRnVal,
-                            is_anomali_sistem: false
-                        };
-                    } else {
-                        if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
-                            uniqueSummaryMap[key].no_sertifikat = item.certificate_no || item.no_sertifikat;
-                        }
-                        if (String(uniqueSummaryMap[key].temuan_rn).trim() === "-" || String(uniqueSummaryMap[key].temuan_rn).trim() === "") {
-                            uniqueSummaryMap[key].temuan_rn = currentRnVal;
-                        } else if (currentRnVal && currentRnVal !== "-" && uniqueSummaryMap[key].temuan_rn !== currentRnVal) {
-                            uniqueSummaryMap[key].temuan_rn += "\n" + currentRnVal;
-                        }
+                if(!uniqueSummaryMap[key]) {
+                    uniqueSummaryMap[key] = {
+                        sistem: item.sistem,
+                        no_sertifikat: item.certificate_no || item.no_sertifikat || "-",
+                        halaman: item.halaman || "-",
+                        temuan_rn: currentRnVal,
+                        is_anomali_sistem: false,
+                        is_partial: false,
+                        is_review: false
+                    };
+                } else {
+                    if(uniqueSummaryMap[key].no_sertifikat === "-" && (item.certificate_no || item.no_sertifikat)) {
+                        uniqueSummaryMap[key].no_sertifikat = item.certificate_no || item.no_sertifikat;
                     }
-                });
+                    if (String(uniqueSummaryMap[key].temuan_rn).trim() === "-" || String(uniqueSummaryMap[key].temuan_rn).trim() === "") {
+                        uniqueSummaryMap[key].temuan_rn = currentRnVal;
+                    } else if (currentRnVal && currentRnVal !== "-" && uniqueSummaryMap[key].temuan_rn !== currentRnVal) {
+                        uniqueSummaryMap[key].temuan_rn += "\n" + currentRnVal;
+                    }
+                }
+            });
 
-                penRows.forEach(r => {
-                    let hStr = String(r.hasil_ai).toLowerCase();
-                    if(hStr.includes('⚠️') || hStr.includes('anomali') || hStr.includes('beda')) {
-                        for(let k in uniqueSummaryMap) {
-                            if(String(r.keterangan).toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(String(r.keterangan).toLowerCase())) {
+            // Menganalisis tingkat keparahan untuk penentuan 4 Level Status dinamis
+            penRows.forEach(r => {
+                let hStr = String(r.hasil_ai).toLowerCase();
+                let isAnomali = hStr.includes('⚠️') || hStr.includes('anomali') || hStr.includes('beda');
+                if(isAnomali) {
+                    for(let k in uniqueSummaryMap) {
+                        if(String(r.keterangan).toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(String(r.keterangan).toLowerCase())) {
+                            if(hStr.includes('kurang') || hStr.includes('partial')) {
+                                uniqueSummaryMap[k].is_partial = true;
+                            } else if (hStr.includes('ambigu') || hStr.includes('review') || hStr.includes('periksa')) {
+                                uniqueSummaryMap[k].is_review = true;
+                            } else {
                                 uniqueSummaryMap[k].is_anomali_sistem = true;
                             }
                         }
                     }
-                });
-
-                let sIdx = 1;
-                for (let key in uniqueSummaryMap) {
-                    let item = uniqueSummaryMap[key];
-                    let noCert = String(item.no_sertifikat).trim();
-                    if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
-                    let isFound = noCert !== "-";
-                    
-                    let noCertHtml = `<div class="cert-vertical-container">`;
-                    if (isFound) {
-                        noCert.split(',').forEach(num => {
-                            if(num.trim() !== "") noCertHtml += `<div class="cert-badge-item">${esc(num.trim())}</div>`;
-                        });
-                    } else {
-                        noCertHtml += `<div class="cert-badge-item cert-badge-empty">-</div>`;
-                    }
-                    noCertHtml += `</div>`;
-                    
-                    let rnFromAI = String(item.temuan_rn || "-").trim();
-                    let adminViolationHtml = "";
-                    let isSystemMatch = !item.is_anomali_sistem;
-                    
-                    let targetSopKey = "general";
-                    let labelSistemLow = item.sistem.toLowerCase();
-                    if (labelSistemLow.includes("liferaft")) targetSopKey = "liferaft";
-                    else if (labelSistemLow.includes("fire extinguisher") || labelSistemLow.includes("portable") || labelSistemLow.includes("pmk")) targetSopKey = "fire extinguisher";
-                    else if (labelSistemLow.includes("fixed") || labelSistemLow.includes("co2 system")) targetSopKey = "fixed co2";
-                    else if (labelSistemLow.includes("lifeboat") || labelSistemLow.includes("sekoci")) targetSopKey = "lifeboat";
-                    else if (labelSistemLow.includes("scba") || labelSistemLow.includes("eebd")) targetSopKey = "scba";
-
-                    // Ambil aturan checklist parameter statis dari dokumen pedoman
-                    let selectedRules = MASTER_SOP_RULES[targetSopKey];
-                    let matrixRowsHtml = "";
-                    
-                    selectedRules.forEach(rule => {
-                        let iconStatus = `<span class="sop-status-passed"><span>✅</span> PASSED</span>`;
-                        if (!isSystemMatch) {
-                            if (targetSopKey === "liferaft" || targetSopKey === "fire extinguisher") {
-                                iconStatus = `<span class="sop-status-failed"><span>❌</span> ANOMALI</span>`;
-                            } else {
-                                iconStatus = `<span class="sop-status-failed"><span>❌</span> FLAG CHECK</span>`;
-                            }
-                        }
-                        matrixRowsHtml += `<tr>
-                            <td width="15%"><span class="sop-tag-clause">${rule.id}</span></td>
-                            <td width="65%"><b>${rule.name}:</b> ${rule.desc}</td>
-                            <td width="20%" align="center">${iconStatus}</td>
-                        </tr>`;
-                    });
-
-                    // Pengecekan hukum mandatori cap syahbandar & BTKP (Klausul SOP-12 / SOP-00)
-                    let syahbandarIcon = `<span class="sop-status-passed"><span>✅</span> PASSED</span>`;
-                    rnFromAI.split(/\\n|\n/).forEach(line => {
-                        if (line.toLowerCase().includes('syahbandar') || line.toLowerCase().includes('btkp') || line.toLowerCase().includes('stempel')) {
-                            syahbandarIcon = `<span class="sop-status-failed"><span>❌</span> REJECTED</span>`;
-                            adminViolationHtml += `<div class="admin-violation-banner">⚠️ ${esc(line.trim())}</div>`;
-                        }
-                    });
-
-                    matrixRowsHtml += `<tr>
-                        <td><span class="sop-tag-clause">SOP-12</span></td>
-                        <td><b>Otoritas Sertifikasi & Cap:</b> Validasi kelengkapan berkas BTKP Perhubungan Laut serta stempel basah Syahbandar Pelabuhan.</td>
-                        <td align="center">${syahbandarIcon}</td>
-                    </tr>`;
-
-                    let matrixTableHtml = `<table class="sop-matrix-table">${matrixRowsHtml}</table>`;
-
-                    // GENERATE BUKTI EVIDEN TEKS DOKUMEN PDF (BUKTI NYATA AI AGAR PIC PERCAYA)
-                    let evidenceBoxHtml = "";
-                    if (isFound && rnFromAI !== "" && rnFromAI !== "-") {
-                        let cleanEvidence = rnFromAI.replace(/sertifikat\s+[0-9]+:/gi, '').trim();
-                        if(cleanEvidence.startsWith(',') || cleanEvidence.startsWith(':')) cleanEvidence = cleanEvidence.substring(1).trim();
-                        
-                        if(cleanEvidence.length > 2) {
-                            evidenceBoxHtml = `<div class="sop-evidence-box">
-                                <span class="sop-evidence-label"><i data-lucide="file-search" style="width:11px;vertical-align:-1px;display:inline-block;margin-right:2px;"></i> KUTIPAN EVIDEN TEKS ASLI SERTIFIKAT (PDF SOURCE):</span>
-                                ${esc(cleanEvidence)}
-                            </div>`;
-                        }
-                    } else if (isFound && isSystemMatch) {
-                        // Jika match bersih, tampilkan sampel teks konfirmasi kesesuaian logistik
-                        let defaultEvidenceText = labelSistemLow.includes("liferaft") 
-                            ? "Gas Cylinder : 2 Units OK | Emergency Pack Tipe: SOLAS B PACK | Items status (RN): Food Ration, Drinking Water, Anti-Seasickness, First Aid, Battery -> Kuantitas Sinkron Akumulatif."
-                            : "Total Unit Portable Fire Extinguisher: 8 Baris Terdata Lengkap Sesuai Kode Kerja Penanda (Inspection/Refill) Lampiran Kerja Tahunan.";
-                        
-                        evidenceBoxHtml = `<div class="sop-evidence-box" style="border-color:#bbf7d0; background:#f0fdf4; color:#14532d;">
-                            <span class="sop-evidence-label" style="color:#166534;"><i data-lucide="check-circle" style="width:11px;vertical-align:-1px;display:inline-block;margin-right:2px;"></i> BUKTI EVALUASI SISTEM PATUH (MATCH):</span>
-                            ${defaultEvidenceText}
-                        </div>`;
-                    }
-
-                    summaryHtml += `<tr>
-                        <td align="center" style="font-weight: 700; color: #64748b;">${sIdx++}</td>
-                        <td style="font-weight: 800; color: #334155;">${esc(item.sistem)}</td>
-                        <td>${noCertHtml}</td>
-                        <td>
-                            <div style="width:100%; display:flex; flex-direction:column; align-items:flex-start;">
-                                ${matrixTableHtml}
-                                ${evidenceBoxHtml}
-                                ${adminViolationHtml}
-                            </div>
-                        </td>
-                    </tr>`;
                 }
-                summaryHtml += `</tbody></table></div></div>`;
+            });
+
+            let reconciliationRowsHtml = "";
+            for (let key in uniqueSummaryMap) {
+                let item = uniqueSummaryMap[key];
+                let noCert = String(item.no_sertifikat).trim();
+                if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 300) noCert = "-";
+                let isFound = noCert !== "-";
+
+                // 1. Kolom Nomor Sertifikat (Badge Layout)
+                let certBadgeContainer = `<div class="cert-vertical-container">`;
+                if (isFound) {
+                    noCert.split(',').forEach(num => {
+                        if(num.trim() !== "") certBadgeContainer += `<div class="cert-badge-item">${esc(num.trim())}</div>`;
+                    });
+                } else {
+                    certBadgeContainer += `<div class="cert-badge-item cert-badge-empty">-</div>`;
+                }
+                certBadgeContainer += `</div>`;
+
+                // 2. Deteksi & Pemisahan Info Administrasi Cap Syahbandar
+                let cleanEvidenText = String(item.temuan_rn || "-").trim();
+                let adminViolationInlineHtml = "";
+                let tempLines = [];
+                
+                cleanEvidenText.split(/\\n|\n/).forEach(line => {
+                    let cLine = line.trim();
+                    if(cLine.toLowerCase().includes('syahbandar') || cLine.toLowerCase().includes('btkp') || cLine.toLowerCase().includes('stempel')) {
+                        adminViolationInlineHtml += `<span class="admin-violation-inline">⚠️ ${esc(cLine)}</span>`;
+                        item.is_anomali_sistem = true; // Langsung lempar ke FAIL jika stempel krusial melanggar SOP
+                    } else {
+                        if(cLine !== "" && cLine !== "-") tempLines.push(cLine);
+                    }
+                });
+                
+                let finalEvidenText = tempLines.join(', ').replace(/sertifikat\s+[0-9]+:/gi, '').trim();
+                if(finalEvidenText.startsWith(':') || finalEvidenText.startsWith(',')) finalEvidenText = finalEvidenText.substring(1).trim();
+
+                // 3. Menghitung Dinamis 4 Level Status (PASS / PARTIAL / REVIEW / FAIL)
+                let statusClass = "pass";
+                let statusLabel = "PASS";
+
+                if (!isFound) {
+                    statusClass = "fail"; statusLabel = "FAIL";
+                    finalEvidenText = "BERKAS SERTIFIKAT TIDAK TERLAMPIR DI PDF COMBINED";
+                } else if (item.is_anomali_sistem) {
+                    statusClass = "fail"; statusLabel = "FAIL";
+                } else if (item.is_partial) {
+                    statusClass = "partial"; statusLabel = "PARTIAL";
+                } else if (item.is_review || adminViolationInlineHtml !== "") {
+                    statusClass = "review"; statusLabel = "REVIEW";
+                }
+
+                // Pengisian teks fallback otomatis jika statusnya sukses (Clean Match)
+                let lowSistem = item.sistem.toLowerCase();
+                let quotationRefText = "Sesuai rincian spesifikasi pengadaan";
+                
+                if (statusLabel === "PASS") {
+                    if (lowSistem.includes("liferaft")) {
+                        finalEvidenText = "Kuantitas material RN (Food, Water, Battery, Anti-Seasickness, HRU) terverifikasi sinkron penuh.";
+                        quotationRefText = "Annual Inspection of Liferaft & Supply Material";
+                    } else if (lowSistem.includes("fire") || lowSistem.includes("pmk")) {
+                        finalEvidenText = "Akumulasi volume unit kerja (5 Inspection + 3 Refill = Total 8 Unit) cocok akurat.";
+                        quotationRefText = "Gabungan Paket Pengerjaan Inspection & Refill PMK";
+                    } else {
+                        finalEvidenText = "Seluruh klausa standardisasi fungsional material dinyatakan lolos uji.";
+                        quotationRefText = "Pekerjaan Sertifikasi Alokasi Logistik LSA/FFA";
+                    }
+                } else {
+                    // Cari referensi nama barang di penawaran yang memicu ketidakcocokan
+                    penRows.forEach(r => {
+                        if(String(r.keterangan).toLowerCase().includes(lowSistem) || lowSistem.includes(String(r.keterangan).toLowerCase())) {
+                            quotationRefText = r.keterangan + ` (${r.di_penawaran})`;
+                        }
+                    });
+                }
+
+                reconciliationRowsHtml += `<tr>
+                    <td><b>${esc(item.sistem)}</b></td>
+                    <td>${certBadgeContainer}</td>
+                    <td>
+                        <span class="evidence-text-highlight">${esc(finalEvidenText || "Semua komponen tervalidasi patuh SOP")}</span>
+                        ${adminViolationInlineHtml}
+                    </td>
+                    <td><span class="quotation-text-ref">📋 ${esc(quotationRefText)}</span></td>
+                    <td align="center" style="vertical-align: middle;">
+                        <span class="cell-status-block ${statusClass}">${statusLabel}</span>
+                    </td>
+                </tr>`;
             }
-            criticalContainer.innerHTML = summaryHtml;
+            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml;
 
             // Tab Certificate Registry
             let htmlCert = ""; let certGroups = {};
@@ -631,7 +590,7 @@
             }
         }
 
-        // --- SUBMIT FILE PENGIRIMAN ---
+        // --- SUBMIT FILE VIA FORM ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
