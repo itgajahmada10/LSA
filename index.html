@@ -166,10 +166,11 @@
         </div>
     </div>
 
-    <script>
+<script>
         lucide.createIcons();
-        const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/277b56f1-5761-412a-9be5-86298d5aa5de";
-        const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-audit-status";
+        // 1. URL DIKEMBALIKAN KE SISTEM LSA LAMA
+        const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+        const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         let pollingInterval;
 
         function renderTable(auditData) {
@@ -302,12 +303,30 @@
         async function checkStatus(jobId) {
             try {
                 let res = await fetch(`${STATUS_URL}?job_id=${jobId}`);
-                let json = await res.json();
-                if (json.status === "completed" || Array.isArray(json)) {
+                let text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return; // Cegah error JSON jika response mentah
+                
+                let json = JSON.parse(text);
+                
+                // Menyesuaikan logika deteksi status LSA lama (Mencari array atau status 'completed')
+                let rows = Array.isArray(json) ? json : (json.data || [json]);
+                let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
+
+                if (json.status === "completed" || ourRow) {
                     clearInterval(pollingInterval);
-                    renderTable(Array.isArray(json) ? json : json.data);
+                    
+                    // Rekonstruksi Payload JSON (Mencegah terpotong seperti di LSA lama)
+                    let fullPayloadStr = ""; 
+                    if(ourRow && ourRow["Payload1"]) {
+                        for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
+                        renderTable(JSON.parse(fullPayloadStr));
+                    } else {
+                        renderTable(Array.isArray(json) ? json : json.data);
+                    }
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.log("Polling timeout/error", e);
+            }
         }
 
         document.getElementById('auditForm').onsubmit = async (e) => {
@@ -324,22 +343,22 @@
             const fd = new FormData();
             fd.append('job_id', id);
             
+            // 2. VARIABEL DIKEMBALIKAN KE BAHASA INDONESIA SESUAI N8N LAMA
             if (document.getElementById('quotationFile').files[0]) {
-                fd.append('Quotation', document.getElementById('quotationFile').files[0]);
+                fd.append('penawaran', document.getElementById('quotationFile').files[0]);
             }
             if (document.getElementById('certFile').files[0]) {
-                fd.append('Certificate', document.getElementById('certFile').files[0]);
+                fd.append('sertifikat', document.getElementById('certFile').files[0]);
             }
-            // Mencegah error jika field DO dibiarkan kosong
             if (document.getElementById('deliveryFile').files[0]) {
-                fd.append('Delivery_Order', document.getElementById('deliveryFile').files[0]);
+                fd.append('surat_jalan', document.getElementById('deliveryFile').files[0]);
             }
 
             try {
                 const req = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
                 if (!req.ok) throw new Error("Connection to N8N failed.");
                 document.getElementById('pollingCard').style.display = 'block';
-                pollingInterval = setInterval(() => checkStatus(id), 3000);
+                pollingInterval = setInterval(() => checkStatus(id), 8000); // Waktu poll dikembalikan ke 8 detik sesuai sistem lama
             } catch (err) {
                 errorBox.style.display = 'block';
                 errorBox.innerText = err.message;
@@ -349,5 +368,4 @@
             }
         };
     </script>
-</body>
 </html>
