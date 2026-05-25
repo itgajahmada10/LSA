@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSA Audit Portal — Waruna Group</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <title>Waruna LSA Audit — V7 Pro Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         /* === CORE VARIABLES (MANUALBOOK UI + LSA TABLES) === */
@@ -14,10 +14,12 @@
             --primary-light: #fbf9fc;
             --bg-card: #ffffff; 
             --border-color: #e8dee8; 
-            --text-main: #333333; 
+            --text-main: #1e293b; 
             --text-muted: #64748b;
             --success: #15803d; 
             --error: #b91c1c; 
+            --warning: #b45309;
+            /* LSA Badges & Boxes */
             --bg-vendor: #fef9c3; 
             --border-vendor: #facc15; 
             --bg-system: #e0f2fe; 
@@ -34,13 +36,13 @@
         * { box-sizing: border-box; }
         .main-container { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; max-width: 1500px; margin: 0 auto; align-items: flex-start; }
         
-        /* === LEFT PANEL (FORM) === */
+        /* === LEFT PANEL (FORM UPLOAD) === */
         .left-panel { flex: 1; min-width: 320px; max-width: 380px; position: sticky; top: 30px; }
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); }
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
         label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
-        .upload-section { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #b59ebc; background: #fbf9fc;}
+        .upload-section { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #b59ebc; background: #fbf9fc; transition: 0.3s;}
         input[type="file"] { width: 100%; padding: 8px; background-color: #fff; border-radius: 6px; border: 1px solid #ccc; font-size: 11px; cursor: pointer;}
         .btn-submit { background-color: var(--primary); color: white; border: none; padding: 15px; width: 100%; font-size: 14px; font-family: 'Poppins', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; text-transform: uppercase; }
         .btn-submit:hover { background-color: var(--primary-hover); }
@@ -71,7 +73,7 @@
 
         /* TABS LAYOUT */
         .main-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
-        .sidebar { display: flex; flex-direction: column; gap: 10px; }
+        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 30px; }
         .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 12px; }
         .nav-item:hover { border-color: var(--primary); background: #fbf9fc; }
         .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
@@ -82,35 +84,35 @@
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* SUMMARY STYLES */
+        /* SUMMARY STYLES (Identik dengan LSA Lama) */
         .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 5px solid var(--error); }
         .critical-title { color: var(--error); font-size: 14px; font-weight: 800; margin-top: 0; margin-bottom: 5px; }
         .critical-subtitle { font-size: 11px; color: #991b1b; margin-top: 0; margin-bottom: 15px; font-style: italic; }
         .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 11px; line-height: 1.6; font-weight: 500; }
         .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px; border-left: 5px solid var(--success); }
 
-        /* TABLES STYLES (From LSA Lama) */
+        /* TABLES STYLES (Identik dengan LSA Lama) */
         .table-responsive { width: 100%; overflow-x: auto; }
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        th { background-color: var(--primary-light); color: var(--primary); padding: 10px 8px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
-        td { border: 1px solid var(--border-color); padding: 8px 8px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
+        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
+        td { border: 1px solid var(--border-color); padding: 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
         
-        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 10px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; }
+        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
         .group-header td { background-color: #e2e8f0; font-weight: 800; color: #1e293b; font-size: 11px; padding: 10px 15px; }
         
-        /* DATA CONTAINERS */
+        /* DATA CONTAINERS (Identik dengan LSA Lama) */
         .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 4px 6px; border-radius: 3px; margin-bottom: 4px; font-weight: 700; color: #713f12; font-size: 11px; }
         .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 4px 6px; border-radius: 3px; margin-bottom: 4px; font-weight: 600; color: #0369a1; font-size: 10px; }
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 4px 6px; border-radius: 3px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
         
         .badge-rn { background-color: var(--bg-rn); border: 1px solid var(--border-rn); color: var(--text-rn); font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
         .badge-ok { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 700; padding: 2px 5px; border-radius: 3px; display: inline-block; font-size: 9px; text-transform: uppercase; }
-        .doc-val { background: #f8fafc; padding: 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600; font-size: 11px; }
+        .doc-val { background: #fbf9fc; padding: 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 600; font-size: 11px; }
         
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
 
-        .explanation-row td { background-color: #f8fafc; border-top: none; padding: 8px 15px; }
+        .explanation-row td { background-color: #fbf9fc; border-top: none; padding: 8px 15px; }
         .ai-note { padding: 8px 12px; border-radius: 6px; font-size: 11px; line-height: 1.5; font-weight: 500; }
         .ai-note.err { background: #fef2f2; border-left: 4px solid var(--error); color: var(--error); }
         .ai-note.ok { background: #f0fdf4; border-left: 4px solid var(--success); color: var(--success); }
@@ -121,8 +123,8 @@
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .sidebar, .action-buttons, .filter-btn { display: none !important; }
-            .main-container { display: block; max-width: 100%; }
+            .left-panel, .sidebar, .action-buttons, .filter-btn, .header, form { display: none !important; }
+            .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
             .card-box { padding: 0; border: none; box-shadow: none; }
             .main-layout { display: block; }
@@ -237,16 +239,13 @@
     <script>
         lucide.createIcons();
         
-        // Configuration
+        // --- KONFIGURASI WEBHOOK n8n ---
         const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         
-        let pollingInterval;
-        let timerInterval;
-        let isFilter = false;
-        let currentShipName = "LSA_Audit_Report";
+        let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
 
-        // --- UI Interactions ---
+        // --- INTERAKSI UI ---
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
             el.innerHTML = msg; 
@@ -279,7 +278,6 @@
             var u = clone.querySelector('.left-panel'); if(u) u.parentNode.removeChild(u);
             var actionBtns = clone.querySelector('.action-buttons'); if(actionBtns) actionBtns.parentNode.removeChild(actionBtns);
             
-            // Expand right panel
             var rp = clone.querySelector('.right-panel');
             if(rp) rp.style.width = '100%';
 
@@ -290,7 +288,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
-        // --- Data Rendering (From LSA Lama) ---
+        // --- RENDER TABEL & LOGIKA MAPPING (IDENTIK DENGAN LSA LAMA & MT CHIRA) ---
         function renderAuditReport(parsed) {
             if (Array.isArray(parsed)) {
                 let combined = { tabel_audit: [], summary_sertifikat: [] };
@@ -312,7 +310,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // 1. Populate Top Bar
+            // 1. Setup Top Bar
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             for(let r of certRows) {
                 if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
@@ -330,7 +328,7 @@
             document.getElementById("val-owner").innerText = v_own;
             if(v_name !== "-") currentShipName = "Audit_LSA_" + v_name.replace(/\s+/g, '_');
 
-            // 2. Render Tabel Penawaran
+            // 2. Tab Penawaran (Quotation)
             let htmlPen = ""; let anomalyList = [];
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
@@ -384,7 +382,7 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-            // 3. Render TAB SUMMARY
+            // 3. Tab Summary
             let criticalContainer = document.getElementById("critical-summary-container");
             let summaryHtml = "";
 
@@ -517,7 +515,7 @@
             }
             criticalContainer.innerHTML = summaryHtml;
 
-            // 4. Render Tabel Sertifikat
+            // 4. Tab Sertifikat
             let htmlCert = ""; let certGroups = {};
             certRows.forEach(r => {
                 let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
@@ -558,22 +556,37 @@
             document.getElementById("body-sertifikat").innerHTML = htmlCert;
         }
 
-        // --- Data Fetching & Submission ---
+        // --- SISTEM POLLING ANTI-CACHE ---
         async function checkStatus(jobId) {
             try {
-                let res = await fetch(`${STATUS_URL}?job_id=${jobId}`);
+                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, {
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                });
+                
                 let text = await res.text();
                 if(!text || text.trim().charAt(0) === "<") return;
                 
                 let json = JSON.parse(text);
+                console.log(`[Polling n8n] Cek Job ID: ${jobId}`, json);
+
                 let rows = Array.isArray(json) ? json : (json.data || [json]);
                 let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
 
-                if (json.status === "processing" || !ourRow) return;
+                if (json.status === "processing" || !ourRow) {
+                    return; 
+                }
 
+                // DATA DITEMUKAN: Stop interval, ubah tampilan
                 clearInterval(pollingInterval);
                 clearInterval(timerInterval);
                 
+                document.getElementById('pollingCard').style.display = 'none';
+                document.getElementById('reportPanel').style.display = 'block';
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                
+                // Mencegah terpotongnya JSON dari struktur Google Sheet
                 let fullPayloadStr = ""; 
                 if(ourRow["Payload1"]) {
                     for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
@@ -583,11 +596,22 @@
                 } else {
                     renderAuditReport(Array.isArray(json) ? json : json.data);
                 }
+                
+                lucide.createIcons();
+                
             } catch (e) {
-                console.log("Polling error:", e);
+                console.error("Polling error / JSON parse error:", e);
+                clearInterval(pollingInterval);
+                clearInterval(timerInterval);
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                showMessage("Koneksi polling gagal atau JSON terpotong. Cek log console (F12).", true);
+                lucide.createIcons();
             }
         }
 
+        // --- SUBMIT PENGIRIMAN FILE ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
