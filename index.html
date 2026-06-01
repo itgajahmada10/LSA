@@ -3,583 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7 Pro Enterprise Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <title>Waruna Group | Smart Audit LSA V7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* === CORE VARIABLES (MURNI WARNA V7 PRO) === */
-        :root { 
-            --primary: #4e2b5c; 
-            --primary-hover: #3b1e47; 
-            --primary-light: #fbf9fc;
-            --bg-card: #ffffff; 
-            --border-color: #e8dee8; 
-            --text-main: #1e293b; 
-            --text-muted: #64748b;
-            
-            /* 4 Level Status Colors */
-            --status-pass-bg: #f0fdf4;
-            --status-pass-border: #bbf7d0;
-            --status-pass-text: #166534;
-            
-            --status-partial-bg: #fff7ed;
-            --status-partial-border: #ffedd5;
-            --status-partial-text: #c2410c;
-            
-            --status-review-bg: #fefce8;
-            --status-review-border: #fef08a;
-            --status-review-text: #854d0e;
-            
-            --status-fail-bg: #fef2f2;
-            --status-fail-border: #fecaca;
-            --status-fail-text: #991b1b;
-
-            /* LSA Badges & Boxes */
-            --bg-vendor: #fef9c3; 
-            --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; 
-            --border-system: #7dd3fc;
-            --bg-code: #f0fdf4; 
-            --border-code: #86efac;     
-            --bg-rn: #fae8ff;
-            --border-rn: #e9d5ff;
-            --text-rn: #701a75;
+        :root {
+            --primary: #1e3a8a; --primary-light: #eff6ff; 
+            --border-color: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #15803d; --error: #b91c1c;
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
+            --bg-system: #e0f2fe; --border-system: #7dd3fc; 
+            --bg-code: #f0fdf4; --border-code: #86efac;     
         }
-
-        /* === STRUCTURAL LAYOUT === */
-        body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
+        
+        body { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-main); background: #f1f5f9; margin: 0; padding: 0; line-height: 1.3; }
         * { box-sizing: border-box; }
-        .main-container { display: flex; gap: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        
-        /* === LEFT PANEL (FORM UPLOAD) === */
-        .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); }
-        .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
-        
-        .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
-        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
-        .upload-section { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #b59ebc; background: #fbf9fc; transition: 0.3s;}
-        input[type="file"] { width: 100%; padding: 8px; background-color: #fff; border-radius: 6px; border: 1px solid #ccc; font-size: 11px; cursor: pointer;}
-        .btn-submit { background-color: var(--primary); color: white; border: none; padding: 15px; width: 100%; font-size: 14px; font-family: 'Poppins', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; text-transform: uppercase; }
-        .btn-submit:hover { background-color: var(--primary-hover); }
-        .btn-submit:disabled { background-color: #9b8a9f; cursor: not-allowed; }
-        #ui-message { display: none; margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
-        /* === RIGHT PANEL === */
-        .right-panel { flex: 1; min-width: 0; width: 100%; transition: all 0.4s ease; }
-        .top-info-bar { background: #fbf9fc; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .ship-info { display: flex; gap: 25px; align-items: center; flex-wrap: wrap; }
+        /* UPLOAD SECTION */
+        #upload-section { max-width: 900px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .app-title { text-align: center; color: var(--primary); font-size: 20px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; }
+        .upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 15px; text-align: center; background: #f8fafc; }
+        .upload-zone.has-file { border-color: var(--success); background: #f0fdf4; border-style: solid; }
+        .uz-label { display: block; font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+        .file-input { width: 100%; font-size: 10px; cursor: pointer; }
+        .btn-run { width: 100%; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
+        #ui-message { display: none; margin-bottom: 15px; padding: 10px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
+
+        /* LOADING */
+        .loading-box { display: none; text-align: center; padding: 40px; background: #fff; border-radius: 12px; max-width: 900px; margin: 40px auto; border: 1px solid var(--border-color); }
+        .loading-box.show { display: block; }
+        .spinner { width: 40px; height: 40px; margin: 0 auto 15px; border: 4px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* DASHBOARD LAYOUT */
+        #dashboard-section { display: none; padding: 15px; max-width: 1300px; margin: 0 auto; }
+        .top-info-bar { background: #fff; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); position: sticky; top: 10px; z-index: 1000; }
+        .ship-info { display: flex; gap: 20px; align-items: center; }
         .info-box { display: flex; flex-direction: column; }
-        .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        .info-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
         .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
-        
-        .action-buttons { display: flex; gap: 10px; }
-        .btn-modern { padding: 8px 15px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; border: 1px solid var(--primary); }
-        .btn-simple { background: white; color: var(--primary); }
-        .btn-simple:hover { background: #fbf9fc; }
-        .btn-full { background: var(--primary); color: white; }
-        .btn-full:hover { background: var(--primary-hover); }
-        .btn-toggle-view { border-color: #64748b; color: #64748b; background: white; }
-        .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
+        .btn-action { padding: 8px 15px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
-        /* === HORIZONTAL TABS === */
-        .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; overflow-x: auto; }
-        .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; }
-        .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+        .main-layout { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start; }
+        .sidebar { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 90px; }
+        .nav-item { padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .nav-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .filter-btn { background: #fff; color: var(--error); border: 1px solid var(--error); }
+        .filter-btn.active { background: var(--error); color: #fff; }
 
-        .filter-btn { margin-left: auto; color: var(--error); border: 1px solid var(--border-color); background: white; border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; margin-bottom: 6px; white-space: nowrap; }
-        .filter-btn:hover { background: #fef2f2; border-color: var(--error); }
-        .filter-btn.active { background: var(--error); color: #fff; border-color: var(--error); }
-
-        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
+        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .critical-summary { background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--error); }
+        .critical-title { color: var(--error); font-size: 16px; font-weight: 800; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .critical-subtitle { font-size: 12px; color: #991b1b; margin-top: 0; font-style: italic; margin-bottom: 15px; }
+        .critical-list { margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 12px; line-height: 1.6; }
+        .success-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px; border-left: 4px solid var(--success); }
 
-        /* TABLES CORE STYLES */
         .table-responsive { width: 100%; overflow-x: auto; }
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
-        td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
-        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
+        th { background-color: var(--primary-light); color: var(--primary); padding: 8px 5px; font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; }
+        td { border: 1px solid var(--border-color); padding: 6px 5px; font-size: 10px; vertical-align: top; word-wrap: break-word; }
         
-        .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-        .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
-
-        /* GRANULAR BULLET LIST STYLES (ANTI-NOISE) */
-        .granular-bullet-list { margin: 0; padding-left: 14px; list-style-type: disc; color: #334155; }
-        .granular-bullet-list li { margin-bottom: 4px; font-weight: 600; line-height: 1.4; font-size: 11px; }
-        .granular-bullet-list li strong { color: #0f172a; }
+        .section-title td { background-color: var(--primary); color: white; font-weight: 700; padding: 8px 10px; font-size: 12px; text-transform: uppercase; }
+        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 11px; padding: 8px; }
         
-        /* Highlight khusus untuk item yang berstatus RN/Anomali di dalam list */
-        .text-highlight-rn { color: #701a75 !important; background: #fae8ff; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
-        .text-highlight-fail { color: #b91c1c !important; background: #fef2f2; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
-
-        .admin-violation-banner { width: 100%; background: #fff5f5; border-left: 4px solid var(--error); border-radius: 4px; padding: 6px 10px; font-size: 10.5px; font-weight: 700; color: var(--error); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
-
-        /* Level 4 Status Badge Label Blocks */
-        .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
-        .cell-status-block.pass { background-color: var(--status-pass-bg); border-color: var(--status-pass-border); color: var(--status-pass-text); }
-        .cell-status-block.partial { background-color: var(--status-partial-bg); border-color: var(--status-partial-border); color: var(--status-partial-text); }
-        .cell-status-block.review { background-color: var(--status-review-bg); border-color: var(--status-review-border); color: var(--status-review-text); }
-        .cell-status-block.fail { background-color: var(--status-fail-bg); border-color: var(--status-fail-border); color: var(--status-fail-text); }
-
+        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; }
+        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; }
+        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-family: monospace; }
+        
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
+        .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
+        .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; }
+        .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
+        .ai-note.ok { background: #f0fdf4; border-left: 3px solid var(--success); color: var(--success); }
 
         body.filter-anomali .row-match { display: none !important; }
-
-        /* === PRINT STYLES === */
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .tabs-container, .action-buttons, .filter-btn, .header, form { display: none !important; }
-            .main-container { display: block; max-width: 100%; gap: 0; }
-            .right-panel { display: block; width: 100%; min-width: 0; }
-            .card-box { padding: 0; border: none; box-shadow: none; }
-            .content-card { display: block !important; margin-bottom: 30px; border: none; }
-            table { font-size: 9px; page-break-inside: auto; }
-            tr, td, th { page-break-inside: avoid; }
-        }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        
-        <div class="left-panel" id="uploadPanel">
-            <div class="card-box">
-                <div class="header">
-                    <h2><i data-lucide="shield-check"></i> Verification</h2>
-                    <p style="color: #666; font-size: 12px; font-weight:500;">AI LSA System</p>
-                </div>
-                <form id="auditForm">
-                    <div class="upload-section">
-                        <label><i data-lucide="file-text" style="width:14px; vertical-align:-2px;"></i> 1. Quotation Document</label>
-                        <input type="file" id="quotationFile" accept=".pdf" required>
-                    </div>
-                    <div class="upload-section">
-                        <label><i data-lucide="file-badge" style="width:14px; vertical-align:-2px;"></i> 2. Certificate Report</label>
-                        <input type="file" id="certFile" accept=".pdf" required>
-                    </div>
-                    <div class="upload-section">
-                        <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional)</label>
-                        <input type="file" id="deliveryFile" accept=".pdf">
-                    </div>
-                    <div style="margin-bottom: 15px; font-size: 10px; color: #701a75; font-weight: 700; text-align: center;">0---0---0---0 PROCESSING AI SYSTEM</div>
-                    <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
-                    <div id="ui-message"></div>
-                </form>
-            </div>
+
+<div id="upload-section">
+    <div class="app-title">Waruna LSA Audit - V7 Final</div>
+    <div id="ui-message"></div>
+    <div class="upload-grid">
+        <div class="upload-zone" id="zone-p"><span class="uz-label">Quotation Document</span><input type="file" id="file-penawaran" class="file-input" accept="application/pdf"></div>
+        <div class="upload-zone" id="zone-s"><span class="uz-label">Certificate Report</span><input type="file" id="file-sertifikat" class="file-input" accept="application/pdf"></div>
+        <div class="upload-zone" id="zone-d"><span class="uz-label">Delivery Order</span><input type="file" id="file-do" class="file-input" accept="application/pdf"></div>
+    </div>
+    <button type="button" id="btn-run" class="btn-run">RUN COMPREHENSIVE VERIFICATION</button>
+</div>
+
+<div class="loading-box" id="loading">
+    <div class="spinner"></div>
+    <h3 style="margin-top:0; color:var(--text-main);">AI is processing document...</h3>
+    <div id="loading-txt" style="color: var(--text-muted); font-size: 13px; font-weight: 600;">(Waiting time: 0 seconds)</div>
+</div>
+
+<div id="dashboard-section">
+    <div class="top-info-bar">
+        <div class="ship-info">
+            <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
+            <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
+            <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
+            <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
         </div>
-
-        <div class="right-panel">
-            <div id="pollingCard" class="card-box" style="display: none; text-align: center; padding: 60px 20px;">
-                <div class="loader"></div>
-                <h2>Analyzing...</h2>
-                <div id="loading-txt" style="color: #666; font-size: 13px; font-weight: 600; margin-bottom: 10px;">(Waiting time: <b>0</b> seconds)</div>
-                <p style="color: #666; font-size: 11px;">Performing Triangulation Data via N8N Architecture</p>
-            </div>
-
-            <div id="reportPanel" class="card-box" style="display: none;">
-                <div class="top-info-bar">
-                    <div class="ship-info">
-                        <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
-                        <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
-                        <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
-                        <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
-                    </div>
-                    <div class="action-buttons">
-                        <button onclick="toggleUploadForm()" class="btn-modern btn-toggle-view" id="toggleFormBtn">
-                            <i data-lucide="sidebar-close" id="toggleIcon" style="width:16px;"></i> <span id="toggleText">Hide Upload Form</span>
-                        </button>
-                        <button onclick="downloadHTML()" class="btn-modern btn-simple"><i data-lucide="download" style="width:16px;"></i> Save HTML</button>
-                        <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
-                    </div>
-                </div>
-
-                <div class="tabs-container">
-                    <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
-                    <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
-                    <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
-                    <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
-                </div>
-
-                <main class="content-area">
-                    <div id="tab-summary" class="content-card active">
-                        <div class="table-responsive">
-                            <table id="reconciliation-executive-table">
-                                <thead>
-                                    <tr class="section-title"><td colspan="5">PETA REKONSILIASI KEPATUHAN BERKAS (SIDE-BY-SIDE RECONCILIATION TABLE)</td></tr>
-                                    <tr>
-                                        <th width="18%">Kategori</th>
-                                        <th width="18%">Sertifikat Aktual</th>
-                                        <th width="32%">Eviden Sertifikat (Data PDF)</th>
-                                        <th width="20%">Quotation (Data Penawaran)</th>
-                                        <th width="12%" style="text-align:center;">Status Validasi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-reconciliation-summary"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div id="tab-penawaran" class="content-card">
-                        <div class="table-responsive">
-                            <table>
-                                <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK (ONLY ANOMALIES)</td></tr>
-                                <tr>
-                                    <th width="4%" style="text-align:center;">NO</th>
-                                    <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                                    <th width="13%">QUOTATION (QTY)</th>
-                                    <th width="15%">CERTIFICATE (QTY)</th>
-                                    <th width="8%" style="text-align:center;">DO (QTY)</th>
-                                    <th width="15%" style="text-align:center;">AUDIT STATUS</th>
-                                </tr>
-                                <tbody id="body-penawaran"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div id="tab-sertifikat" class="content-card">
-                        <div class="table-responsive">
-                            <table>
-                                <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
-                                <tr>
-                                    <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
-                                    <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
-                                    <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
-                                </tr>
-                                <tbody id="body-sertifikat"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
+        <button class="btn-action" onclick="window.print()" style="background: var(--text-main); color: #fff;">🖨️ Print</button>
     </div>
 
-    <script>
-        lucide.createIcons();
-        
-        const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
-        const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
-        
-        let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
+    <div class="main-layout">
+        <aside class="sidebar">
+            <div class="nav-item active" onclick="switchTab('tab-summary', this)">📊 Summary</div>
+            <div class="nav-item" onclick="switchTab('tab-sertifikat', this)">🛡️ Certificate</div>
+            <div class="nav-item" onclick="switchTab('tab-penawaran', this)">📋 Quotation</div>
+            <div class="nav-item filter-btn" onclick="toggleFilter(this)" style="margin-top: 15px; justify-content: center;">👁️ Only Anomalies</div>
+        </aside>
 
-        function showMessage(msg, isError) {
-            const el = document.getElementById('ui-message');
-            el.innerHTML = msg; el.style.display = 'block';
-            el.style.backgroundColor = isError ? '#fdedec' : '#e9f7ef';
-            el.style.color = isError ? '#c0392b' : '#1e8449';
-            el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
-        }
+        <main class="content-area">
+            <div id="tab-summary" class="content-card active"><div id="critical-summary-container"></div></div>
+            <div id="tab-sertifikat" class="content-card">
+                <div class="table-responsive">
+                    <table>
+                        <tr class="section-title"><td colspan="13">CERTIFICATE LIST</td></tr>
+                        <tr><th width="3%">NO</th><th width="15%">REPORT</th><th width="12%">CERT NO</th><th width="12%">SHIP</th><th width="12%">OWNER</th><th width="8%">IMO</th><th width="5%">CLS</th><th width="5%">GT</th><th width="8%">NAT</th><th width="5%">CALL</th><th width="8%">DATE</th><th width="8%">SIGN</th><th width="7%">STAT</th></tr>
+                        <tbody id="body-sertifikat"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="tab-penawaran" class="content-card">
+                <div class="table-responsive">
+                    <table>
+                        <tr class="section-title"><td colspan="6">QUOTATION (COMPLIANCE CHECK)</td></tr>
+                        <tr><th width="4%">NO</th><th width="45%">INSPECTION POINT</th><th width="15%">QUOTATION (QTY)</th><th width="15%">CERTIFICATE (QTY)</th><th width="8%">DO</th><th width="13%">STATUS</th></tr>
+                        <tbody id="body-penawaran"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
+<script>
+function bindFile(inId,zoneId){
+    var inp = document.getElementById(inId); if(!inp) return;
+    inp.addEventListener("change", function(){
+        if(this.files.length) document.getElementById(zoneId).classList.add("has-file");
+        else document.getElementById(zoneId).classList.remove("has-file");
+    });
+}
+bindFile("file-penawaran","zone-p");
+bindFile("file-sertifikat","zone-s");
+bindFile("file-do","zone-d");
 
-        function toggleFilter(el) {
-            isFilter = !isFilter;
-            if(isFilter) {
-                el.classList.add('active'); document.body.classList.add('filter-anomali');
-            } else {
-                el.classList.remove('active'); document.body.classList.remove('filter-anomali');
-            }
-        }
+function switchTab(tabId, el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
 
-        function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+let isFilter = false;
+function toggleFilter(el) {
+    isFilter = !isFilter;
+    if(isFilter) { el.classList.add('active'); document.body.classList.add('filter-anomali'); } 
+    else { el.classList.remove('active'); document.body.classList.remove('filter-anomali'); }
+}
 
-        // --- ENGINE RENDERING REKONSILIASI SIDE-BY-SIDE LIST ARRAY (SOP VER-10) ---
-        function renderAuditReport(parsed) {
-            if (Array.isArray(parsed)) {
-                let combined = { tabel_audit: [], summary_sertifikat: [] };
-                parsed.forEach(item => {
-                    if (item.tabel_audit) combined.tabel_audit = combined.tabel_audit.concat(item.tabel_audit);
-                    if (item.summary_sertifikat) combined.summary_sertifikat = combined.summary_sertifikat.concat(item.summary_sertifikat);
-                });
-                parsed = combined;
-            }
+function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-            if (!parsed || !parsed.tabel_audit) {
-                showMessage("Format data JSON tidak dikenali oleh sistem.", true);
-                return;
-            }
+function showMessage(msg, isError) {
+    const el = document.getElementById('ui-message');
+    el.innerHTML = msg; el.style.display = 'block';
+    el.style.backgroundColor = isError ? '#fef2f2' : '#f0fdf4';
+    el.style.color = isError ? '#b91c1c' : '#15803d';
+}
 
-            let certRows = [], penRows = [];
-            parsed.tabel_audit.forEach(r => {
-                let k = String(r.kategori || "").toUpperCase();
-                if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
-            });
+var WH_SUBMIT = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+var WH_POLL   = "https://n8.waruna-group.co.id/webhook/check-status-audit";
 
-            // Top Bar
-            let v_name="-", v_imo="-", v_call="-", v_own="-";
-            for(let r of certRows) {
-                if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
-                    String(r.di_sertifikat).split('|').forEach(x => {
-                        let kv = x.split(':'); if(kv.length<2) return;
-                        let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
-                        if(k.includes("name")) v_name=v; if(k.includes("imo")) v_imo=v;
-                        if(k.includes("call")) v_call=v; if(k.includes("owner")) v_own=v;
-                    }); break;
-                }
-            }
-            document.getElementById("val-vessel").innerText = v_name.toUpperCase();
-            document.getElementById("val-imo").innerText = v_imo;
-            document.getElementById("val-call").innerText = v_call;
-            document.getElementById("val-owner").innerText = v_own;
-
-            // Tab Penawaran Harga (Hanya Anomali)
-            let htmlPen = ""; 
-            penRows.forEach((r, idx) => {
-                let rawAlias = String(r.alias_sistem || "-").trim();
-                let aliasParts = rawAlias.split(" - ");
-                let itemCode = aliasParts[0] || "-";
-                let systemName = aliasParts.slice(1).join(" - ") || "-";
-                let hasilStr = String(r.hasil_ai || "");
-                let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
-
-                if (isWarn) {
-                    let certQty = String(r.di_sertifikat || "-").trim();
-                    htmlPen += `<tr class="row-anomali">
-                        <td align="center"><b>${idx + 1}</b></td>
-                        <td>
-                            <div class="box-vendor">${esc(r.keterangan)}</div>
-                            <div class="box-system">${esc(systemName)}</div>
-                            <div class="box-code">${esc(itemCode)}</div>
-                        </td>
-                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                        <td><div class="doc-val">${esc(certQty)}</div></td>
-                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                        <td class="err-cell">⚠️ ANOMALI</td>
-                    </tr>`;
-                }
-            });
-            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
-
-            // ===============================================
-            // GENERATE 5-COLUMN GRANULAR SIDE-BY-SIDE SUMMARY
-            // ===============================================
-            let reconciliationRowsHtml = "";
-            let summaryList = parsed.summary_sertifikat || [];
-
-            summaryList.forEach(item => {
-                let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
-                if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 250) noCert = "-";
-                let isFound = noCert !== "-";
-
-                // 1. Kolom Nomor Sertifikat (Badge Layout)
-                let certBadgeContainer = `<div class="cert-vertical-container">`;
-                if (isFound) {
-                    noCert.split(',').forEach(num => {
-                        if(num.trim() !== "") certBadgeContainer += `<div class="cert-badge-item">${esc(num.trim())}</div>`;
-                    });
-                } else {
-                    certBadgeContainer += `<div class="cert-badge-item cert-badge-empty">-</div>`;
-                }
-                certBadgeContainer += `</div>`;
-
-                // 2. Kolom Eviden Sertifikat (Memecah List Array Suku Cadang & Memisahkan SOP-00)
-                let certBulletItemsHtml = `<ul class="granular-bullet-list">`;
-                let adminViolationBannerHtml = "";
-                let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
-                
-                if (typeof rawEvidenArray === 'string') {
-                    rawEvidenArray = rawEvidenArray.split('\n');
-                }
-
-                if (Array.isArray(rawEvidenArray) && rawEvidenArray.length > 0) {
-                    rawEvidenArray.forEach(line => {
-                        let cleanLine = line.trim();
-                        if (cleanLine !== "" && cleanLine !== "-") {
-                            // Cek apakah mengandung penanda anomali legalitas cap syahbandar
-                            if (cleanLine.toLowerCase().includes("syahbandar") || cleanLine.toLowerCase().includes("btkp") || cleanLine.toLowerCase().includes("anomali legalitas") || cleanLine.toLowerCase().includes("stempel")) {
-                                adminViolationBannerHtml += `<div class="admin-violation-banner">⚠️ ${esc(cleanLine.replace(/⚠️ ANOMALI LEGALITAS:/gi, ''))}</div>`;
-                            } else {
-                                // Beri warna background khusus jika teks mengandung kata kunci krusial (RN/Anomali)
-                                let renderedLine = esc(cleanLine);
-                                if (cleanLine.toLowerCase().includes("rn") || cleanLine.toLowerCase().includes("renew") || cleanLine.toLowerCase().includes("ganti")) {
-                                    renderedLine = `<span class="text-highlight-rn">${renderedLine}</span>`;
-                                } else if (cleanLine.toLowerCase().includes("kurang") || cleanLine.toLowerCase().includes("anomali")) {
-                                    renderedLine = `<span class="text-highlight-fail">${renderedLine}</span>`;
-                                }
-                                certBulletItemsHtml += `<li>${renderedLine}</li>`;
-                            }
-                        }
-                    });
-                } else {
-                    certBulletItemsHtml += `<li>-</li>`;
-                }
-                certBulletItemsHtml += `</ul>`;
-
-                // 3. Kolom Referensi Quotation (Memecah List Array Penawaran)
-                let quotBulletItemsHtml = `<ul class="granular-bullet-list">`;
-                let rawQuotArray = item.referensi_quotation || [];
-                
-                if (typeof rawQuotArray === 'string') {
-                    rawQuotArray = rawQuotArray.split('\n');
-                }
-
-                if (Array.isArray(rawQuotArray) && rawQuotArray.length > 0) {
-                    rawQuotArray.forEach(line => {
-                        let cleanLine = line.trim();
-                        if (cleanLine !== "" && cleanLine !== "-") {
-                            quotBulletItemsHtml += `<li><strong>${esc(cleanLine)}</strong></li>`;
-                        }
-                    });
-                } else {
-                    quotBulletItemsHtml += `<li>Sesuai penawaran terlampir</li>`;
-                }
-                quotBulletItemsHtml += `</ul>`;
-
-                // 4. Penentuan Blok Label Status 4 Level (PASS / PARTIAL / REVIEW / FAIL)
-                let currentStatus = String(item.status || "PASS").toUpperCase();
-                let statusClass = "pass";
-                if (currentStatus === "FAIL") statusClass = "fail";
-                else if (currentStatus === "PARTIAL") statusClass = "partial";
-                else if (currentStatus === "REVIEW") statusClass = "review";
-
-                let rowClass = (currentStatus === "PASS") ? "row-match" : "row-anomali";
-
-                reconciliationRowsHtml += `<tr class="${rowClass}">
-                    <td><b>${esc(item.sistem)}</b></td>
-                    <td>${certBadgeContainer}</td>
-                    <td>
-                        ${certBulletItemsHtml}
-                        ${adminViolationBannerHtml}
-                    </td>
-                    <td>${quotBulletItemsHtml}</td>
-                    <td align="center" style="vertical-align: middle;">
-                        <span class="cell-status-block ${statusClass}">${currentStatus}</span>
-                    </td>
-                </tr>`;
-            });
-
-            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<tr><td colspan="5" align="center" style="padding:30px; font-weight:700; color:var(--success);">✅ DATA JSON REKONSILIASI KOSONG ATAU BELUM TERHUBUNG</td></tr>`;
-
-            // Tab Certificate Registry
-            let htmlCert = ""; let certGroups = {};
-            certRows.forEach(r => {
-                let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
-                if(!certGroups[cNo]) certGroups[cNo] = []; certGroups[cNo].push(r);
-            });
-
-            let gIdx = 1;
-            for (let cNo in certGroups) {
-                let groupWarn = certGroups[cNo].some(r => {
-                    let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
-                });
-                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
-                
-                certGroups[cNo].forEach(r => {
-                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
-                    String(r.di_sertifikat).split('|').forEach(p => {
-                        let kv = p.split(':'); if(kv.length < 2) return;
-                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
-                        if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
-                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
-                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
-                        if(k.includes("sign")) d.sign=v;
-                    });
-                    
-                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
-                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-                    htmlCert += `<tr class="${rowClass}">
-                        <td align="center">${gIdx++}</td>
-                        <td><b>${esc(r.keterangan)}</b></td>
-                        <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
-                        <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
-                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
-                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ BEDA':'✅ OK'}</td>
-                    </tr>`;
-                });
-            }
-            document.getElementById("body-sertifikat").innerHTML = htmlCert;
-        }
-
-        // --- SISTEM POLLING ANTI-CACHE ---
-        async function checkStatus(jobId) {
+document.getElementById("btn-run").addEventListener("click", async function(){
+    var pI=document.getElementById("file-penawaran"), sI=document.getElementById("file-sertifikat"), dI=document.getElementById("file-do");
+    if(!pI.files.length || !sI.files.length) { showMessage("⚠️ Dokumen Quotation & Certificate wajib diunggah.", true); return; }
+    
+    var jobId = "JOB-" + Date.now();
+    var fd = new FormData();
+    fd.append("penawaran", pI.files[0]); fd.append("sertifikat", sI.files[0]); fd.append("job_id", jobId);
+    if(dI.files.length) fd.append("surat_jalan", dI.files[0]);
+    
+    document.getElementById("upload-section").style.display = "none";
+    document.getElementById("loading").classList.add("show");
+    
+    var startMs = Date.now();
+    var timerInt = setInterval(function() {
+        var s = Math.floor((Date.now() - startMs) / 1000);
+        document.getElementById("loading-txt").innerHTML = `0---0---0---0 PROCESSING AI SYSTEM (<b>${s}</b> seconds)`;
+    }, 1000);
+    
+    try {
+        await fetch(WH_SUBMIT, {method:"POST", body:fd});
+        var poll = setInterval(async function(){
             try {
-                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, {
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
-                let text = await res.text();
-                if(!text || text.trim().charAt(0) === "<") return;
+                var res = await fetch(WH_POLL+"?job_id="+jobId);
+                var text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return; 
                 
-                let json = JSON.parse(text);
-                let rows = Array.isArray(json) ? json : (json.data || [json]);
-                let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-
-                if (json.status === "processing" || !ourRow) return; 
-
-                clearInterval(pollingInterval); clearInterval(timerInterval);
-                document.getElementById('pollingCard').style.display = 'none';
-                document.getElementById('reportPanel').style.display = 'block';
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                var data = JSON.parse(text);
+                var rows = Array.isArray(data) ? data : (data.data || [data]);
+                var ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
                 
-                const panel = document.getElementById('uploadPanel');
-                if(!panel.classList.contains('is-hidden')) toggleUploadForm();
-
-                let fullPayloadStr = ""; 
-                if(ourRow["Payload1"]) {
-                    for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
-                    renderAuditReport(JSON.parse(fullPayloadStr));
-                } else if (ourRow.tabel_audit) {
-                    renderAuditReport(ourRow);
-                } else {
-                    renderAuditReport(Array.isArray(json) ? json : json.data);
+                if(data.status === "processing" || !ourRow) return; 
+                
+                clearInterval(poll); clearInterval(timerInt);
+                
+                // === STITCHER UNIVERSAL: KEBAL SPASI GOOGLE SHEETS ===
+                var fullPayloadStr = ""; 
+                var rowKeys = Object.keys(ourRow);
+                for(let i = 1; i <= 10; i++) {
+                    var targetKey = rowKeys.find(k => k.toLowerCase().replace(/\s/g, "") === ("payload" + i));
+                    if(targetKey) {
+                        fullPayloadStr += (ourRow[targetKey] || "");
+                    }
                 }
-                lucide.createIcons();
-            } catch (e) {
-                clearInterval(pollingInterval); clearInterval(timerInterval);
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                showMessage("Koneksi polling gagal atau JSON terpotong.", true);
-                lucide.createIcons();
-            }
+                
+                // --- DECODE BASE64 ---
+                var binaryString = window.atob(fullPayloadStr);
+                var bytes = new Uint8Array(binaryString.length);
+                for (var i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                var decodedStr = new TextDecoder("utf-8").decode(bytes);
+                
+                document.getElementById("loading").classList.remove("show");
+                document.getElementById("dashboard-section").style.display = "block";
+                
+                renderAuditReport(JSON.parse(decodedStr));
+                
+            } catch(e) { console.error("Proses dekripsi gagal, mencoba kembali...", e); }
+        }, 8000);
+    } catch(e){ 
+        clearInterval(timerInt); 
+        document.getElementById("loading").classList.remove("show");
+        document.getElementById("upload-section").style.display = "block";
+        showMessage("Koneksi gagal: " + e.message, true); 
+    }
+});
+
+function renderAuditReport(parsed) {
+    if (!parsed.tabel_audit) return;
+    let certRows = [], penRows = [];
+    
+    parsed.tabel_audit.forEach(r => {
+        let certContent = String(r.di_sertifikat || "").toLowerCase();
+        let isCertData = certContent.includes("certno:") || certContent.includes("imo:") || certContent.includes("page:");
+        let isBarangFisik = String(r.keterangan || "").toLowerCase().match(/unit|pack|cyl|pc|set|lot|lumpsum/);
+        if (isCertData && !isBarangFisik) certRows.push(r); else penRows.push(r);
+    });
+
+    // Populate Top Bar Vessel
+    let v_name="-", v_imo="-", v_call="-", v_own="-";
+    for(let r of certRows) {
+        if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
+            String(r.di_sertifikat).split('|').forEach(x => {
+                let kv = x.split(':'); if(kv.length<2) return;
+                let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                if(k.includes("name")) v_name=v; if(k.includes("imo")) v_imo=v;
+                if(k.includes("call")) v_call=v; if(k.includes("owner")) v_own=v;
+            });
+            break;
+        }
+    }
+    document.getElementById("val-vessel").innerText = v_name.toUpperCase();
+    document.getElementById("val-imo").innerText = v_imo;
+    document.getElementById("val-call").innerText = v_call;
+    document.getElementById("val-owner").innerText = v_own;
+
+    // Render Tabel Penawaran
+    let htmlPen = ""; let anomalyList = [];
+    penRows.forEach((r, idx) => {
+        let aliasParts = String(r.alias_sistem || "-").split(" - ");
+        let itemCode = aliasParts[0] || "-"; let systemName = aliasParts.slice(1).join(" - ") || "-";
+        let hasilStr = String(r.hasil_ai || "");
+        let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
+        let rowClass = isWarn ? 'row-anomali' : 'row-match';
+
+        if (isWarn) {
+            let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+            anomalyList.push(`<b>${esc(r.keterangan)}:</b> ${esc(cleanReason)}`);
         }
 
-        // --- SUBMIT FILE VIA FORM ---
-        document.getElementById('auditForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const id = `JOB-${Date.now()}`;
-            const btn = document.getElementById('submitBtn');
-            const errorBox = document.getElementById('ui-message');
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
-            errorBox.style.display = 'none';
-            document.getElementById('reportPanel').style.display = 'none';
+        htmlPen += `<tr class="${rowClass}">
+            <td align="center"><b>${idx + 1}</b></td>
+            <td>
+                <div class="box-vendor">${esc(r.keterangan)}</div>
+                <div class="box-system">${esc(systemName)}</div>
+                <div class="box-code">${esc(itemCode)}</div>
+            </td>
+            <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+            <td><div class="doc-val">${esc(r.di_sertifikat)}</div></td>
+            <td align="center">${esc(r.di_do)}</td>
+            <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'ANOMALI':'MATCH'}</td>
+        </tr>`;
 
-            const fd = new FormData();
-            fd.append('job_id', id);
-            if (document.getElementById('quotationFile').files[0]) fd.append('penawaran', document.getElementById('quotationFile').files[0]);
-            if (document.getElementById('certFile').files[0]) fd.append('sertifikat', document.getElementById('certFile').files[0]);
-            if (document.getElementById('deliveryFile').files[0]) fd.append('surat_jalan', document.getElementById('deliveryFile').files[0]);
+        if (hasilStr.trim() !== "") {
+            let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+            htmlPen += `<tr class="explanation-row ${rowClass}">
+                <td></td><td colspan="5"><div class="ai-note ${isWarn ? 'err' : 'ok'}"><b>${isWarn ? '⚠️ AI Generated:' : '✅ AI Generated:'}</b> ${esc(cleanReason)}</div></td>
+            </tr>`;
+        }
+    });
+    document.getElementById("body-penawaran").innerHTML = htmlPen;
 
-            try {
-                const req = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
-                if (!req.ok) throw new Error("Connection to N8N failed.");
-                document.getElementById('pollingCard').style.display = 'block';
-                let startMs = Date.now();
-                timerInterval = setInterval(() => {
-                    let s = Math.floor((Date.now() - startMs) / 1000);
-                    document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
-                }, 1000);
-                pollingInterval = setInterval(() => checkStatus(id), 8000);
-            } catch (err) {
-                showMessage(err.message, true);
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                lucide.createIcons();
-            }
-        };
-    </script>
+    // Render Tabel Sertifikat
+    let htmlCert = ""; let certGroups = {};
+    certRows.forEach(r => {
+        let cNo = "-";
+        String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
+        if(!certGroups[cNo]) certGroups[cNo] = [];
+        certGroups[cNo].push(r);
+    });
+
+    let gIdx = 1;
+    for (let cNo in certGroups) {
+        let groupWarn = certGroups[cNo].some(r => String(r.hasil_ai).includes('⚠️'));
+        htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">CERTIFICATE: ${esc(cNo)}</td></tr>`;
+        certGroups[cNo].forEach(r => {
+            let d = { ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
+            String(r.di_sertifikat).split('|').forEach(p => {
+                let kv = p.split(':'); if(kv.length < 2) return;
+                let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
+                if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
+                if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
+                if(k.includes("sign")) d.sign=v;
+            });
+            let isWarn = String(r.hasil_ai).includes('⚠️');
+            htmlCert += `<tr class="${isWarn ? 'row-anomali' : 'row-match'}">
+                <td align="center">${gIdx++}</td><td><b>${esc(r.keterangan)}</b></td><td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td>${esc(d.imo)}</td><td>${esc(d.cls)}</td><td>${esc(d.gt)}</td><td>${esc(d.nat)}</td><td>${esc(d.call)}</td><td>${esc(d.date)}</td><td>${esc(d.sign)}</td><td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'BEDA':'OK'}</td>
+            </tr>`;
+        });
+    }
+    document.getElementById("body-sertifikat").innerHTML = htmlCert;
+
+    // Render Summary
+    let summaryHtml = "";
+    if (anomalyList.length > 0) {
+        let listHtml = anomalyList.map(issue => `<li>${issue}</li>`).join('');
+        summaryHtml += `<div class="critical-summary"><h4 class="critical-title">⚠️ Buyer Attention Required</h4><ol class="critical-list">${listHtml}</ol></div>`;
+    } else {
+        summaryHtml += `<div class="success-summary"><h4 class="critical-title" style="color:var(--success);">✅ Audit Completed: No Anomalies</h4></div>`;
+    }
+    document.getElementById("critical-summary-container").innerHTML = summaryHtml;
+}
+</script>
 </body>
 </html>
