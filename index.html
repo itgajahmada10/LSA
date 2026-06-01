@@ -112,7 +112,6 @@
         .granular-bullet-list li { margin-bottom: 4px; font-weight: 600; line-height: 1.4; font-size: 11px; }
         .granular-bullet-list li strong { color: #0f172a; }
         
-        /* Highlight khusus untuk item yang berstatus RN/Anomali di dalam list */
         .text-highlight-rn { color: #701a75 !important; background: #fae8ff; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
         .text-highlight-fail { color: #b91c1c !important; background: #fef2f2; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
 
@@ -128,7 +127,18 @@
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
 
+        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 11px; padding: 8px; }
+        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
+        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 10px; }
+        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
+        .doc-val { background: #fdfdfd; padding: 4px; border-radius: 2px; border: 1px solid #f1f5f9; font-weight: 600; font-size: 11px; }
+
         body.filter-anomali .row-match { display: none !important; }
+
+        /* LOADING ANIMATION */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        .loader-small { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* === PRINT STYLES === */
         @media print {
@@ -193,7 +203,6 @@
                         <button onclick="toggleUploadForm()" class="btn-modern btn-toggle-view" id="toggleFormBtn">
                             <i data-lucide="sidebar-close" id="toggleIcon" style="width:16px;"></i> <span id="toggleText">Hide Upload Form</span>
                         </button>
-                        <button onclick="downloadHTML()" class="btn-modern btn-simple"><i data-lucide="download" style="width:16px;"></i> Save HTML</button>
                         <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
                     </div>
                 </div>
@@ -265,7 +274,7 @@
         const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         
-        let pollingInterval, timerInterval, isFilter = false, currentShipName = "LSA_Audit_Report";
+        let pollingInterval, timerInterval, isFilter = false;
 
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
@@ -291,19 +300,114 @@
             }
         }
 
+        function toggleUploadForm() {
+            const panel = document.getElementById('uploadPanel');
+            const icon = document.getElementById('toggleIcon');
+            const text = document.getElementById('toggleText');
+            
+            panel.classList.toggle('is-hidden');
+            
+            if (panel.classList.contains('is-hidden')) {
+                icon.setAttribute('data-lucide', 'sidebar-open');
+                text.innerText = 'Show Upload Form';
+            } else {
+                icon.setAttribute('data-lucide', 'sidebar-close');
+                text.innerText = 'Hide Upload Form';
+            }
+            lucide.createIcons();
+        }
+
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-        // --- ENGINE RENDERING REKONSILIASI SIDE-BY-SIDE LIST ARRAY (SOP VER-10) ---
-        function renderAuditReport(parsed) {
-            if (Array.isArray(parsed)) {
-                let combined = { tabel_audit: [], summary_sertifikat: [] };
-                parsed.forEach(item => {
-                    if (item.tabel_audit) combined.tabel_audit = combined.tabel_audit.concat(item.tabel_audit);
-                    if (item.summary_sertifikat) combined.summary_sertifikat = combined.summary_sertifikat.concat(item.summary_sertifikat);
+        // --- SISTEM DECODE BASE64 UNIVERSAL (ANTI-ERROR) ---
+        async function checkStatus(jobId) {
+            try {
+                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, {
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
                 });
-                parsed = combined;
-            }
+                let text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return;
+                
+                let json = JSON.parse(text);
+                let rows = Array.isArray(json) ? json : (json.data || [json]);
+                let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
 
+                if (json.status === "processing" || !ourRow) return; 
+
+                clearInterval(pollingInterval); clearInterval(timerInterval);
+                document.getElementById('pollingCard').style.display = 'none';
+                document.getElementById('reportPanel').style.display = 'block';
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                
+                const panel = document.getElementById('uploadPanel');
+                if(!panel.classList.contains('is-hidden')) toggleUploadForm();
+
+                // ILMU HITAM: DECODE BASE64 + STITCHER UNIVERSAL
+                let fullPayloadStr = ""; 
+                let rowKeys = Object.keys(ourRow);
+                for(let i = 1; i <= 10; i++) {
+                    let targetKey = rowKeys.find(k => k.toLowerCase().replace(/\s/g, "") === ("payload" + i));
+                    if(targetKey) {
+                        fullPayloadStr += (ourRow[targetKey] || "");
+                    }
+                }
+                
+                // DECODE Base64 to JSON String
+                var binaryString = window.atob(fullPayloadStr);
+                var bytes = new Uint8Array(binaryString.length);
+                for (var i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                var decodedStr = new TextDecoder("utf-8").decode(bytes);
+
+                // Render JSON hasil decode
+                renderAuditReport(JSON.parse(decodedStr));
+                lucide.createIcons();
+                
+            } catch (e) {
+                console.log("Menunggu dekripsi...", e);
+            }
+        }
+
+        // --- SUBMIT FILE VIA FORM ---
+        document.getElementById('auditForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = `JOB-${Date.now()}`;
+            const btn = document.getElementById('submitBtn');
+            const errorBox = document.getElementById('ui-message');
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
+            errorBox.style.display = 'none';
+            document.getElementById('reportPanel').style.display = 'none';
+
+            const fd = new FormData();
+            fd.append('job_id', id);
+            if (document.getElementById('quotationFile').files[0]) fd.append('penawaran', document.getElementById('quotationFile').files[0]);
+            if (document.getElementById('certFile').files[0]) fd.append('sertifikat', document.getElementById('certFile').files[0]);
+            if (document.getElementById('deliveryFile').files[0]) fd.append('surat_jalan', document.getElementById('deliveryFile').files[0]);
+
+            try {
+                const req = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+                if (!req.ok) throw new Error("Connection to N8N failed.");
+                document.getElementById('pollingCard').style.display = 'block';
+                let startMs = Date.now();
+                timerInterval = setInterval(() => {
+                    let s = Math.floor((Date.now() - startMs) / 1000);
+                    document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
+                }, 1000);
+                pollingInterval = setInterval(() => checkStatus(id), 8000);
+            } catch (err) {
+                showMessage(err.message, true);
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                lucide.createIcons();
+            }
+        };
+
+        // --- ENGINE RENDERING REKONSILIASI V7 ---
+        function renderAuditReport(parsed) {
             if (!parsed || !parsed.tabel_audit) {
                 showMessage("Format data JSON tidak dikenali oleh sistem.", true);
                 return;
@@ -360,9 +464,7 @@
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
-            // ===============================================
-            // GENERATE 5-COLUMN GRANULAR SIDE-BY-SIDE SUMMARY
-            // ===============================================
+            // Tab Executive Summary (Side-by-Side)
             let reconciliationRowsHtml = "";
             let summaryList = parsed.summary_sertifikat || [];
 
@@ -371,7 +473,6 @@
                 if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 250) noCert = "-";
                 let isFound = noCert !== "-";
 
-                // 1. Kolom Nomor Sertifikat (Badge Layout)
                 let certBadgeContainer = `<div class="cert-vertical-container">`;
                 if (isFound) {
                     noCert.split(',').forEach(num => {
@@ -382,24 +483,18 @@
                 }
                 certBadgeContainer += `</div>`;
 
-                // 2. Kolom Eviden Sertifikat (Memecah List Array Suku Cadang & Memisahkan SOP-00)
                 let certBulletItemsHtml = `<ul class="granular-bullet-list">`;
                 let adminViolationBannerHtml = "";
                 let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
-                
-                if (typeof rawEvidenArray === 'string') {
-                    rawEvidenArray = rawEvidenArray.split('\n');
-                }
+                if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
 
                 if (Array.isArray(rawEvidenArray) && rawEvidenArray.length > 0) {
                     rawEvidenArray.forEach(line => {
                         let cleanLine = line.trim();
                         if (cleanLine !== "" && cleanLine !== "-") {
-                            // Cek apakah mengandung penanda anomali legalitas cap syahbandar
                             if (cleanLine.toLowerCase().includes("syahbandar") || cleanLine.toLowerCase().includes("btkp") || cleanLine.toLowerCase().includes("anomali legalitas") || cleanLine.toLowerCase().includes("stempel")) {
                                 adminViolationBannerHtml += `<div class="admin-violation-banner">⚠️ ${esc(cleanLine.replace(/⚠️ ANOMALI LEGALITAS:/gi, ''))}</div>`;
                             } else {
-                                // Beri warna background khusus jika teks mengandung kata kunci krusial (RN/Anomali)
                                 let renderedLine = esc(cleanLine);
                                 if (cleanLine.toLowerCase().includes("rn") || cleanLine.toLowerCase().includes("renew") || cleanLine.toLowerCase().includes("ganti")) {
                                     renderedLine = `<span class="text-highlight-rn">${renderedLine}</span>`;
@@ -410,18 +505,12 @@
                             }
                         }
                     });
-                } else {
-                    certBulletItemsHtml += `<li>-</li>`;
-                }
+                } else { certBulletItemsHtml += `<li>-</li>`; }
                 certBulletItemsHtml += `</ul>`;
 
-                // 3. Kolom Referensi Quotation (Memecah List Array Penawaran)
                 let quotBulletItemsHtml = `<ul class="granular-bullet-list">`;
                 let rawQuotArray = item.referensi_quotation || [];
-                
-                if (typeof rawQuotArray === 'string') {
-                    rawQuotArray = rawQuotArray.split('\n');
-                }
+                if (typeof rawQuotArray === 'string') rawQuotArray = rawQuotArray.split('\n');
 
                 if (Array.isArray(rawQuotArray) && rawQuotArray.length > 0) {
                     rawQuotArray.forEach(line => {
@@ -430,12 +519,9 @@
                             quotBulletItemsHtml += `<li><strong>${esc(cleanLine)}</strong></li>`;
                         }
                     });
-                } else {
-                    quotBulletItemsHtml += `<li>Sesuai penawaran terlampir</li>`;
-                }
+                } else { quotBulletItemsHtml += `<li>Sesuai penawaran terlampir</li>`; }
                 quotBulletItemsHtml += `</ul>`;
 
-                // 4. Penentuan Blok Label Status 4 Level (PASS / PARTIAL / REVIEW / FAIL)
                 let currentStatus = String(item.status || "PASS").toUpperCase();
                 let statusClass = "pass";
                 if (currentStatus === "FAIL") statusClass = "fail";
@@ -447,17 +533,13 @@
                 reconciliationRowsHtml += `<tr class="${rowClass}">
                     <td><b>${esc(item.sistem)}</b></td>
                     <td>${certBadgeContainer}</td>
-                    <td>
-                        ${certBulletItemsHtml}
-                        ${adminViolationBannerHtml}
-                    </td>
+                    <td>${certBulletItemsHtml}${adminViolationBannerHtml}</td>
                     <td>${quotBulletItemsHtml}</td>
                     <td align="center" style="vertical-align: middle;">
                         <span class="cell-status-block ${statusClass}">${currentStatus}</span>
                     </td>
                 </tr>`;
             });
-
             document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<tr><td colspan="5" align="center" style="padding:30px; font-weight:700; color:var(--success);">✅ DATA JSON REKONSILIASI KOSONG ATAU BELUM TERHUBUNG</td></tr>`;
 
             // Tab Certificate Registry
@@ -500,86 +582,6 @@
             }
             document.getElementById("body-sertifikat").innerHTML = htmlCert;
         }
-
-        // --- SISTEM POLLING ANTI-CACHE ---
-        async function checkStatus(jobId) {
-            try {
-                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, {
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
-                let text = await res.text();
-                if(!text || text.trim().charAt(0) === "<") return;
-                
-                let json = JSON.parse(text);
-                let rows = Array.isArray(json) ? json : (json.data || [json]);
-                let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-
-                if (json.status === "processing" || !ourRow) return; 
-
-                clearInterval(pollingInterval); clearInterval(timerInterval);
-                document.getElementById('pollingCard').style.display = 'none';
-                document.getElementById('reportPanel').style.display = 'block';
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                
-                const panel = document.getElementById('uploadPanel');
-                if(!panel.classList.contains('is-hidden')) toggleUploadForm();
-
-                let fullPayloadStr = ""; 
-                if(ourRow["Payload1"]) {
-                    for(let i=1; i<=10; i++) fullPayloadStr += (ourRow["Payload" + i] || "");
-                    renderAuditReport(JSON.parse(fullPayloadStr));
-                } else if (ourRow.tabel_audit) {
-                    renderAuditReport(ourRow);
-                } else {
-                    renderAuditReport(Array.isArray(json) ? json : json.data);
-                }
-                lucide.createIcons();
-            } catch (e) {
-                clearInterval(pollingInterval); clearInterval(timerInterval);
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                showMessage("Koneksi polling gagal atau JSON terpotong.", true);
-                lucide.createIcons();
-            }
-        }
-
-        // --- SUBMIT FILE VIA FORM ---
-        document.getElementById('auditForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const id = `JOB-${Date.now()}`;
-            const btn = document.getElementById('submitBtn');
-            const errorBox = document.getElementById('ui-message');
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
-            errorBox.style.display = 'none';
-            document.getElementById('reportPanel').style.display = 'none';
-
-            const fd = new FormData();
-            fd.append('job_id', id);
-            if (document.getElementById('quotationFile').files[0]) fd.append('penawaran', document.getElementById('quotationFile').files[0]);
-            if (document.getElementById('certFile').files[0]) fd.append('sertifikat', document.getElementById('certFile').files[0]);
-            if (document.getElementById('deliveryFile').files[0]) fd.append('surat_jalan', document.getElementById('deliveryFile').files[0]);
-
-            try {
-                const req = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
-                if (!req.ok) throw new Error("Connection to N8N failed.");
-                document.getElementById('pollingCard').style.display = 'block';
-                let startMs = Date.now();
-                timerInterval = setInterval(() => {
-                    let s = Math.floor((Date.now() - startMs) / 1000);
-                    document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
-                }, 1000);
-                pollingInterval = setInterval(() => checkStatus(id), 8000);
-            } catch (err) {
-                showMessage(err.message, true);
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                lucide.createIcons();
-            }
-        };
     </script>
 </body>
 </html>
