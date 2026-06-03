@@ -436,7 +436,7 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // Tab Penawaran Harga (Hanya Anomali)
+            // Tab Penawaran Harga (Semua Data - Filter Only Anomalies)
             let htmlPen = ""; 
             penRows.forEach((r, idx) => {
                 let rawAlias = String(r.alias_sistem || "-").trim();
@@ -446,21 +446,21 @@
                 let hasilStr = String(r.hasil_ai || "");
                 let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
 
-                if (isWarn) {
-                    let certQty = String(r.di_sertifikat || "-").trim();
-                    htmlPen += `<tr class="row-anomali">
-                        <td align="center"><b>${idx + 1}</b></td>
-                        <td>
-                            <div class="box-vendor">${esc(r.keterangan)}</div>
-                            <div class="box-system">${esc(systemName)}</div>
-                            <div class="box-code">${esc(itemCode)}</div>
-                        </td>
-                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                        <td><div class="doc-val">${esc(certQty)}</div></td>
-                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                        <td class="err-cell">⚠️ ANOMALI</td>
-                    </tr>`;
-                }
+                let certQty = String(r.di_sertifikat || "-").trim();
+                let rowClass = isWarn ? 'row-anomali' : 'row-match';
+
+                htmlPen += `<tr class="${rowClass}">
+                    <td align="center"><b>${idx + 1}</b></td>
+                    <td>
+                        <div class="box-vendor">${esc(r.keterangan)}</div>
+                        <div class="box-system">${esc(systemName)}</div>
+                        <div class="box-code">${esc(itemCode)}</div>
+                    </td>
+                    <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+                    <td><div class="doc-val">${esc(certQty)}</div></td>
+                    <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
+                    <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
+                </tr>`;
             });
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
