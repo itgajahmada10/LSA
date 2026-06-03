@@ -84,12 +84,12 @@
         .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
 
         /* === HORIZONTAL TABS === */
-        .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; overflow-x: auto; }
-        .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; }
+        .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; flex-shrink: 0; }
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
-        .filter-btn { margin-left: auto; color: var(--error); border: 1px solid var(--border-color); background: white; border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; margin-bottom: 6px; white-space: nowrap; }
+        .filter-btn { margin-left: auto; color: var(--error); border: 1px solid var(--border-color); background: white; border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; margin-bottom: 6px; white-space: nowrap; flex-shrink: 0; }
         .filter-btn:hover { background: #fef2f2; border-color: var(--error); }
         .filter-btn.active { background: var(--error); color: #fff; border-color: var(--error); }
 
@@ -301,10 +301,15 @@
         function toggleFilter(el) {
             isFilter = !isFilter;
             if(isFilter) {
-                el.classList.add('active'); document.body.classList.add('filter-anomali');
+                el.classList.add('active'); 
+                document.body.classList.add('filter-anomali');
+                el.innerHTML = '<i data-lucide="eye-off" style="width:16px;"></i> Show All Items';
             } else {
-                el.classList.remove('active'); document.body.classList.remove('filter-anomali');
+                el.classList.remove('active'); 
+                document.body.classList.remove('filter-anomali');
+                el.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies';
             }
+            lucide.createIcons();
         }
 
         function toggleUploadForm() {
@@ -426,19 +431,22 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // Top Bar
+            // Top Bar (DIREVISI: LOOPING ANTI-BOLONG)
             let v_name="-", v_imo="-", v_call="-", v_own="-";
-            for(let r of certRows) {
-                if(String(r.di_sertifikat).toLowerCase().includes("name:")) {
+            certRows.forEach(r => {
+                let certContent = String(r.di_sertifikat).toLowerCase();
+                if(certContent.includes("name:")) {
                     String(r.di_sertifikat).split('|').forEach(x => {
                         let kv = x.split(':'); if(kv.length<2) return;
                         let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
-                        if(k.includes("name")) v_name=v; if(k.includes("imo")) v_imo=v;
-                        if(k.includes("call")) v_call=v; if(k.includes("owner")) v_own=v;
-                    }); break;
+                        if(k.includes("name") && v !== "-" && v !== "") v_name = v.toUpperCase();
+                        if(k.includes("imo") && v !== "-" && v !== "") v_imo = v;
+                        if(k.includes("call") && v !== "-" && v !== "") v_call = v;
+                        if(k.includes("owner") && v !== "-" && v !== "") v_own = v.toUpperCase();
+                    });
                 }
-            }
-            document.getElementById("val-vessel").innerText = v_name.toUpperCase();
+            });
+            document.getElementById("val-vessel").innerText = v_name;
             document.getElementById("val-imo").innerText = v_imo;
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
