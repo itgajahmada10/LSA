@@ -107,7 +107,7 @@
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
 
-        /* GRANULAR BULLET LIST STYLES (ANTI-NOISE) */
+        /* GRANULAR BULLET LIST STYLES */
         .granular-bullet-list { margin: 0; padding-left: 14px; list-style-type: disc; color: #334155; }
         .granular-bullet-list li { margin-bottom: 4px; font-weight: 600; line-height: 1.4; font-size: 11px; }
         .granular-bullet-list li strong { color: #0f172a; }
@@ -436,32 +436,51 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // Tab Penawaran Harga (Semua Data - Filter Only Anomalies)
+            // Tab Penawaran Harga (DENGAN GROUPING FOLDER DARI DOKUMEN ASLI)
             let htmlPen = ""; 
-            penRows.forEach((r, idx) => {
-                let rawAlias = String(r.alias_sistem || "-").trim();
-                let aliasParts = rawAlias.split(" - ");
-                let itemCode = aliasParts[0] || "-";
-                let systemName = aliasParts.slice(1).join(" - ") || "-";
-                let hasilStr = String(r.hasil_ai || "");
-                let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
-
-                let certQty = String(r.di_sertifikat || "-").trim();
-                let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-                htmlPen += `<tr class="${rowClass}">
-                    <td align="center"><b>${idx + 1}</b></td>
-                    <td>
-                        <div class="box-vendor">${esc(r.keterangan)}</div>
-                        <div class="box-system">${esc(systemName)}</div>
-                        <div class="box-code">${esc(itemCode)}</div>
-                    </td>
-                    <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                    <td><div class="doc-val">${esc(certQty)}</div></td>
-                    <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                    <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
-                </tr>`;
+            let groupedPen = {};
+            penRows.forEach(r => {
+                let g = r.grup_penawaran && r.grup_penawaran !== "-" ? r.grup_penawaran : "Item Lainnya";
+                if(!groupedPen[g]) groupedPen[g] = [];
+                groupedPen[g].push(r);
             });
+
+            for(let g in groupedPen) {
+                // Cek apakah di dalam grup ini ada anomali atau tidak
+                let groupHasWarn = groupedPen[g].some(r => {
+                    let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
+                });
+                
+                // Header Group (Ikut sembunyi kalau di mode Only Anomalies dan tidak ada anomali)
+                let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
+                htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
+                
+                groupedPen[g].forEach((r) => {
+                    let rawAlias = String(r.alias_sistem || "-").trim();
+                    let aliasParts = rawAlias.split(" - ");
+                    let itemCode = aliasParts[0] || "-";
+                    let systemName = aliasParts.slice(1).join(" - ") || "-";
+                    let hasilStr = String(r.hasil_ai || "");
+                    let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
+
+                    let certQty = String(r.di_sertifikat || "-").trim();
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
+                    let noUrut = r.no_urut_penawaran || "-";
+
+                    htmlPen += `<tr class="${rowClass}">
+                        <td align="center"><b>${esc(noUrut)}</b></td>
+                        <td>
+                            <div class="box-vendor">${esc(r.keterangan)}</div>
+                            <div class="box-system">${esc(systemName)}</div>
+                            <div class="box-code">${esc(itemCode)}</div>
+                        </td>
+                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+                        <td><div class="doc-val">${esc(certQty)}</div></td>
+                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
+                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
+                    </tr>`;
+                });
+            }
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
 
             // Tab Executive Summary (Side-by-Side)
