@@ -17,10 +17,6 @@
             --text-main: #1e293b; 
             --text-muted: #64748b;
             
-            /* CSS Variables untuk Sticky Header (Auto-Updated by JS) */
-            --header-h: 170px;
-            --title-h: 42px;
-
             /* 4 Level Status Colors */
             --status-pass-bg: #f0fdf4;
             --status-pass-border: #bbf7d0;
@@ -42,9 +38,6 @@
             --border-system: #7dd3fc;
             --bg-code: #f0fdf4; 
             --border-code: #86efac;     
-            --bg-rn: #fae8ff;
-            --border-rn: #e9d5ff;
-            --text-rn: #701a75;
         }
 
         /* === STRUCTURAL LAYOUT === */
@@ -71,23 +64,6 @@
             box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08);
         }
         .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; }
-
-        /* === STICKY TABLE HEADERS (BUG FIX) === */
-        thead tr.section-title td {
-            position: sticky;
-            top: calc(var(--header-h) - 1px);
-            z-index: 12;
-            background-clip: padding-box;
-            outline: 1px solid var(--primary);
-        }
-        thead tr:not(.section-title) th {
-            position: sticky;
-            top: calc(var(--header-h) + var(--title-h) - 2px);
-            z-index: 11;
-            background-clip: padding-box;
-            outline: 1px solid var(--border-color);
-            box-shadow: 0 6px 15px -5px rgba(78, 43, 92, 0.15);
-        }
 
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
@@ -131,7 +107,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* TABLES CORE STYLES */
-        .table-responsive { width: 100%; } 
+        .table-responsive { width: 100%; overflow-x: auto; } 
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
         th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
         td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
@@ -188,16 +164,8 @@
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
             
-            /* RESET STICKY HEADER SAAT PRINT BIAR GAK NUMPUK */
-            .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
-            thead { display: table-header-group !important; }
-            thead tr.section-title td, 
-            thead tr:not(.section-title) th { 
-                position: static !important; 
-                top: auto !important; 
-                outline: none !important; 
-                box-shadow: none !important; 
-            }
+            /* RESET SEMUA STICKY SAAT PRINT BIAR RAPI */
+            .sticky-top-section { position: relative !important; top: auto !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
             .tabs-container { display: none !important; }
             
             .card-box { padding: 0; border: none; box-shadow: none; }
@@ -205,6 +173,7 @@
             .content-card { display: block !important; margin-bottom: 30px; border: none; }
             table { font-size: 9px; page-break-inside: auto; }
             tr, td, th { page-break-inside: avoid; }
+            thead { display: table-header-group; }
         }
     </style>
 </head>
@@ -247,7 +216,7 @@
 
             <div id="reportPanel" class="card-box" style="display: none;">
                 
-                <!-- AWAL BUNGKUSAN STICKY HEADER -->
+                <!-- AWAL BUNGKUSAN STICKY HEADER (HANYA INFO KAPAL & TABS) -->
                 <div class="sticky-top-section">
                     <div class="top-info-bar">
                         <div class="ship-info">
@@ -346,29 +315,12 @@
             el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
         }
 
-        // --- FIX TINGGI NOL BUG (CSS VARIABLES) ---
-        function updateStickyHeaderHeight() {
-            const topSection = document.querySelector('.sticky-top-section');
-            if(topSection) {
-                document.documentElement.style.setProperty('--header-h', topSection.offsetHeight + 'px');
-            }
-            
-            // Hanya mengukur dari tab yang SEDANG AKTIF terlihat di layar
-            const activeTitle = document.querySelector('.content-card.active thead tr.section-title td');
-            if(activeTitle && activeTitle.offsetHeight > 0) {
-                document.documentElement.style.setProperty('--title-h', activeTitle.offsetHeight + 'px');
-            }
-        }
-        window.addEventListener('resize', updateStickyHeaderHeight);
-
+        // TABS BERSIH DARI SCRIPT STICKY TABLE YANG BIKIN ERROR
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            
-            // Delay sepersekian detik agar display block selesai sebelum diukur
-            setTimeout(updateStickyHeaderHeight, 50);
         }
 
         function toggleFilter(el) {
@@ -383,7 +335,6 @@
                 el.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies';
             }
             lucide.createIcons();
-            setTimeout(updateStickyHeaderHeight, 50);
         }
 
         function toggleUploadForm() {
@@ -723,9 +674,6 @@
                 });
             }
             document.getElementById("body-sertifikat").innerHTML = htmlCert;
-
-            // Kalkulasi header yang mulus
-            setTimeout(updateStickyHeaderHeight, 100);
         }
     </script>
 </body>
