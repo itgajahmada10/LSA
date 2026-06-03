@@ -17,19 +17,20 @@
             --text-main: #1e293b; 
             --text-muted: #64748b;
             
+            /* CSS Variables untuk Sticky Header (Auto-Updated by JS) */
+            --header-h: 170px;
+            --title-h: 42px;
+
             /* 4 Level Status Colors */
             --status-pass-bg: #f0fdf4;
             --status-pass-border: #bbf7d0;
             --status-pass-text: #166534;
-            
             --status-partial-bg: #fff7ed;
             --status-partial-border: #ffedd5;
             --status-partial-text: #c2410c;
-            
             --status-review-bg: #fefce8;
             --status-review-border: #fef08a;
             --status-review-text: #854d0e;
-            
             --status-fail-bg: #fef2f2;
             --status-fail-border: #fecaca;
             --status-fail-text: #991b1b;
@@ -58,10 +59,7 @@
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
         
         /* === STICKY HEADER DASHBOARD (ANTI-SCROLL) === */
-        #reportPanel {
-            padding: 0 !important;
-            overflow: visible !important;
-        }
+        #reportPanel { padding: 0 !important; overflow: visible !important; }
         .sticky-top-section {
             position: sticky;
             top: 0;
@@ -72,20 +70,19 @@
             border-bottom: 2px solid var(--border-color);
             box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08);
         }
-        .tabs-container {
-            border-bottom: none !important;
-            margin-bottom: 0 !important;
-        }
+        .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; }
 
-        /* === STICKY TABLE HEADERS === */
+        /* === STICKY TABLE HEADERS (BUG FIX) === */
         thead tr.section-title td {
             position: sticky;
+            top: calc(var(--header-h) - 1px);
             z-index: 12;
             background-clip: padding-box;
             outline: 1px solid var(--primary);
         }
         thead tr:not(.section-title) th {
             position: sticky;
+            top: calc(var(--header-h) + var(--title-h) - 2px);
             z-index: 11;
             background-clip: padding-box;
             outline: 1px solid var(--border-color);
@@ -133,8 +130,8 @@
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-       /* TABLES CORE STYLES */
-        .table-responsive { width: 100%; } /* overflow-x DIHAPUS BIAR STICKY JALAN */
+        /* TABLES CORE STYLES */
+        .table-responsive { width: 100%; } 
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
         th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
         td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
@@ -191,9 +188,16 @@
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
             
-            /* RESET STICKY HEADER SAAT PRINT */
+            /* RESET STICKY HEADER SAAT PRINT BIAR GAK NUMPUK */
             .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
-            thead tr.section-title td, thead tr:not(.section-title) th { position: relative !important; outline: none; box-shadow: none; }
+            thead { display: table-header-group !important; }
+            thead tr.section-title td, 
+            thead tr:not(.section-title) th { 
+                position: static !important; 
+                top: auto !important; 
+                outline: none !important; 
+                box-shadow: none !important; 
+            }
             .tabs-container { display: none !important; }
             
             .card-box { padding: 0; border: none; box-shadow: none; }
@@ -243,6 +247,7 @@
 
             <div id="reportPanel" class="card-box" style="display: none;">
                 
+                <!-- AWAL BUNGKUSAN STICKY HEADER -->
                 <div class="sticky-top-section">
                     <div class="top-info-bar">
                         <div class="ship-info">
@@ -266,6 +271,7 @@
                         <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
                     </div>
                 </div>
+
                 <main class="content-area" style="padding: 25px 30px 30px 30px;">
                     <div id="tab-summary" class="content-card active">
                         <div class="table-responsive">
@@ -340,21 +346,18 @@
             el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
         }
 
-        // FUNGSI UPDATE STICKY HEADER
+        // --- FIX TINGGI NOL BUG (CSS VARIABLES) ---
         function updateStickyHeaderHeight() {
             const topSection = document.querySelector('.sticky-top-section');
-            if(!topSection) return;
-            const h = topSection.offsetHeight; 
+            if(topSection) {
+                document.documentElement.style.setProperty('--header-h', topSection.offsetHeight + 'px');
+            }
             
-            document.querySelectorAll('table').forEach(table => {
-                const titleTd = table.querySelector('thead tr.section-title td');
-                if(titleTd) titleTd.style.top = (h - 1) + 'px'; 
-                
-                const titleHeight = titleTd ? titleTd.offsetHeight : 0;
-                table.querySelectorAll('thead tr:not(.section-title) th').forEach(th => {
-                    th.style.top = (h + titleHeight - 2) + 'px';
-                });
-            });
+            // Hanya mengukur dari tab yang SEDANG AKTIF terlihat di layar
+            const activeTitle = document.querySelector('.content-card.active thead tr.section-title td');
+            if(activeTitle && activeTitle.offsetHeight > 0) {
+                document.documentElement.style.setProperty('--title-h', activeTitle.offsetHeight + 'px');
+            }
         }
         window.addEventListener('resize', updateStickyHeaderHeight);
 
@@ -364,7 +367,7 @@
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             
-            // Kalkulasi ulang posisi header tabel agar nempel sempurna saat pindah tab
+            // Delay sepersekian detik agar display block selesai sebelum diukur
             setTimeout(updateStickyHeaderHeight, 50);
         }
 
@@ -380,7 +383,7 @@
                 el.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies';
             }
             lucide.createIcons();
-            setTimeout(updateStickyHeaderHeight, 50); // Re-kalkulasi karena tinggi konten bisa berubah
+            setTimeout(updateStickyHeaderHeight, 50);
         }
 
         function toggleUploadForm() {
@@ -721,7 +724,7 @@
             }
             document.getElementById("body-sertifikat").innerHTML = htmlCert;
 
-            // Trigger kalkulasi sticky header setelah tabel selesai digambar
+            // Kalkulasi header yang mulus
             setTimeout(updateStickyHeaderHeight, 100);
         }
     </script>
