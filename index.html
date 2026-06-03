@@ -56,6 +56,27 @@
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
         
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
+        
+        /* === STICKY HEADER DASHBOARD (ANTI-SCROLL) === */
+        #reportPanel {
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+        .sticky-top-section {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background-color: var(--bg-card);
+            padding: 30px 30px 0 30px;
+            border-radius: 16px 16px 0 0;
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08);
+        }
+        .tabs-container {
+            border-bottom: none !important;
+            margin-bottom: 0 !important;
+        }
+
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
         label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
@@ -84,7 +105,7 @@
         .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
 
         /* === HORIZONTAL TABS === */
-        .tabs-container { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; gap: 5px; width: 100%; flex-wrap: wrap; }
+        .tabs-container { display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap; }
         .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; flex-shrink: 0; }
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
@@ -151,10 +172,16 @@
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .tabs-container, .action-buttons, .filter-btn, .header, form { display: none !important; }
+            .left-panel, .action-buttons, .filter-btn, .header, form { display: none !important; }
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
+            
+            /* RESET STICKY HEADER SAAT PRINT */
+            .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
+            .tabs-container { display: none !important; }
+            
             .card-box { padding: 0; border: none; box-shadow: none; }
+            .content-area { padding: 0 !important; }
             .content-card { display: block !important; margin-bottom: 30px; border: none; }
             table { font-size: 9px; page-break-inside: auto; }
             tr, td, th { page-break-inside: avoid; }
@@ -183,7 +210,7 @@
                         <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional)</label>
                         <input type="file" id="deliveryFile" accept=".pdf">
                     </div>
-                    <div style="margin-bottom: 15px; font-size: 10px; color: #701a75; font-weight: 700; text-align: center;">0---0---0---0 PROCESSING AI SYSTEM</div>
+                    <div style="margin-bottom: 15px; font-size: 10px; color: #701a75; font-weight: 700; text-align: center;">0---0---0---0 ini proses nya..</div>
                     <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
                     <div id="ui-message"></div>
                 </form>
@@ -199,29 +226,35 @@
             </div>
 
             <div id="reportPanel" class="card-box" style="display: none;">
-                <div class="top-info-bar">
-                    <div class="ship-info">
-                        <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
-                        <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
-                        <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
-                        <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
+                
+                <!-- AWAL BUNGKUSAN STICKY HEADER -->
+                <div class="sticky-top-section">
+                    <div class="top-info-bar">
+                        <div class="ship-info">
+                            <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
+                            <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
+                            <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
+                            <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="toggleUploadForm()" class="btn-modern btn-toggle-view" id="toggleFormBtn">
+                                <i data-lucide="sidebar-close" id="toggleIcon" style="width:16px;"></i> <span id="toggleText">Hide Upload Form</span>
+                            </button>
+                            <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
+                        </div>
                     </div>
-                    <div class="action-buttons">
-                        <button onclick="toggleUploadForm()" class="btn-modern btn-toggle-view" id="toggleFormBtn">
-                            <i data-lucide="sidebar-close" id="toggleIcon" style="width:16px;"></i> <span id="toggleText">Hide Upload Form</span>
-                        </button>
-                        <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
+
+                    <div class="tabs-container">
+                        <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
+                        <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
+                        <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
+                        <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
                     </div>
                 </div>
+                <!-- AKHIR BUNGKUSAN STICKY HEADER -->
 
-                <div class="tabs-container">
-                    <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
-                    <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
-                    <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
-                    <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
-                </div>
-
-                <main class="content-area">
+                <!-- Area Konten dengan padding atas tambahan -->
+                <main class="content-area" style="padding: 25px 30px 30px 30px;">
                     <div id="tab-summary" class="content-card active">
                         <div class="table-responsive">
                             <table id="reconciliation-executive-table">
@@ -431,7 +464,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // Top Bar (DIREVISI: LOOPING ANTI-BOLONG)
+            // Top Bar (LOOPING ANTI-BOLONG)
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             certRows.forEach(r => {
                 let certContent = String(r.di_sertifikat).toLowerCase();
@@ -451,7 +484,7 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // Tab Penawaran Harga (GROUPING FOLDER & AI REASON ROW)
+            // Tab Penawaran Harga (GROUPING FOLDER & LABEL SERTIFIKAT VERTIKAL)
             let htmlPen = ""; 
             let groupedPen = {};
             penRows.forEach(r => {
@@ -461,16 +494,14 @@
             });
 
             for(let g in groupedPen) {
-                // Cek apakah di dalam grup ini ada anomali atau tidak
                 let groupHasWarn = groupedPen[g].some(r => {
                     let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
                 });
                 
-                // Header Group (Ikut sembunyi kalau di mode Only Anomalies dan tidak ada anomali)
                 let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
                 htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
                 
-             groupedPen[g].forEach((r) => {
+                groupedPen[g].forEach((r) => {
                     let rawAlias = String(r.alias_sistem || "-").trim();
                     let aliasParts = rawAlias.split(" - ");
                     let itemCode = aliasParts[0] || "-";
@@ -482,11 +513,10 @@
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     let noUrut = r.no_urut_penawaran || "-";
                     
-                    // PEMBUATAN LABEL KAPSUL VERTIKAL
+                    // PEMBUATAN LABEL KAPSUL VERTIKAL UNTUK NOMOR SERTIFIKAT
                     let certTerkait = String(r.cert_terkait || "-").trim();
                     let certBadgeHtml = "";
                     if(certTerkait !== "-") {
-                        // Bungkus dengan Flexbox Column biar berbaris vertikal ke bawah
                         certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">`;
                         certTerkait.split(',').forEach(c => {
                             if(c.trim() !== "") {
