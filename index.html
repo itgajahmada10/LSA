@@ -133,6 +133,13 @@
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
         .doc-val { background: #fdfdfd; padding: 4px; border-radius: 2px; border: 1px solid #f1f5f9; font-weight: 600; font-size: 11px; }
 
+        /* EXPLANATION ROW (AI REASON) */
+        .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
+        .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; }
+        .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
+        .ai-note.ok { background: #f0fdf4; border-left: 3px solid var(--success); color: var(--success); }
+
+        /* Hide matched rows when filter is active */
         body.filter-anomali .row-match { display: none !important; }
 
         /* LOADING ANIMATION */
@@ -436,7 +443,7 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // Tab Penawaran Harga (DENGAN GROUPING FOLDER DARI DOKUMEN ASLI)
+            // Tab Penawaran Harga (GROUPING FOLDER & AI REASON ROW)
             let htmlPen = ""; 
             let groupedPen = {};
             penRows.forEach(r => {
@@ -467,6 +474,7 @@
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     let noUrut = r.no_urut_penawaran || "-";
 
+                    // 1. Render Baris Utama
                     htmlPen += `<tr class="${rowClass}">
                         <td align="center"><b>${esc(noUrut)}</b></td>
                         <td>
@@ -479,6 +487,25 @@
                         <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
                         <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
                     </tr>`;
+
+                    // 2. Render Baris Penjelasan AI Reason (Khusus Anomali)
+                    if (isWarn && hasilStr.trim() !== "") {
+                        let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+                        if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) {
+                            cleanReason = cleanReason.substring(1).trim();
+                        }
+                        
+                        if(cleanReason !== "") {
+                            htmlPen += `<tr class="explanation-row ${rowClass}">
+                                <td style="border-right: 1px solid var(--border-color);"></td>
+                                <td colspan="5">
+                                    <div class="ai-note err">
+                                        <b>💡 AI Reason:</b> ${esc(cleanReason)}
+                                    </div>
+                                </td>
+                            </tr>`;
+                        }
+                    }
                 });
             }
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
