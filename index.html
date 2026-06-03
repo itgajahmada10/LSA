@@ -77,6 +77,21 @@
             margin-bottom: 0 !important;
         }
 
+        /* === STICKY TABLE HEADERS === */
+        thead tr.section-title td {
+            position: sticky;
+            z-index: 12;
+            background-clip: padding-box;
+            outline: 1px solid var(--primary);
+        }
+        thead tr:not(.section-title) th {
+            position: sticky;
+            z-index: 11;
+            background-clip: padding-box;
+            outline: 1px solid var(--border-color);
+            box-shadow: 0 6px 15px -5px rgba(78, 43, 92, 0.15);
+        }
+
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
         label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
@@ -178,6 +193,7 @@
             
             /* RESET STICKY HEADER SAAT PRINT */
             .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
+            thead tr.section-title td, thead tr:not(.section-title) th { position: relative !important; outline: none; box-shadow: none; }
             .tabs-container { display: none !important; }
             
             .card-box { padding: 0; border: none; box-shadow: none; }
@@ -227,7 +243,6 @@
 
             <div id="reportPanel" class="card-box" style="display: none;">
                 
-                <!-- AWAL BUNGKUSAN STICKY HEADER -->
                 <div class="sticky-top-section">
                     <div class="top-info-bar">
                         <div class="ship-info">
@@ -251,9 +266,6 @@
                         <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
                     </div>
                 </div>
-                <!-- AKHIR BUNGKUSAN STICKY HEADER -->
-
-                <!-- Area Konten dengan padding atas tambahan -->
                 <main class="content-area" style="padding: 25px 30px 30px 30px;">
                     <div id="tab-summary" class="content-card active">
                         <div class="table-responsive">
@@ -276,15 +288,17 @@
                     <div id="tab-penawaran" class="content-card">
                         <div class="table-responsive">
                             <table>
-                                <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
-                                <tr>
-                                    <th width="4%" style="text-align:center;">NO</th>
-                                    <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                                    <th width="13%">QUOTATION (QTY)</th>
-                                    <th width="15%">CERTIFICATE (QTY)</th>
-                                    <th width="8%" style="text-align:center;">DO (QTY)</th>
-                                    <th width="15%" style="text-align:center;">AUDIT STATUS</th>
-                                </tr>
+                                <thead>
+                                    <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
+                                    <tr>
+                                        <th width="4%" style="text-align:center;">NO</th>
+                                        <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
+                                        <th width="13%">QUOTATION (QTY)</th>
+                                        <th width="15%">CERTIFICATE (QTY)</th>
+                                        <th width="8%" style="text-align:center;">DO (QTY)</th>
+                                        <th width="15%" style="text-align:center;">AUDIT STATUS</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="body-penawaran"></tbody>
                             </table>
                         </div>
@@ -293,12 +307,14 @@
                     <div id="tab-sertifikat" class="content-card">
                         <div class="table-responsive">
                             <table>
-                                <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
-                                <tr>
-                                    <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
-                                    <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
-                                    <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
-                                </tr>
+                                <thead>
+                                    <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
+                                    <tr>
+                                        <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
+                                        <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
+                                        <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="body-sertifikat"></tbody>
                             </table>
                         </div>
@@ -324,11 +340,32 @@
             el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
         }
 
+        // FUNGSI UPDATE STICKY HEADER
+        function updateStickyHeaderHeight() {
+            const topSection = document.querySelector('.sticky-top-section');
+            if(!topSection) return;
+            const h = topSection.offsetHeight; 
+            
+            document.querySelectorAll('table').forEach(table => {
+                const titleTd = table.querySelector('thead tr.section-title td');
+                if(titleTd) titleTd.style.top = (h - 1) + 'px'; 
+                
+                const titleHeight = titleTd ? titleTd.offsetHeight : 0;
+                table.querySelectorAll('thead tr:not(.section-title) th').forEach(th => {
+                    th.style.top = (h + titleHeight - 2) + 'px';
+                });
+            });
+        }
+        window.addEventListener('resize', updateStickyHeaderHeight);
+
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
+            
+            // Kalkulasi ulang posisi header tabel agar nempel sempurna saat pindah tab
+            setTimeout(updateStickyHeaderHeight, 50);
         }
 
         function toggleFilter(el) {
@@ -343,6 +380,7 @@
                 el.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies';
             }
             lucide.createIcons();
+            setTimeout(updateStickyHeaderHeight, 50); // Re-kalkulasi karena tinggi konten bisa berubah
         }
 
         function toggleUploadForm() {
@@ -682,6 +720,9 @@
                 });
             }
             document.getElementById("body-sertifikat").innerHTML = htmlCert;
+
+            // Trigger kalkulasi sticky header setelah tabel selesai digambar
+            setTimeout(updateStickyHeaderHeight, 100);
         }
     </script>
 </body>
