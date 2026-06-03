@@ -470,7 +470,7 @@
                 let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
                 htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
                 
-                groupedPen[g].forEach((r) => {
+             groupedPen[g].forEach((r) => {
                     let rawAlias = String(r.alias_sistem || "-").trim();
                     let aliasParts = rawAlias.split(" - ");
                     let itemCode = aliasParts[0] || "-";
@@ -481,6 +481,20 @@
                     let certQty = String(r.di_sertifikat || "-").trim();
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     let noUrut = r.no_urut_penawaran || "-";
+                    
+                    // PEMBUATAN LABEL KAPSUL VERTIKAL
+                    let certTerkait = String(r.cert_terkait || "-").trim();
+                    let certBadgeHtml = "";
+                    if(certTerkait !== "-") {
+                        // Bungkus dengan Flexbox Column biar berbaris vertikal ke bawah
+                        certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">`;
+                        certTerkait.split(',').forEach(c => {
+                            if(c.trim() !== "") {
+                                certBadgeHtml += `<span style="background: #f8fafc; color: #475569; font-size: 9px; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: 700; width: max-content; display: inline-block; white-space: normal;">🏷️ ${esc(c.trim())}</span>`;
+                            }
+                        });
+                        certBadgeHtml += `</div>`;
+                    }
 
                     // 1. Render Baris Utama
                     htmlPen += `<tr class="${rowClass}">
@@ -491,7 +505,10 @@
                             <div class="box-code">${esc(itemCode)}</div>
                         </td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                        <td><div class="doc-val">${esc(certQty)}</div></td>
+                        <td>
+                            <div class="doc-val">${esc(certQty)}</div>
+                            ${certBadgeHtml} 
+                        </td>
                         <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
                         <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
                     </tr>`;
