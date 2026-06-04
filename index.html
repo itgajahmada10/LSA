@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.4 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.5 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -111,7 +111,7 @@
         .sop-item.fail-border { border-left-color: #ef4444; background: #fef2f2; }
         
         .sop-icon { font-size: 14px; line-height: 1; margin-top: 1px; }
-        .sop-text { font-size: 11.5px; font-weight: 500; color: #334155; line-height: 1.5; }
+        .sop-text { font-size: 11.5px; font-weight: 500; color: #334155; line-height: 1.6; }
         .sop-text strong { color: var(--primary); font-weight: 800; }
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
@@ -125,13 +125,6 @@
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
 
-        /* Level 4 Status Badge Label Blocks */
-        .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
-        .cell-status-block.pass { background-color: var(--status-pass-bg); border-color: var(--status-pass-border); color: var(--status-pass-text); }
-        .cell-status-block.partial { background-color: var(--status-partial-bg); border-color: var(--status-partial-border); color: var(--status-partial-text); }
-        .cell-status-block.review { background-color: var(--status-review-bg); border-color: var(--status-review-border); color: var(--status-review-text); }
-        .cell-status-block.fail { background-color: var(--status-fail-bg); border-color: var(--status-fail-border); color: var(--status-fail-text); }
-
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
 
@@ -141,12 +134,10 @@
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
         .doc-val { background: #fdfdfd; padding: 4px; border-radius: 2px; border: 1px solid #f1f5f9; font-weight: 600; font-size: 11px; }
 
-        /* EXPLANATION ROW (AI REASON) */
         .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
         .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; }
         .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
-        .ai-note.ok { background: #f0fdf4; border-left: 3px solid var(--success); color: var(--success); }
-
+        
         body.filter-anomali .row-match { display: none !important; }
 
         /* LOADING ANIMATION */
@@ -161,17 +152,14 @@
             .left-panel, .action-buttons, .filter-btn, .header, form { display: none !important; }
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
-            
             .sticky-top-section { position: relative !important; top: auto !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
             .tabs-container { display: none !important; }
-            
             .card-box { padding: 0; border: none; box-shadow: none; }
             .content-area { padding: 0 !important; }
             .content-card { display: block !important; margin-bottom: 30px; border: none; }
             table { font-size: 9px; page-break-inside: auto; }
             tr, td, th { page-break-inside: avoid; }
             thead { display: table-header-group; }
-            
             .exec-card { page-break-inside: avoid; border: 1px solid #ccc; box-shadow: none !important; margin-bottom: 15px; }
             .exec-card-body { grid-template-columns: 40% 60%; }
         }
@@ -242,45 +230,10 @@
 
                 <main class="content-area" style="padding: 25px 30px 30px 30px;">
                     <div id="tab-summary" class="content-card active" style="background: transparent; border: none; box-shadow: none;">
-                        <div id="body-reconciliation-summary" class="exec-summary-grid">
-                            <!-- Kartu-kartu hasil AI akan dirender di sini -->
-                        </div>
+                        <div id="body-reconciliation-summary" class="exec-summary-grid"></div>
                     </div>
-
-                    <div id="tab-penawaran" class="content-card">
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
-                                    <tr>
-                                        <th width="4%" style="text-align:center;">NO</th>
-                                        <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                                        <th width="13%">QUOTATION (QTY)</th>
-                                        <th width="15%">CERTIFICATE (QTY)</th>
-                                        <th width="8%" style="text-align:center;">DO (QTY)</th>
-                                        <th width="15%" style="text-align:center;">AUDIT STATUS</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-penawaran"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div id="tab-sertifikat" class="content-card">
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
-                                    <tr>
-                                        <th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th>
-                                        <th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th>
-                                        <th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-sertifikat"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div id="tab-penawaran" class="content-card"><div class="table-responsive"><table><thead><tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr><tr><th width="4%" style="text-align:center;">NO</th><th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th><th width="13%">QUOTATION (QTY)</th><th width="15%">CERTIFICATE (QTY)</th><th width="8%" style="text-align:center;">DO (QTY)</th><th width="15%" style="text-align:center;">AUDIT STATUS</th></tr></thead><tbody id="body-penawaran"></tbody></table></div></div>
+                    <div id="tab-sertifikat" class="content-card"><div class="table-responsive"><table><thead><tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr><tr><th width="3%" style="text-align:center;">NO</th><th width="15%">REPORT NAME</th><th width="12%">CERT NO</th><th width="12%">SHIP NAME</th><th width="12%">OWNER</th><th width="8%" style="text-align:center;">IMO NO</th><th width="5%" style="text-align:center;">CLASS</th><th width="5%" style="text-align:center;">GT</th><th width="6%">FLAG</th><th width="6%" style="text-align:center;">CALL</th><th width="8%">SERVICING DATE</th><th width="8%">SIGN DATE</th><th width="6%" style="text-align:center;">STATUS</th></tr></thead><tbody id="body-sertifikat"></tbody></table></div></div>
                 </main>
             </div>
         </div>
@@ -288,10 +241,8 @@
 
     <script>
         lucide.createIcons();
-        
         const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
-        
         let pollingInterval, timerInterval, isFilter = false;
 
         function showMessage(msg, isError) {
@@ -326,20 +277,16 @@
             const icon = document.getElementById('toggleIcon');
             const text = document.getElementById('toggleText');
             panel.classList.toggle('is-hidden');
-            
             if (panel.classList.contains('is-hidden')) {
-                icon.setAttribute('data-lucide', 'sidebar-open');
-                text.innerText = 'Show Upload Form';
+                icon.setAttribute('data-lucide', 'sidebar-open'); text.innerText = 'Show Upload Form';
             } else {
-                icon.setAttribute('data-lucide', 'sidebar-close');
-                text.innerText = 'Hide Upload Form';
+                icon.setAttribute('data-lucide', 'sidebar-close'); text.innerText = 'Hide Upload Form';
             }
             lucide.createIcons();
         }
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-        // --- SISTEM DECODE BASE64 ---
         async function checkStatus(jobId) {
             try {
                 let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }});
@@ -349,7 +296,6 @@
                 let json = JSON.parse(text);
                 let rows = Array.isArray(json) ? json : (json.data || [json]);
                 let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-
                 if (json.status === "processing" || !ourRow) return; 
 
                 clearInterval(pollingInterval); clearInterval(timerInterval);
@@ -375,7 +321,6 @@
 
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
-                
             } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
@@ -410,11 +355,9 @@
             }
         };
 
-        // --- ENGINE RENDERING REKONSILIASI V7.4 SMART MATRIX ---
         function renderAuditReport(parsed) {
             if (!parsed || !parsed.tabel_audit) {
-                showMessage("Format data JSON tidak dikenali oleh sistem.", true);
-                return;
+                showMessage("Format data JSON tidak dikenali oleh sistem.", true); return;
             }
 
             let certRows = [], penRows = [];
@@ -423,7 +366,6 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // Top Bar
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             certRows.forEach(r => {
                 let certContent = String(r.di_sertifikat).toLowerCase();
@@ -443,19 +385,16 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // Tab Penawaran Harga
             let htmlPen = ""; let groupedPen = {};
             penRows.forEach(r => {
                 let g = r.grup_penawaran && r.grup_penawaran !== "-" ? r.grup_penawaran : "Item Lainnya";
-                if(!groupedPen[g]) groupedPen[g] = [];
-                groupedPen[g].push(r);
+                if(!groupedPen[g]) groupedPen[g] = []; groupedPen[g].push(r);
             });
 
             for(let g in groupedPen) {
                 let groupHasWarn = groupedPen[g].some(r => {
                     let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
                 });
-                
                 let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
                 htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
                 
@@ -478,9 +417,7 @@
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     htmlPen += `<tr class="${rowClass}">
                         <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
-                        <td>
-                            <div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div>
-                        </td>
+                        <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
                         <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
                         <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
@@ -498,11 +435,8 @@
             }
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP</td></tr>`;
 
-            // Tab Executive Summary (Smart Matrix UI)
             let reconciliationRowsHtml = "";
             let summaryList = parsed.summary_sertifikat || [];
-
-            // Urutkan agar "Pengecekan Umum Dokumen" selalu tampil paling atas
             summaryList.sort((a, b) => {
                 if(String(a.sistem).toLowerCase().includes("umum")) return -1;
                 if(String(b.sistem).toLowerCase().includes("umum")) return 1;
@@ -533,7 +467,6 @@
                 } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
                 quotBulletItemsHtml += `</ul>`;
 
-                // --- SMART SOP PARSING (MEMECAH BERDASARKAN TITIK DUA ":") ---
                 let sopChecklistHtml = `<div class="sop-check-grid">`;
                 let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
                 if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
@@ -543,12 +476,9 @@
                         let cleanLine = line.trim();
                         if (cleanLine !== "" && cleanLine !== "-") {
                             let textLower = cleanLine.toLowerCase();
-                            
-                            // Logika Deteksi Cerdas
-                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak sesuai") || textLower.includes("gagal") || textLower.includes("tidak ada cap");
+                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak sesuai") || textLower.includes("gagal") || textLower.includes("tidak ada cap") || textLower.includes("[red]");
                             let isWarn = false;
                             
-                            // Syarat warning: Ada indikasi RN/Renew/Mendekati umur batas TAPI bukan kalimat negasi.
                             if ((textLower.includes("rn:") || textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("warning")) 
                                 && !textLower.includes("tidak ada material rn") && !textLower.includes("tidak ada item rn") && !textLower.includes("tidak ada material yg di rn")) {
                                 isWarn = true;
@@ -557,7 +487,6 @@
                             let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
                             let icon = isFail ? "❌" : (isWarn ? "⚠️" : "✅");
                             
-                            // Pemecah string otomatis (Berdasarkan Matrix Name)
                             let renderedText = "";
                             let colonIndex = cleanLine.indexOf(':');
                             if(colonIndex !== -1) {
@@ -567,6 +496,10 @@
                             } else {
                                 renderedText = `<strong>${esc(cleanLine)}</strong>`;
                             }
+
+                            // --- FITUR BARU: TERJEMAHAN VERTIKAL (||) & STABILO MERAH ([RED]) ---
+                            renderedText = renderedText.replace(/\|\|/g, '<br>&nbsp;&nbsp;&nbsp;&bull; ');
+                            renderedText = renderedText.replace(/\[RED\](.*?)\[\/RED\]/g, '<span style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fca5a5;">$1</span>');
 
                             sopChecklistHtml += `
                             <div class="sop-item ${borderClass}">
@@ -582,7 +515,6 @@
                 let statusClass = "pass";
                 if (currentStatus === "FAIL") statusClass = "fail";
                 else if (currentStatus === "PARTIAL" || currentStatus === "REVIEW") statusClass = "partial";
-
                 let isGeneral = String(item.sistem).toLowerCase().includes("umum");
 
                 reconciliationRowsHtml += `
@@ -607,7 +539,6 @@
             });
             document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<div style="text-align:center; padding:40px; color:#64748b; font-weight:700;">✅ DATA KOSONG ATAU BELUM TERHUBUNG</div>`;
 
-            // Tab Certificate Registry
             let htmlCert = ""; let certGroups = {};
             certRows.forEach(r => {
                 let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
@@ -616,9 +547,7 @@
 
             let gIdx = 1;
             for (let cNo in certGroups) {
-                let groupWarn = certGroups[cNo].some(r => {
-                    let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
-                });
+                let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
                 htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
                 
                 certGroups[cNo].forEach(r => {
