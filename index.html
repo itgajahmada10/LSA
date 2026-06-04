@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7 Pro Enterprise Dashboard</title>
+    <title>Waruna LSA Audit — V7.3 Pro Enterprise Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -17,6 +17,10 @@
             --text-main: #1e293b; 
             --text-muted: #64748b;
             
+            /* CSS Variables untuk Sticky Header (Auto-Updated by JS) */
+            --header-h: 170px;
+            --title-h: 42px;
+
             /* 4 Level Status Colors */
             --status-pass-bg: #f0fdf4;
             --status-pass-border: #bbf7d0;
@@ -119,7 +123,7 @@
         /* Kolom Kiri: Referensi */
         .exec-col-ref { padding: 20px 25px; border-right: 1px dashed var(--border-color); background: #ffffff; }
         .exec-col-title { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; display: inline-block; }
-        .ref-quote-list { margin: 0 0 15px 0; padding-left: 15px; font-weight: 600; color: #334155; font-size: 11.5px; }
+        .ref-quote-list { margin: 0 0 15px 0; padding-left: 15px; font-weight: 600; color: #334155; font-size: 11.5px; line-height: 1.5; }
         .ref-quote-list li { margin-bottom: 5px; }
         
         /* Kolom Kanan: Audit SOP */
@@ -454,7 +458,7 @@
             }
         };
 
-        // --- ENGINE RENDERING REKONSILIASI V7 ---
+        // --- ENGINE RENDERING REKONSILIASI V7.3 ---
         function renderAuditReport(parsed) {
             if (!parsed || !parsed.tabel_audit) {
                 showMessage("Format data JSON tidak dikenali oleh sistem.", true);
@@ -601,7 +605,7 @@
                 } else { quotBulletItemsHtml += `<li>Sesuai penawaran terlampir</li>`; }
                 quotBulletItemsHtml += `</ul>`;
 
-                // Render SOP Checklist (Kotak-kotak temuan)
+                // Render SOP Checklist (Kotak-kotak temuan dengan JS yang lebih pintar)
                 let sopChecklistHtml = `<div class="sop-check-grid">`;
                 let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
                 if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
@@ -611,8 +615,15 @@
                         let cleanLine = line.trim();
                         if (cleanLine !== "" && cleanLine !== "-") {
                             let textLower = cleanLine.toLowerCase();
-                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak ada cap");
-                            let isWarn = textLower.includes("rn") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("diganti");
+                            
+                            // Logika pintar untuk menentukan ikon (Menangkal error 'Tidak ada material RN')
+                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak ada cap") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan");
+                            
+                            // Warning hanya aktif jika ada kata 'rn' TAPI TIDAK ADA KATA 'tidak ada'
+                            let isWarn = false;
+                            if ((textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("diganti")) && !textLower.includes("tidak ada pergantian") && !textLower.includes("tidak ada material")) {
+                                isWarn = true;
+                            }
                             
                             let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
                             let icon = isFail ? "❌" : (isWarn ? "⚠️" : "✅");
