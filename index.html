@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.3 Pro Enterprise Dashboard</title>
+    <title>Waruna LSA Audit — V7.4 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        /* === CORE VARIABLES (MURNI WARNA V7 PRO) === */
+        /* === CORE VARIABLES === */
         :root { 
             --primary: #4e2b5c; 
             --primary-hover: #3b1e47; 
@@ -17,31 +17,19 @@
             --text-main: #1e293b; 
             --text-muted: #64748b;
             
-            /* CSS Variables untuk Sticky Header (Auto-Updated by JS) */
             --header-h: 170px;
             --title-h: 42px;
 
             /* 4 Level Status Colors */
-            --status-pass-bg: #f0fdf4;
-            --status-pass-border: #bbf7d0;
-            --status-pass-text: #166534;
-            --status-partial-bg: #fff7ed;
-            --status-partial-border: #ffedd5;
-            --status-partial-text: #c2410c;
-            --status-review-bg: #fefce8;
-            --status-review-border: #fef08a;
-            --status-review-text: #854d0e;
-            --status-fail-bg: #fef2f2;
-            --status-fail-border: #fecaca;
-            --status-fail-text: #991b1b;
+            --status-pass-bg: #f0fdf4; --status-pass-border: #bbf7d0; --status-pass-text: #166534;
+            --status-partial-bg: #fff7ed; --status-partial-border: #ffedd5; --status-partial-text: #c2410c;
+            --status-review-bg: #fefce8; --status-review-border: #fef08a; --status-review-text: #854d0e;
+            --status-fail-bg: #fef2f2; --status-fail-border: #fecaca; --status-fail-text: #991b1b;
 
             /* LSA Badges & Boxes */
-            --bg-vendor: #fef9c3; 
-            --border-vendor: #facc15; 
-            --bg-system: #e0f2fe; 
-            --border-system: #7dd3fc;
-            --bg-code: #f0fdf4; 
-            --border-code: #86efac;     
+            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
+            --bg-system: #e0f2fe; --border-system: #7dd3fc;
+            --bg-code: #f0fdf4; --border-code: #86efac;     
         }
 
         /* === STRUCTURAL LAYOUT === */
@@ -52,21 +40,11 @@
         /* === LEFT PANEL (FORM UPLOAD) === */
         .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
-        
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
         
         /* === STICKY HEADER DASHBOARD (ANTI-SCROLL) === */
         #reportPanel { padding: 0 !important; overflow: visible !important; }
-        .sticky-top-section {
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            background-color: var(--bg-card);
-            padding: 30px 30px 0 30px;
-            border-radius: 16px 16px 0 0;
-            border-bottom: 2px solid var(--border-color);
-            box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08);
-        }
+        .sticky-top-section { position: sticky; top: 0; z-index: 999; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08); }
         .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; }
 
         .header { text-align: center; margin-bottom: 25px; }
@@ -110,7 +88,7 @@
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* === MODERN EXECUTIVE CARDS (TAB 1 ALTERNATIVE) === */
+        /* === MODERN EXECUTIVE CARDS (SMART MATRIX PARSING) === */
         .exec-summary-grid { display: flex; flex-direction: column; gap: 20px; width: 100%; }
         .exec-card { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px -10px rgba(78, 43, 92, 0.08); transition: transform 0.2s; }
         .exec-card:hover { transform: translateY(-2px); box-shadow: 0 12px 25px -10px rgba(78, 43, 92, 0.12); border-color: #d8c8df; }
@@ -119,14 +97,11 @@
         .exec-card-title { margin: 0; font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px;}
         
         .exec-card-body { display: grid; grid-template-columns: 35% 65%; }
-        
-        /* Kolom Kiri: Referensi */
         .exec-col-ref { padding: 20px 25px; border-right: 1px dashed var(--border-color); background: #ffffff; }
         .exec-col-title { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; display: inline-block; }
         .ref-quote-list { margin: 0 0 15px 0; padding-left: 15px; font-weight: 600; color: #334155; font-size: 11.5px; line-height: 1.5; }
         .ref-quote-list li { margin-bottom: 5px; }
         
-        /* Kolom Kanan: Audit SOP */
         .exec-col-audit { padding: 20px 25px; background: #fdfdfd; }
         .sop-check-grid { display: flex; flex-direction: column; gap: 10px; }
         
@@ -136,8 +111,9 @@
         .sop-item.fail-border { border-left-color: #ef4444; background: #fef2f2; }
         
         .sop-icon { font-size: 14px; line-height: 1; margin-top: 1px; }
-        .sop-text { font-size: 11.5px; font-weight: 600; color: #1e293b; line-height: 1.5; }
+        .sop-text { font-size: 11.5px; font-weight: 500; color: #334155; line-height: 1.5; }
         .sop-text strong { color: var(--primary); font-weight: 800; }
+        .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
         /* TABLES CORE STYLES (TAB 2 & 3) */
         .table-responsive { width: 100%; overflow-x: auto; } 
@@ -171,7 +147,6 @@
         .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
         .ai-note.ok { background: #f0fdf4; border-left: 3px solid var(--success); color: var(--success); }
 
-        /* Hide matched rows when filter is active */
         body.filter-anomali .row-match { display: none !important; }
 
         /* LOADING ANIMATION */
@@ -187,7 +162,6 @@
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
             
-            /* RESET SEMUA STICKY SAAT PRINT BIAR RAPI */
             .sticky-top-section { position: relative !important; top: auto !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
             .tabs-container { display: none !important; }
             
@@ -198,7 +172,6 @@
             tr, td, th { page-break-inside: avoid; }
             thead { display: table-header-group; }
             
-            /* Print style khusus Executive Cards */
             .exec-card { page-break-inside: avoid; border: 1px solid #ccc; box-shadow: none !important; margin-bottom: 15px; }
             .exec-card-body { grid-template-columns: 40% 60%; }
         }
@@ -243,7 +216,6 @@
 
             <div id="reportPanel" class="card-box" style="display: none;">
                 
-                <!-- AWAL BUNGKUSAN STICKY HEADER (HANYA INFO KAPAL & TABS) -->
                 <div class="sticky-top-section">
                     <div class="top-info-bar">
                         <div class="ship-info">
@@ -330,7 +302,6 @@
             el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
         }
 
-        // TABS BERSIH DARI SCRIPT STICKY TABLE YANG BIKIN ERROR
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
@@ -341,12 +312,10 @@
         function toggleFilter(el) {
             isFilter = !isFilter;
             if(isFilter) {
-                el.classList.add('active'); 
-                document.body.classList.add('filter-anomali');
+                el.classList.add('active'); document.body.classList.add('filter-anomali');
                 el.innerHTML = '<i data-lucide="eye-off" style="width:16px;"></i> Show All Items';
             } else {
-                el.classList.remove('active'); 
-                document.body.classList.remove('filter-anomali');
+                el.classList.remove('active'); document.body.classList.remove('filter-anomali');
                 el.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies';
             }
             lucide.createIcons();
@@ -356,7 +325,6 @@
             const panel = document.getElementById('uploadPanel');
             const icon = document.getElementById('toggleIcon');
             const text = document.getElementById('toggleText');
-            
             panel.classList.toggle('is-hidden');
             
             if (panel.classList.contains('is-hidden')) {
@@ -371,12 +339,10 @@
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-        // --- SISTEM DECODE BASE64 UNIVERSAL (ANTI-ERROR) ---
+        // --- SISTEM DECODE BASE64 ---
         async function checkStatus(jobId) {
             try {
-                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, {
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
+                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }});
                 let text = await res.text();
                 if(!text || text.trim().charAt(0) === "<") return;
                 
@@ -390,49 +356,36 @@
                 document.getElementById('pollingCard').style.display = 'none';
                 document.getElementById('reportPanel').style.display = 'block';
                 const btn = document.getElementById('submitBtn');
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 
                 const panel = document.getElementById('uploadPanel');
                 if(!panel.classList.contains('is-hidden')) toggleUploadForm();
 
-                // ILMU HITAM: DECODE BASE64 + STITCHER UNIVERSAL
                 let fullPayloadStr = ""; 
                 let rowKeys = Object.keys(ourRow);
                 for(let i = 1; i <= 10; i++) {
                     let targetKey = rowKeys.find(k => k.toLowerCase().replace(/\s/g, "") === ("payload" + i));
-                    if(targetKey) {
-                        fullPayloadStr += (ourRow[targetKey] || "");
-                    }
+                    if(targetKey) fullPayloadStr += (ourRow[targetKey] || "");
                 }
                 
-                // DECODE Base64 to JSON String
                 var binaryString = window.atob(fullPayloadStr);
                 var bytes = new Uint8Array(binaryString.length);
-                for (var i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
+                for (var i = 0; i < binaryString.length; i++) { bytes[i] = binaryString.charCodeAt(i); }
                 var decodedStr = new TextDecoder("utf-8").decode(bytes);
 
-                // Render JSON hasil decode
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
                 
-            } catch (e) {
-                console.log("Menunggu dekripsi...", e);
-            }
+            } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
-        // --- SUBMIT FILE VIA FORM ---
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
             const id = `JOB-${Date.now()}`;
             const btn = document.getElementById('submitBtn');
             const errorBox = document.getElementById('ui-message');
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
-            errorBox.style.display = 'none';
-            document.getElementById('reportPanel').style.display = 'none';
+            btn.disabled = true; btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
+            errorBox.style.display = 'none'; document.getElementById('reportPanel').style.display = 'none';
 
             const fd = new FormData();
             fd.append('job_id', id);
@@ -452,13 +405,12 @@
                 pollingInterval = setInterval(() => checkStatus(id), 8000);
             } catch (err) {
                 showMessage(err.message, true);
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 lucide.createIcons();
             }
         };
 
-        // --- ENGINE RENDERING REKONSILIASI V7.3 ---
+        // --- ENGINE RENDERING REKONSILIASI V7.4 SMART MATRIX ---
         function renderAuditReport(parsed) {
             if (!parsed || !parsed.tabel_audit) {
                 showMessage("Format data JSON tidak dikenali oleh sistem.", true);
@@ -471,7 +423,7 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            // Top Bar (LOOPING ANTI-BOLONG)
+            // Top Bar
             let v_name="-", v_imo="-", v_call="-", v_own="-";
             certRows.forEach(r => {
                 let certContent = String(r.di_sertifikat).toLowerCase();
@@ -491,9 +443,8 @@
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
 
-            // Tab Penawaran Harga (GROUPING FOLDER & LABEL SERTIFIKAT VERTIKAL)
-            let htmlPen = ""; 
-            let groupedPen = {};
+            // Tab Penawaran Harga
+            let htmlPen = ""; let groupedPen = {};
             penRows.forEach(r => {
                 let g = r.grup_penawaran && r.grup_penawaran !== "-" ? r.grup_penawaran : "Item Lainnya";
                 if(!groupedPen[g]) groupedPen[g] = [];
@@ -510,89 +461,66 @@
                 
                 groupedPen[g].forEach((r) => {
                     let rawAlias = String(r.alias_sistem || "-").trim();
-                    let aliasParts = rawAlias.split(" - ");
-                    let itemCode = aliasParts[0] || "-";
-                    let systemName = aliasParts.slice(1).join(" - ") || "-";
+                    let itemCode = rawAlias.split(" - ")[0] || "-";
+                    let systemName = rawAlias.split(" - ").slice(1).join(" - ") || "-";
                     let hasilStr = String(r.hasil_ai || "");
                     let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
 
-                    let certQty = String(r.di_sertifikat || "-").trim();
-                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
-                    let noUrut = r.no_urut_penawaran || "-";
-                    
-                    // PEMBUATAN LABEL KAPSUL VERTIKAL UNTUK NOMOR SERTIFIKAT
-                    let certTerkait = String(r.cert_terkait || "-").trim();
                     let certBadgeHtml = "";
-                    if(certTerkait !== "-") {
+                    if(String(r.cert_terkait || "-").trim() !== "-") {
                         certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">`;
-                        certTerkait.split(',').forEach(c => {
-                            if(c.trim() !== "") {
-                                certBadgeHtml += `<span style="background: #f8fafc; color: #475569; font-size: 9px; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: 700; width: max-content; display: inline-block; white-space: normal;">🏷️ ${esc(c.trim())}</span>`;
-                            }
+                        String(r.cert_terkait).split(',').forEach(c => {
+                            if(c.trim() !== "") certBadgeHtml += `<span style="background: #f8fafc; color: #475569; font-size: 9px; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: 700; width: max-content;">🏷️ ${esc(c.trim())}</span>`;
                         });
                         certBadgeHtml += `</div>`;
                     }
 
-                    // 1. Render Baris Utama
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     htmlPen += `<tr class="${rowClass}">
-                        <td align="center"><b>${esc(noUrut)}</b></td>
+                        <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
                         <td>
-                            <div class="box-vendor">${esc(r.keterangan)}</div>
-                            <div class="box-system">${esc(systemName)}</div>
-                            <div class="box-code">${esc(itemCode)}</div>
+                            <div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div>
                         </td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                        <td>
-                            <div class="doc-val">${esc(certQty)}</div>
-                            ${certBadgeHtml} 
-                        </td>
+                        <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
                         <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
                         <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
                     </tr>`;
 
-                    // 2. Render Baris Penjelasan AI Reason (Khusus Anomali)
                     if (isWarn && hasilStr.trim() !== "") {
                         let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
-                        if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) {
-                            cleanReason = cleanReason.substring(1).trim();
-                        }
-                        
+                        if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
                         if(cleanReason !== "") {
-                            htmlPen += `<tr class="explanation-row ${rowClass}">
-                                <td style="border-right: 1px solid var(--border-color);"></td>
-                                <td colspan="5">
-                                    <div class="ai-note err">
-                                        <b>💡 AI Reason:</b> ${esc(cleanReason)}
-                                    </div>
-                                </td>
-                            </tr>`;
+                            htmlPen += `<tr class="explanation-row ${rowClass}"><td style="border-right: 1px solid var(--border-color);"></td><td colspan="5"><div class="ai-note err"><b>💡 AI Reason:</b> ${esc(cleanReason)}</div></td></tr>`;
                         }
                     }
                 });
             }
-            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP (TIDAK ADA ANOMALI TIMBUL)</td></tr>`;
+            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP</td></tr>`;
 
-            // Tab Executive Summary (Modern Cards Interface)
+            // Tab Executive Summary (Smart Matrix UI)
             let reconciliationRowsHtml = "";
             let summaryList = parsed.summary_sertifikat || [];
 
+            // Urutkan agar "Pengecekan Umum Dokumen" selalu tampil paling atas
+            summaryList.sort((a, b) => {
+                if(String(a.sistem).toLowerCase().includes("umum")) return -1;
+                if(String(b.sistem).toLowerCase().includes("umum")) return 1;
+                return 0;
+            });
+
             summaryList.forEach(item => {
                 let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
-                if (noCert.toLowerCase().includes("tidak ditemukan") || noCert.length > 250) noCert = "-";
-                let isFound = noCert !== "-";
+                let isFound = noCert !== "-" && !noCert.toLowerCase().includes("tidak ditemukan") && noCert.length < 250;
 
-                // Render Badge Sertifikat
                 let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;">`;
                 if (isFound) {
                     noCert.split(',').forEach(num => {
                         if(num.trim() !== "") certBadgeContainer += `<div style="background:#f1f5f9; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1; font-weight:700; color:#475569; font-size:10px;">🏷️ ${esc(num.trim())}</div>`;
                     });
-                } else {
-                    certBadgeContainer += `<div style="background:#fef2f2; color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:10px;">TIDAK DITEMUKAN</div>`;
-                }
+                } else { certBadgeContainer += `<div style="background:#fef2f2; color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:10px;">TIDAK DITEMUKAN</div>`; }
                 certBadgeContainer += `</div>`;
 
-                // Render List Quotation
                 let quotBulletItemsHtml = `<ul class="ref-quote-list">`;
                 let rawQuotArray = item.referensi_quotation || [];
                 if (typeof rawQuotArray === 'string') rawQuotArray = rawQuotArray.split('\n');
@@ -602,10 +530,10 @@
                         let cleanLine = line.trim();
                         if (cleanLine !== "" && cleanLine !== "-") quotBulletItemsHtml += `<li>${esc(cleanLine)}</li>`;
                     });
-                } else { quotBulletItemsHtml += `<li>Sesuai penawaran terlampir</li>`; }
+                } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
                 quotBulletItemsHtml += `</ul>`;
 
-                // Render SOP Checklist (Kotak-kotak temuan dengan JS yang lebih pintar)
+                // --- SMART SOP PARSING (MEMECAH BERDASARKAN TITIK DUA ":") ---
                 let sopChecklistHtml = `<div class="sop-check-grid">`;
                 let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
                 if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
@@ -616,20 +544,29 @@
                         if (cleanLine !== "" && cleanLine !== "-") {
                             let textLower = cleanLine.toLowerCase();
                             
-                            // Logika pintar untuk menentukan ikon (Menangkal error 'Tidak ada material RN')
-                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak ada cap") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan");
-                            
-                            // Warning hanya aktif jika ada kata 'rn' TAPI TIDAK ADA KATA 'tidak ada'
+                            // Logika Deteksi Cerdas
+                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak sesuai") || textLower.includes("gagal") || textLower.includes("tidak ada cap");
                             let isWarn = false;
-                            if ((textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("diganti")) && !textLower.includes("tidak ada pergantian") && !textLower.includes("tidak ada material")) {
+                            
+                            // Syarat warning: Ada indikasi RN/Renew/Mendekati umur batas TAPI bukan kalimat negasi.
+                            if ((textLower.includes("rn:") || textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("warning")) 
+                                && !textLower.includes("tidak ada material rn") && !textLower.includes("tidak ada item rn") && !textLower.includes("tidak ada material yg di rn")) {
                                 isWarn = true;
                             }
                             
                             let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
                             let icon = isFail ? "❌" : (isWarn ? "⚠️" : "✅");
                             
-                            // Highlight kata kunci penting
-                            let renderedText = esc(cleanLine).replace(/(Kuantitas Material:|Status RN Material:|Expired Date:|Status Pengesahan:|Masa Hydrotest:|Working Code & Kapasitas:|Kuantitas Label:|Kondisi Set & Cylinder:)/g, "<strong>$1</strong>");
+                            // Pemecah string otomatis (Berdasarkan Matrix Name)
+                            let renderedText = "";
+                            let colonIndex = cleanLine.indexOf(':');
+                            if(colonIndex !== -1) {
+                                let title = cleanLine.substring(0, colonIndex);
+                                let desc = cleanLine.substring(colonIndex + 1);
+                                renderedText = `<strong>${esc(title)}:</strong> <span class="highlight-data">${esc(desc)}</span>`;
+                            } else {
+                                renderedText = `<strong>${esc(cleanLine)}</strong>`;
+                            }
 
                             sopChecklistHtml += `
                             <div class="sop-item ${borderClass}">
@@ -638,21 +575,21 @@
                             </div>`;
                         }
                     });
-                } else { sopChecklistHtml += `<div class="sop-item pass-border"><span class="sop-text">Semua parameter sesuai SOP</span></div>`; }
+                } else { sopChecklistHtml += `<div class="sop-item pass-border"><span class="sop-text">Semua parameter tervalidasi</span></div>`; }
                 sopChecklistHtml += `</div>`;
 
-                // Badge Status Utama
                 let currentStatus = String(item.status || "PASS").toUpperCase();
                 let statusClass = "pass";
                 if (currentStatus === "FAIL") statusClass = "fail";
-                else if (currentStatus === "PARTIAL") statusClass = "partial";
-                else if (currentStatus === "REVIEW") statusClass = "review";
+                else if (currentStatus === "PARTIAL" || currentStatus === "REVIEW") statusClass = "partial";
+
+                let isGeneral = String(item.sistem).toLowerCase().includes("umum");
 
                 reconciliationRowsHtml += `
-                <div class="exec-card">
-                    <div class="exec-card-header">
-                        <h3 class="exec-card-title">🛡️ ${esc(item.sistem)}</h3>
-                        <span class="cell-status-block ${statusClass}">${currentStatus}</span>
+                <div class="exec-card" ${isGeneral ? 'style="border-color: var(--primary); border-width: 2px;"' : ''}>
+                    <div class="exec-card-header" ${isGeneral ? 'style="background-color: var(--primary);"' : ''}>
+                        <h3 class="exec-card-title" ${isGeneral ? 'style="color: white;"' : ''}>🛡️ ${esc(item.sistem)}</h3>
+                        ${!isGeneral ? `<span class="cell-status-block ${statusClass}">${currentStatus}</span>` : `<span class="cell-status-block" style="background:#fff; color:var(--primary);">WAJIB</span>`}
                     </div>
                     <div class="exec-card-body">
                         <div class="exec-col-ref">
@@ -662,7 +599,7 @@
                             ${certBadgeContainer}
                         </div>
                         <div class="exec-col-audit">
-                            <span class="exec-col-title">Checklist Audit SOP</span>
+                            <span class="exec-col-title">Checklist Audit Matrix SOP</span>
                             ${sopChecklistHtml}
                         </div>
                     </div>
