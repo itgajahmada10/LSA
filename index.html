@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.11 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.12 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -25,10 +25,6 @@
             --bg-vendor: #fef9c3; --border-vendor: #facc15; 
             --bg-system: #e0f2fe; --border-system: #7dd3fc;
             --bg-code: #f0fdf4; --border-code: #86efac;     
-            
-            /* Variabel Tinggi Sticky Otomatis (Dihitung JS) */
-            --sticky-offset-1: 140px; 
-            --sticky-offset-2: 181px; 
         }
 
         body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
@@ -41,9 +37,9 @@
         
         #reportPanel { padding: 0 !important; overflow: visible !important; }
         
-        /* HEADER UTAMA BEKU (GAMBAR 4) */
-        .sticky-top-section { position: sticky; top: 0; z-index: 999; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08); }
-        .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap; }
+        .sticky-top-section { position: relative; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); }
+        .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; display: flex; align-items: center; justify-content: space-between; gap: 5px; width: 100%; flex-wrap: wrap; }
+        .tab-group { display: flex; align-items: center; gap: 5px; }
 
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
@@ -75,12 +71,13 @@
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
+        /* FIX TOMBOL FILTER ANTI NUMPUK */
+        .filter-wrapper { display: flex; gap: 8px; flex-direction: row; margin-bottom: 6px; flex-shrink: 0; }
         .filter-btn-dual { background: white; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 8px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; transition: 0.2s; white-space: nowrap; }
         .filter-btn-dual:hover { background: #f1f5f9; border-color: #cbd5e1; }
         #btn-show-all.active { background: var(--primary); color: white; border-color: var(--primary); }
         #btn-show-anomali.active { background: #ef4444; color: white; border-color: #ef4444; }
 
-        /* Hapus overflow:hidden di sini biar tabel sticky bisa jalan */
         .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); width: 100%; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -107,31 +104,26 @@
         .sop-text strong { color: var(--primary); font-weight: 800; }
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
-        /* === TABLES STYLES === */
+        /* === TABLES STYLES (FIX STICKY CSS MURNI) === */
         .table-responsive { width: 100%; overflow-x: auto; } 
-        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         
-        /* HEADER TABEL BEKU (GAMBAR 2 & 3) */
+        th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
+        
+        /* Baris 1: Judul Kategori Besar */
         thead tr:nth-child(1) td {
-            position: sticky;
-            top: var(--sticky-offset-1);
-            z-index: 20;
-            outline: 1px solid var(--primary); /* Fix border hilang saat sticky */
-            background-clip: padding-box;
+            background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
+            position: sticky; top: 0; z-index: 20;
+            border-bottom: none; /* Cegah double border */
         }
+        
+        /* Baris 2: Nama Kolom */
         thead tr:nth-child(2) th {
-            position: sticky;
-            top: var(--sticky-offset-2);
-            z-index: 19;
-            outline: 1px solid var(--border-color);
+            background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;
+            position: sticky; top: 41px; z-index: 19;
             box-shadow: 0 4px 8px -4px rgba(78, 43, 92, 0.15);
-            background-clip: padding-box;
         }
 
-        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
-        td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
-        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; height: 41px; box-sizing: border-box; }
-        
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
         .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
@@ -166,10 +158,10 @@
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .action-buttons, .filter-group, .header, form { display: none !important; }
+            .left-panel, .action-buttons, .filter-wrapper, .header, form { display: none !important; }
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
-            .sticky-top-section { position: relative !important; top: auto !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
+            .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
             .tabs-container { display: none !important; }
             .card-box { padding: 0; border: none; box-shadow: none; }
             .content-area { padding: 0 !important; }
@@ -183,7 +175,6 @@
                 position: static !important; 
                 top: auto !important; 
                 box-shadow: none !important; 
-                outline: none !important; 
             }
             
             .exec-card { page-break-inside: avoid; border: 1px solid #ccc; box-shadow: none !important; margin-bottom: 15px; }
@@ -251,11 +242,14 @@
                     </div>
 
                     <div class="tabs-container">
-                        <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
-                        <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
-                        <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
+                        <div class="tab-group">
+                            <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
+                            <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
+                            <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
+                        </div>
                         
-                        <div class="filter-group">
+                        <!-- KONTENER TOMBOL FILTER BARU -->
+                        <div class="filter-wrapper">
                             <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
                                 <i data-lucide="list" style="width:14px;"></i> Show All Items
                             </button>
@@ -274,8 +268,10 @@
                         <div class="table-responsive">
                             <table>
                                 <thead>
+                                    <!-- TABEL 1 STICKY BERBASIS CSS -->
                                     <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
                                     <tr>
+                                        <!-- KOLOM NO 40PX -->
                                         <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
                                         <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
                                         <th width="13%">QUOTATION (QTY)</th>
@@ -292,8 +288,10 @@
                         <div class="table-responsive">
                             <table>
                                 <thead>
+                                    <!-- TABEL 2 STICKY BERBASIS CSS -->
                                     <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
                                     <tr>
+                                        <!-- KOLOM NO 40PX -->
                                         <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
                                         <th width="15%">REPORT NAME</th>
                                         <th width="12%">CERT NO</th>
@@ -324,23 +322,6 @@
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         let pollingInterval, timerInterval;
 
-        // --- SISTEM KALKULATOR TINGGI STICKY OTOMATIS ---
-        function updateStickyHeights() {
-            setTimeout(() => {
-                const headerTop = document.querySelector('.sticky-top-section');
-                if (headerTop) {
-                    const topHeight = headerTop.offsetHeight;
-                    // Jarak header 1 (Tabel Judul)
-                    document.documentElement.style.setProperty('--sticky-offset-1', topHeight + 'px');
-                    
-                    // Jarak header 2 (Nama Kolom) = Tinggi header utama + Tinggi Baris Judul Tabel (41px)
-                    document.documentElement.style.setProperty('--sticky-offset-2', (topHeight + 41) + 'px');
-                }
-            }, 100);
-        }
-        window.addEventListener('resize', updateStickyHeights);
-        window.addEventListener('load', updateStickyHeights);
-
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
             el.innerHTML = msg; el.style.display = 'block';
@@ -354,7 +335,6 @@
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            updateStickyHeights(); // Recalculate sticky if tab changed
         }
 
         function setFilterMode(isAnomaliOnly) {
@@ -370,7 +350,6 @@
                 btnAll.classList.add('active');
                 btnAnomali.classList.remove('active');
             }
-            updateStickyHeights();
         }
 
         function toggleUploadForm() {
@@ -384,7 +363,6 @@
                 icon.setAttribute('data-lucide', 'sidebar-close'); text.innerText = 'Hide Upload Form';
             }
             lucide.createIcons();
-            updateStickyHeights();
         }
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -425,7 +403,6 @@
 
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
-                updateStickyHeights(); // Panggil fungsi saat laporan berhasil dibuat
             } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
