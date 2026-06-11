@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.14 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.15 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -112,7 +112,6 @@
         
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
         
-        /* Baris 1: Judul Kategori Besar Mengambang */
         thead tr:nth-child(1) td {
             background-color: var(--primary); color: white; font-weight: 800; padding: 0 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
             position: sticky; top: 0px; z-index: 20;
@@ -121,7 +120,6 @@
             border-bottom: none; 
         }
         
-        /* Baris 2: Nama Kolom Mengambang */
         thead tr:nth-child(2) th {
             background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;
             position: sticky; top: 42px; z-index: 19;
@@ -159,30 +157,43 @@
         .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes pulse-dot { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
 
-        /* === PRINT STYLES === */
+        /* === PRINT STYLES (PERFECT ENTERPRISE PDF) === */
         @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            /* Margin 0 membunuh Header/Footer (URL & Tanggal) bawaan browser Chrome/Edge */
+            @page { size: A4 landscape; margin: 0; }
+            
+            /* Mengganti margin page dengan padding di body agar konten tidak mepet pinggir kertas */
+            body { background: white; padding: 1.5cm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            /* Sembunyikan elemen yang tidak perlu dicetak */
             .left-panel, .action-buttons, .filter-wrapper, .header, form { display: none !important; }
-            .main-container { display: block; max-width: 100%; gap: 0; }
-            .right-panel { display: block; width: 100%; min-width: 0; }
-            .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
+            
+            .main-container { display: block; max-width: 100%; gap: 0; margin: 0; }
+            .right-panel { display: block; width: 100%; }
+            .sticky-top-section { position: static !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; margin-bottom: 20px; }
             .tabs-container { display: none !important; }
             .card-box { padding: 0; border: none; box-shadow: none; }
             .content-area { padding: 0 !important; }
-            .content-card { display: block !important; margin-bottom: 30px; border: none; }
-            table { font-size: 9px; page-break-inside: auto; }
-            tr, td, th { page-break-inside: avoid; }
+            
+            /* Memaksa SEMUA Tab Tercetak sekaligus */
+            .content-card { display: block !important; margin-bottom: 40px; border: none; }
+            
+            table { font-size: 9px; page-break-inside: auto; width: 100%; }
+            
+            /* ANTI-KEPOTONG: Cegah teks patah sembarangan */
+            td, th { page-break-inside: avoid; word-break: keep-all !important; overflow-wrap: normal !important; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
             thead { display: table-header-group; }
             
-            thead tr:nth-child(1) td, thead tr:nth-child(2) th { 
-                position: static !important; 
-                top: auto !important; 
-                box-shadow: none !important; 
-            }
+            /* RESET STICKY SAAT PRINT */
+            thead tr:nth-child(1) td, thead tr:nth-child(2) th { position: static !important; top: auto !important; box-shadow: none !important; }
             
-            .exec-card { page-break-inside: avoid; border: 1px solid #ccc; box-shadow: none !important; margin-bottom: 15px; }
+            /* ANTI-PUTUS: Menjaga Kartu SOP tetap utuh satu blok */
+            .exec-card { page-break-inside: avoid; border: 1px solid #cbd5e1; box-shadow: none !important; margin-bottom: 15px; }
             .exec-card-body { grid-template-columns: 40% 60%; }
+            
+            /* ANTI-NUMPUK: Memaksa Badge Sertifikat berjejer rapi di mode Print */
+            .cert-badge-item { display: inline-block !important; margin: 2px 4px 2px 0 !important; font-size: 9px !important; padding: 3px 5px !important; }
         }
     </style>
 </head>
@@ -270,7 +281,6 @@
                     <div id="tab-penawaran" class="content-card">
                         <div class="table-responsive">
                             <table>
-                                <!-- KUNCI KOLOM DENGAN COLGROUP -->
                                 <colgroup>
                                     <col style="width: 40px;">
                                     <col style="width: 42%;">
@@ -297,21 +307,20 @@
                     <div id="tab-sertifikat" class="content-card">
                         <div class="table-responsive">
                             <table>
-                                <!-- KUNCI KOLOM DENGAN COLGROUP -->
                                 <colgroup>
                                     <col style="width: 40px;">
-                                    <col style="width: 14%;">
+                                    <col style="width: 15%;">
                                     <col style="width: 12%;">
-                                    <col style="width: 12%;">
-                                    <col style="width: 12%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 10%;">
                                     <col style="width: 8%;">
+                                    <col style="width: 6%;">
                                     <col style="width: 5%;">
                                     <col style="width: 5%;">
                                     <col style="width: 6%;">
-                                    <col style="width: 6%;">
                                     <col style="width: 8%;">
                                     <col style="width: 8%;">
-                                    <col style="width: 4%;">
+                                    <col style="width: 7%;">
                                 </colgroup>
                                 <thead>
                                     <tr class="section-title"><td colspan="13" style="display: table-cell; vertical-align: middle;">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
@@ -531,18 +540,19 @@
                     let hasilStr = String(r.hasil_ai || "");
                     let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
 
+                    // FIX BADGE: Menggunakan flex-wrap wrap agar badge menyamping
                     let certBadgeHtml = "";
                     if(String(r.cert_terkait || "-").trim() !== "-") {
-                        certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">`;
+                        certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">`;
                         String(r.cert_terkait).split(',').forEach(c => {
-                            if(c.trim() !== "") certBadgeHtml += `<span style="background: #f8fafc; color: #475569; font-size: 9px; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: 700; width: max-content;">🏷️ ${esc(c.trim())}</span>`;
+                            if(c.trim() !== "") certBadgeHtml += `<span class="cert-badge-item">🏷️ ${esc(c.trim())}</span>`;
                         });
                         certBadgeHtml += `</div>`;
                     }
 
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     htmlPen += `<tr class="${rowClass}">
-                        <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
+                        <td style="text-align: center;"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
                         <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
                         <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
@@ -573,10 +583,11 @@
                 let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
                 let isFound = noCert !== "-" && !noCert.toLowerCase().includes("tidak ditemukan") && noCert.length < 250;
 
-                let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;">`;
+                // FIX BADGE TAB 1
+                let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;">`;
                 if (isFound) {
                     noCert.split(',').forEach(num => {
-                        if(num.trim() !== "") certBadgeContainer += `<div style="background:#f1f5f9; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1; font-weight:700; color:#475569; font-size:10px;">🏷️ ${esc(num.trim())}</div>`;
+                        if(num.trim() !== "") certBadgeContainer += `<span class="cert-badge-item">🏷️ ${esc(num.trim())}</span>`;
                     });
                 } else { certBadgeContainer += `<div style="background:#fef2f2; color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:10px;">TIDAK DITEMUKAN</div>`; }
                 certBadgeContainer += `</div>`;
@@ -690,7 +701,7 @@
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
                     htmlCert += `<tr class="${rowClass}">
-                        <td align="center">${gIdx++}</td>
+                        <td style="text-align: center;">${gIdx++}</td>
                         <td><b>${esc(r.keterangan)}</b></td>
                         <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
                         <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
