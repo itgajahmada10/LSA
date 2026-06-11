@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.13 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.14 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -25,6 +25,9 @@
             --bg-vendor: #fef9c3; --border-vendor: #facc15; 
             --bg-system: #e0f2fe; --border-system: #7dd3fc;
             --bg-code: #f0fdf4; --border-code: #86efac;     
+            
+            --sticky-offset-1: 140px; 
+            --sticky-offset-2: 181px; 
         }
 
         body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
@@ -33,8 +36,6 @@
         
         .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); z-index: 1000; }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
-        
-        /* FIX STICKY: DILARANG KERAS MENGGUNAKAN overflow: hidden DI SINI! */
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; }
         
         #reportPanel { padding: 0 !important; overflow: visible !important; }
@@ -105,23 +106,22 @@
         .sop-text strong { color: var(--primary); font-weight: 800; }
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
-        /* === TABLES STYLES (FIX STICKY CSS MURNI) === */
-        /* FIX STICKY: DILARANG KERAS MENGGUNAKAN overflow-x: auto DI SINI! */
+        /* === TABLES STYLES === */
         .table-responsive { width: 100%; } 
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
         
-        /* Baris 1: Judul Kategori Besar Mengambang (Sticky ke layar paling atas) */
+        /* Baris 1: Judul Kategori Besar Mengambang */
         thead tr:nth-child(1) td {
             background-color: var(--primary); color: white; font-weight: 800; padding: 0 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
             position: sticky; top: 0px; z-index: 20;
-            height: 42px; /* Kunci mati tingginya biar baris 2 gak nabrak */
+            height: 42px; 
             box-sizing: border-box;
             border-bottom: none; 
         }
         
-        /* Baris 2: Nama Kolom Mengambang (Menempel tepat di bawah baris 1) */
+        /* Baris 2: Nama Kolom Mengambang */
         thead tr:nth-child(2) th {
             background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;
             position: sticky; top: 42px; z-index: 19;
@@ -159,7 +159,7 @@
         .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes pulse-dot { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
 
-        /* === PRINT STYLES (ANTI NUMPUK) === */
+        /* === PRINT STYLES === */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -175,7 +175,6 @@
             tr, td, th { page-break-inside: avoid; }
             thead { display: table-header-group; }
             
-            /* RESET STICKY SAAT PRINT BIAR RAPI */
             thead tr:nth-child(1) td, thead tr:nth-child(2) th { 
                 position: static !important; 
                 top: auto !important; 
@@ -271,16 +270,24 @@
                     <div id="tab-penawaran" class="content-card">
                         <div class="table-responsive">
                             <table>
+                                <!-- KUNCI KOLOM DENGAN COLGROUP -->
+                                <colgroup>
+                                    <col style="width: 40px;">
+                                    <col style="width: 42%;">
+                                    <col style="width: 13%;">
+                                    <col style="width: 15%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 20%;">
+                                </colgroup>
                                 <thead>
                                     <tr class="section-title"><td colspan="6" style="display: table-cell; vertical-align: middle;">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
                                     <tr>
-                                        <!-- FIX: Kolom NO digembok di 40px -->
-                                        <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
-                                        <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
-                                        <th width="13%">QUOTATION (QTY)</th>
-                                        <th width="15%">CERTIFICATE (QTY)</th>
-                                        <th width="8%" style="text-align:center;">DO (QTY)</th>
-                                        <th width="15%" style="text-align:center;">AUDIT STATUS</th>
+                                        <th style="text-align: center;">NO</th>
+                                        <th>INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
+                                        <th>QUOTATION (QTY)</th>
+                                        <th>CERTIFICATE (QTY)</th>
+                                        <th style="text-align:center;">DO (QTY)</th>
+                                        <th style="text-align:center;">AUDIT STATUS</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-penawaran"></tbody>
@@ -290,23 +297,38 @@
                     <div id="tab-sertifikat" class="content-card">
                         <div class="table-responsive">
                             <table>
+                                <!-- KUNCI KOLOM DENGAN COLGROUP -->
+                                <colgroup>
+                                    <col style="width: 40px;">
+                                    <col style="width: 14%;">
+                                    <col style="width: 12%;">
+                                    <col style="width: 12%;">
+                                    <col style="width: 12%;">
+                                    <col style="width: 8%;">
+                                    <col style="width: 5%;">
+                                    <col style="width: 5%;">
+                                    <col style="width: 6%;">
+                                    <col style="width: 6%;">
+                                    <col style="width: 8%;">
+                                    <col style="width: 8%;">
+                                    <col style="width: 4%;">
+                                </colgroup>
                                 <thead>
                                     <tr class="section-title"><td colspan="13" style="display: table-cell; vertical-align: middle;">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
                                     <tr>
-                                        <!-- FIX: Kolom NO digembok di 40px -->
-                                        <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
-                                        <th width="15%">REPORT NAME</th>
-                                        <th width="12%">CERT NO</th>
-                                        <th width="12%">SHIP NAME</th>
-                                        <th width="12%">OWNER</th>
-                                        <th width="8%" style="text-align:center;">IMO NO</th>
-                                        <th width="5%" style="text-align:center;">CLASS</th>
-                                        <th width="5%" style="text-align:center;">GT</th>
-                                        <th width="6%">FLAG</th>
-                                        <th width="6%" style="text-align:center;">CALL</th>
-                                        <th width="8%">SERVICING DATE</th>
-                                        <th width="8%">SIGN DATE</th>
-                                        <th width="6%" style="text-align:center;">STATUS</th>
+                                        <th style="text-align: center;">NO</th>
+                                        <th>REPORT NAME</th>
+                                        <th>CERT NO</th>
+                                        <th>SHIP NAME</th>
+                                        <th>OWNER</th>
+                                        <th style="text-align:center;">IMO NO</th>
+                                        <th style="text-align:center;">CLASS</th>
+                                        <th style="text-align:center;">GT</th>
+                                        <th>FLAG</th>
+                                        <th style="text-align:center;">CALL</th>
+                                        <th>SERVICING DATE</th>
+                                        <th>SIGN DATE</th>
+                                        <th style="text-align:center;">STATUS</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-sertifikat"></tbody>
@@ -324,6 +346,19 @@
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         let pollingInterval, timerInterval;
 
+        function updateStickyHeights() {
+            setTimeout(() => {
+                const headerTop = document.querySelector('.sticky-top-section');
+                if (headerTop) {
+                    const topHeight = headerTop.offsetHeight;
+                    document.documentElement.style.setProperty('--sticky-offset-1', topHeight + 'px');
+                    document.documentElement.style.setProperty('--sticky-offset-2', (topHeight + 41) + 'px');
+                }
+            }, 100);
+        }
+        window.addEventListener('resize', updateStickyHeights);
+        window.addEventListener('load', updateStickyHeights);
+
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
             el.innerHTML = msg; el.style.display = 'block';
@@ -337,6 +372,7 @@
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
+            updateStickyHeights(); 
         }
 
         function setFilterMode(isAnomaliOnly) {
@@ -352,6 +388,7 @@
                 btnAll.classList.add('active');
                 btnAnomali.classList.remove('active');
             }
+            updateStickyHeights();
         }
 
         function toggleUploadForm() {
@@ -365,6 +402,7 @@
                 icon.setAttribute('data-lucide', 'sidebar-close'); text.innerText = 'Hide Upload Form';
             }
             lucide.createIcons();
+            updateStickyHeights();
         }
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -405,6 +443,7 @@
 
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
+                updateStickyHeights(); 
             } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
@@ -503,7 +542,7 @@
 
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     htmlPen += `<tr class="${rowClass}">
-                        <td style="width: 40px; text-align: center;"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
+                        <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
                         <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
                         <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
@@ -651,7 +690,7 @@
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
                     htmlCert += `<tr class="${rowClass}">
-                        <td style="width: 40px; text-align: center;">${gIdx++}</td>
+                        <td align="center">${gIdx++}</td>
                         <td><b>${esc(r.keterangan)}</b></td>
                         <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
                         <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
