@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.8 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.9 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -69,10 +69,9 @@
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
-        /* === NEW: DUAL BUTTON FILTER UI === */
-        .filter-group { margin-left: auto; display: flex; gap: 6px; margin-bottom: 6px; }
-        .filter-btn-dual { background: white; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; transition: 0.2s; white-space: nowrap; }
-        .filter-btn-dual:hover { background: #f1f5f9; }
+        /* BUTTON FILTER BARU */
+        .filter-btn-dual { background: white; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 8px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; transition: 0.2s; white-space: nowrap; }
+        .filter-btn-dual:hover { background: #f1f5f9; border-color: #cbd5e1; }
         #btn-show-all.active { background: var(--primary); color: white; border-color: var(--primary); }
         #btn-show-anomali.active { background: #ef4444; color: white; border-color: #ef4444; }
 
@@ -128,12 +127,11 @@
         
         body.filter-anomali .row-match { display: none !important; }
 
-        /* LOADING ANIMATION & SYMBOLIC PULSE */
+        /* LOADING ANIMATION */
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         .loader-small { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse-text { 0% { opacity: 0.4; } 50% { opacity: 1; color: #9d31a5; } 100% { opacity: 0.4; } }
-        .symbolic-loading { animation: pulse-text 1.5s infinite; margin-bottom: 15px; font-size: 11px; color: #701a75; font-weight: 700; text-align: center; display: flex; justify-content: center; gap: 8px;}
+        .symbolic-loading { margin-bottom: 15px; font-size: 11px; color: #701a75; font-weight: 700; text-align: center; display: flex; justify-content: center; gap: 8px;}
         .symbolic-loading span { display: inline-block; width: 6px; height: 6px; background-color: #701a75; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
         .symbolic-loading span:nth-child(2) { animation-delay: 0.2s; }
         .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
@@ -222,7 +220,8 @@
                         <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
                         <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
                         
-                        <div class="filter-group">
+                        <!-- KONTENER TOMBOL FILTER ANTI GAGAL -->
+                        <div style="margin-left: auto; display: flex; gap: 8px;">
                             <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
                                 <i data-lucide="list" style="width:14px;"></i> Show All Items
                             </button>
@@ -265,7 +264,6 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-        // --- NEW JAVASCRIPT LOGIC DUA TOMBOL FILTER ---
         function setFilterMode(isAnomaliOnly) {
             const btnAll = document.getElementById('btn-show-all');
             const btnAnomali = document.getElementById('btn-show-anomali');
@@ -412,4 +410,183 @@
                 let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
                 htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
                 
-                groupedPen[g].forEach((r
+                groupedPen[g].forEach((r) => {
+                    let rawAlias = String(r.alias_sistem || "-").trim();
+                    let itemCode = rawAlias.split(" - ")[0] || "-";
+                    let systemName = rawAlias.split(" - ").slice(1).join(" - ") || "-";
+                    let hasilStr = String(r.hasil_ai || "");
+                    let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
+
+                    let certBadgeHtml = "";
+                    if(String(r.cert_terkait || "-").trim() !== "-") {
+                        certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">`;
+                        String(r.cert_terkait).split(',').forEach(c => {
+                            if(c.trim() !== "") certBadgeHtml += `<span style="background: #f8fafc; color: #475569; font-size: 9px; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: 700; width: max-content;">🏷️ ${esc(c.trim())}</span>`;
+                        });
+                        certBadgeHtml += `</div>`;
+                    }
+
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
+                    htmlPen += `<tr class="${rowClass}">
+                        <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
+                        <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
+                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+                        <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
+                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
+                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
+                    </tr>`;
+
+                    if (isWarn && hasilStr.trim() !== "") {
+                        let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+                        if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+                        if(cleanReason !== "") {
+                            htmlPen += `<tr class="explanation-row ${rowClass}"><td style="border-right: 1px solid var(--border-color);"></td><td colspan="5"><div class="ai-note err"><b>💡 AI Reason:</b> ${esc(cleanReason)}</div></td></tr>`;
+                        }
+                    }
+                });
+            }
+            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP</td></tr>`;
+
+            let reconciliationRowsHtml = "";
+            let summaryList = parsed.summary_sertifikat || [];
+            summaryList.sort((a, b) => {
+                if(String(a.sistem).toLowerCase().includes("umum")) return -1;
+                if(String(b.sistem).toLowerCase().includes("umum")) return 1;
+                return 0;
+            });
+
+            summaryList.forEach(item => {
+                let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
+                let isFound = noCert !== "-" && !noCert.toLowerCase().includes("tidak ditemukan") && noCert.length < 250;
+
+                let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;">`;
+                if (isFound) {
+                    noCert.split(',').forEach(num => {
+                        if(num.trim() !== "") certBadgeContainer += `<div style="background:#f1f5f9; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1; font-weight:700; color:#475569; font-size:10px;">🏷️ ${esc(num.trim())}</div>`;
+                    });
+                } else { certBadgeContainer += `<div style="background:#fef2f2; color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:10px;">TIDAK DITEMUKAN</div>`; }
+                certBadgeContainer += `</div>`;
+
+                let quotBulletItemsHtml = `<ul class="ref-quote-list">`;
+                let rawQuotArray = item.referensi_quotation || [];
+                if (typeof rawQuotArray === 'string') rawQuotArray = rawQuotArray.split('\n');
+
+                if (Array.isArray(rawQuotArray) && rawQuotArray.length > 0) {
+                    rawQuotArray.forEach(line => {
+                        let cleanLine = line.trim();
+                        if (cleanLine !== "" && cleanLine !== "-") quotBulletItemsHtml += `<li>${esc(cleanLine)}</li>`;
+                    });
+                } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
+                quotBulletItemsHtml += `</ul>`;
+
+                let sopChecklistHtml = `<div class="sop-check-grid">`;
+                let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
+                if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
+
+                if (Array.isArray(rawEvidenArray) && rawEvidenArray.length > 0) {
+                    rawEvidenArray.forEach(line => {
+                        let cleanLine = line.trim();
+                        if (cleanLine !== "" && cleanLine !== "-") {
+                            let textLower = cleanLine.toLowerCase();
+                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak sesuai") || textLower.includes("gagal") || textLower.includes("tidak ada cap") || textLower.includes("[red]");
+                            let isWarn = false;
+                            
+                            if ((textLower.includes("rn:") || textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("warning")) 
+                                && !textLower.includes("tidak ada material rn") && !textLower.includes("tidak ada item rn") && !textLower.includes("tidak ada material yg di rn")) {
+                                isWarn = true;
+                            }
+                            
+                            let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
+                            let icon = isFail ? "❌" : (isWarn ? "⚠️" : "✅");
+                            
+                            let renderedText = "";
+                            let colonIndex = cleanLine.indexOf(':');
+                            if(colonIndex !== -1) {
+                                let title = cleanLine.substring(0, colonIndex);
+                                let desc = cleanLine.substring(colonIndex + 1);
+                                renderedText = `<strong>${esc(title)}:</strong> <span class="highlight-data">${esc(desc)}</span>`;
+                            } else {
+                                renderedText = `<strong>${esc(cleanLine)}</strong>`;
+                            }
+
+                            renderedText = renderedText.replace(/\|\|/g, '<br>&nbsp;&nbsp;&nbsp;&bull; ');
+                            renderedText = renderedText.replace(/\[RED\](.*?)\[\/RED\]/g, '<span style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fca5a5;">$1</span>');
+
+                            sopChecklistHtml += `
+                            <div class="sop-item ${borderClass}">
+                                <span class="sop-icon">${icon}</span>
+                                <span class="sop-text">${renderedText}</span>
+                            </div>`;
+                        }
+                    });
+                } else { sopChecklistHtml += `<div class="sop-item pass-border"><span class="sop-text">Semua parameter tervalidasi</span></div>`; }
+                sopChecklistHtml += `</div>`;
+
+                let currentStatus = String(item.status || "PASS").toUpperCase();
+                let statusClass = "pass";
+                if (currentStatus === "FAIL") statusClass = "fail";
+                else if (currentStatus === "PARTIAL" || currentStatus === "REVIEW") statusClass = "partial";
+                let isGeneral = String(item.sistem).toLowerCase().includes("umum");
+
+                reconciliationRowsHtml += `
+                <div class="exec-card" ${isGeneral ? 'style="border-color: var(--primary); border-width: 2px;"' : ''}>
+                    <div class="exec-card-header" ${isGeneral ? 'style="background-color: var(--primary);"' : ''}>
+                        <h3 class="exec-card-title" ${isGeneral ? 'style="color: white;"' : ''}>🛡️ ${esc(item.sistem)}</h3>
+                        ${!isGeneral ? `<span class="cell-status-block ${statusClass}">${currentStatus}</span>` : `<span class="cell-status-block" style="background:#fff; color:var(--primary);">WAJIB</span>`}
+                    </div>
+                    <div class="exec-card-body">
+                        <div class="exec-col-ref">
+                            <span class="exec-col-title">Tagihan Vendor (Quotation)</span>
+                            ${quotBulletItemsHtml}
+                            <span class="exec-col-title" style="margin-top:5px;">Sertifikat Dilampirkan</span>
+                            ${certBadgeContainer}
+                        </div>
+                        <div class="exec-col-audit">
+                            <span class="exec-col-title">Checklist Audit Matrix SOP</span>
+                            ${sopChecklistHtml}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<div style="text-align:center; padding:40px; color:#64748b; font-weight:700;">✅ DATA KOSONG ATAU BELUM TERHUBUNG</div>`;
+
+            let htmlCert = ""; let certGroups = {};
+            certRows.forEach(r => {
+                let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
+                if(!certGroups[cNo]) certGroups[cNo] = []; certGroups[cNo].push(r);
+            });
+
+            let gIdx = 1;
+            for (let cNo in certGroups) {
+                let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
+                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
+                
+                certGroups[cNo].forEach(r => {
+                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
+                    String(r.di_sertifikat).split('|').forEach(p => {
+                        let kv = p.split(':'); if(kv.length < 2) return;
+                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+                        if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
+                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
+                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
+                        if(k.includes("sign")) d.sign=v;
+                    });
+                    
+                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
+
+                    htmlCert += `<tr class="${rowClass}">
+                        <td align="center">${gIdx++}</td>
+                        <td><b>${esc(r.keterangan)}</b></td>
+                        <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
+                        <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
+                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
+                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ BEDA':'✅ OK'}</td>
+                    </tr>`;
+                });
+            }
+            document.getElementById("body-sertifikat").innerHTML = htmlCert;
+        }
+    </script>
+</body>
+</html>
