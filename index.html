@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.5 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.6 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -187,7 +187,6 @@
                         <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional)</label>
                         <input type="file" id="deliveryFile" accept=".pdf">
                     </div>
-                    <div style="margin-bottom: 15px; font-size: 10px; color: #701a75; font-weight: 700; text-align: center;">0---0---0---0 ini proses nya..</div>
                     <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
                     <div id="ui-message"></div>
                 </form>
@@ -224,7 +223,9 @@
                         <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
                         <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
                         <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
-                        <button class="tab-btn filter-btn" onclick="toggleFilter(this)"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</button>
+                        <button class="tab-btn filter-btn" onclick="toggleFilter(this)">
+                            <i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies
+                        </button>
                     </div>
                 </div>
 
@@ -260,6 +261,7 @@
             document.getElementById(tabId).classList.add('active');
         }
 
+        // --- FIX BUG TOMBOL FILTER HILANG ---
         function toggleFilter(el) {
             isFilter = !isFilter;
             if(isFilter) {
@@ -269,7 +271,7 @@
                 el.classList.remove('active'); document.body.classList.remove('filter-anomali');
                 el.innerHTML = '<i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies';
             }
-            lucide.createIcons();
+            lucide.createIcons(); // Panggil ulang Lucide untuk icon baru
         }
 
         function toggleUploadForm() {
@@ -497,7 +499,6 @@
                                 renderedText = `<strong>${esc(cleanLine)}</strong>`;
                             }
 
-                            // --- FITUR BARU: TERJEMAHAN VERTIKAL (||) & STABILO MERAH ([RED]) ---
                             renderedText = renderedText.replace(/\|\|/g, '<br>&nbsp;&nbsp;&nbsp;&bull; ');
                             renderedText = renderedText.replace(/\[RED\](.*?)\[\/RED\]/g, '<span style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fca5a5;">$1</span>');
 
