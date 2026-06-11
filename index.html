@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.7 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.8 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -17,32 +17,27 @@
             --text-main: #1e293b; 
             --text-muted: #64748b;
             
-            /* 4 Level Status Colors */
             --status-pass-bg: #f0fdf4; --status-pass-border: #bbf7d0; --status-pass-text: #166534;
             --status-partial-bg: #fff7ed; --status-partial-border: #ffedd5; --status-partial-text: #c2410c;
             --status-review-bg: #fefce8; --status-review-border: #fef08a; --status-review-text: #854d0e;
             --status-fail-bg: #fef2f2; --status-fail-border: #fecaca; --status-fail-text: #991b1b;
 
-            /* LSA Badges & Boxes */
             --bg-vendor: #fef9c3; --border-vendor: #facc15; 
             --bg-system: #e0f2fe; --border-system: #7dd3fc;
             --bg-code: #f0fdf4; --border-code: #86efac;     
         }
 
-        /* === STRUCTURAL LAYOUT === */
         body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
         * { box-sizing: border-box; }
         .main-container { display: flex; gap: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         
-        /* === LEFT PANEL (FORM UPLOAD) === */
         .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
         
-        /* === STICKY HEADER DASHBOARD (ANTI-SCROLL) === */
         #reportPanel { padding: 0 !important; overflow: visible !important; }
         .sticky-top-section { position: sticky; top: 0; z-index: 999; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08); }
-        .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; }
+        .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap; }
 
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
@@ -54,7 +49,6 @@
         .btn-submit:disabled { background-color: #9b8a9f; cursor: not-allowed; }
         #ui-message { display: none; margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 12px; }
 
-        /* === RIGHT PANEL === */
         .right-panel { flex: 1; min-width: 0; width: 100%; transition: all 0.4s ease; }
         .top-info-bar { background: #fbf9fc; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .ship-info { display: flex; gap: 25px; align-items: center; flex-wrap: wrap; }
@@ -71,67 +65,63 @@
         .btn-toggle-view { border-color: #64748b; color: #64748b; background: white; }
         .btn-toggle-view:hover { background: #f1f5f9; color: #1e293b; border-color: #1e293b; }
 
-        /* === HORIZONTAL TABS === */
-        .tabs-container { display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap; }
         .tab-btn { background: transparent; border: none; padding: 12px 18px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; margin-bottom: -2px; font-family: 'Poppins', sans-serif; flex-shrink: 0; }
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
-        /* TOMBOL FILTER DI TABS */
-        .filter-btn { margin-left: auto; color: var(--error); border: 1px solid var(--border-color); background: white; border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; margin-bottom: 6px; white-space: nowrap; flex-shrink: 0; }
-        .filter-btn:hover { background: #fef2f2; border-color: var(--error); }
-        .filter-btn.active { background: var(--error); color: #fff; border-color: var(--error); }
+        /* === NEW: DUAL BUTTON FILTER UI === */
+        .filter-group { margin-left: auto; display: flex; gap: 6px; margin-bottom: 6px; }
+        .filter-btn-dual { background: white; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 6px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; transition: 0.2s; white-space: nowrap; }
+        .filter-btn-dual:hover { background: #f1f5f9; }
+        #btn-show-all.active { background: var(--primary); color: white; border-color: var(--primary); }
+        #btn-show-anomali.active { background: #ef4444; color: white; border-color: #ef4444; }
 
         .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* === MODERN EXECUTIVE CARDS (SMART MATRIX PARSING) === */
+        /* MATRIX CARDS */
         .exec-summary-grid { display: flex; flex-direction: column; gap: 20px; width: 100%; }
         .exec-card { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px -10px rgba(78, 43, 92, 0.08); transition: transform 0.2s; }
         .exec-card:hover { transform: translateY(-2px); box-shadow: 0 12px 25px -10px rgba(78, 43, 92, 0.12); border-color: #d8c8df; }
-        
         .exec-card-header { padding: 15px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fbf9fc; }
         .exec-card-title { margin: 0; font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px;}
-        
         .exec-card-body { display: grid; grid-template-columns: 35% 65%; }
         .exec-col-ref { padding: 20px 25px; border-right: 1px dashed var(--border-color); background: #ffffff; }
         .exec-col-title { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; display: inline-block; }
         .ref-quote-list { margin: 0 0 15px 0; padding-left: 15px; font-weight: 600; color: #334155; font-size: 11.5px; line-height: 1.5; }
         .ref-quote-list li { margin-bottom: 5px; }
-        
         .exec-col-audit { padding: 20px 25px; background: #fdfdfd; }
         .sop-check-grid { display: flex; flex-direction: column; gap: 10px; }
-        
         .sop-item { display: flex; align-items: flex-start; gap: 12px; background: #ffffff; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); border-left: 4px solid var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .sop-item.pass-border { border-left-color: #10b981; }
         .sop-item.warn-border { border-left-color: #f59e0b; background: #fffbeb; }
         .sop-item.fail-border { border-left-color: #ef4444; background: #fef2f2; }
-        
         .sop-icon { font-size: 14px; line-height: 1; margin-top: 1px; }
         .sop-text { font-size: 11.5px; font-weight: 500; color: #334155; line-height: 1.6; }
         .sop-text strong { color: var(--primary); font-weight: 800; }
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
-        /* TABLES CORE STYLES (TAB 2 & 3) */
+        /* TABLES */
         .table-responsive { width: 100%; overflow-x: auto; } 
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
         th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
         td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
         .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; }
-        
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
-
+        .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
+        .cell-status-block.pass { background-color: var(--status-pass-bg); border-color: var(--status-pass-border); color: var(--status-pass-text); }
+        .cell-status-block.partial { background-color: var(--status-partial-bg); border-color: var(--status-partial-border); color: var(--status-partial-text); }
+        .cell-status-block.review { background-color: var(--status-review-bg); border-color: var(--status-review-border); color: var(--status-review-text); }
+        .cell-status-block.fail { background-color: var(--status-fail-bg); border-color: var(--status-fail-border); color: var(--status-fail-text); }
         .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
         .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
-
         .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 11px; padding: 8px; }
         .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
         .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 10px; }
         .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
         .doc-val { background: #fdfdfd; padding: 4px; border-radius: 2px; border: 1px solid #f1f5f9; font-weight: 600; font-size: 11px; }
-
         .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
         .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; }
         .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
@@ -142,19 +132,17 @@
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         .loader-small { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        @keyframes pulse-text {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; color: #9d31a5; }
-            100% { opacity: 0.4; }
-        }
-        .symbolic-loading { animation: pulse-text 1.5s infinite; margin-bottom: 15px; font-size: 11px; color: #701a75; font-weight: 700; text-align: center; }
+        @keyframes pulse-text { 0% { opacity: 0.4; } 50% { opacity: 1; color: #9d31a5; } 100% { opacity: 0.4; } }
+        .symbolic-loading { animation: pulse-text 1.5s infinite; margin-bottom: 15px; font-size: 11px; color: #701a75; font-weight: 700; text-align: center; display: flex; justify-content: center; gap: 8px;}
+        .symbolic-loading span { display: inline-block; width: 6px; height: 6px; background-color: #701a75; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+        .symbolic-loading span:nth-child(2) { animation-delay: 0.2s; }
+        .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse-dot { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
 
-        /* === PRINT STYLES === */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .left-panel, .action-buttons, .filter-btn, .header, form { display: none !important; }
+            .left-panel, .action-buttons, .filter-group, .header, form { display: none !important; }
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
             .sticky-top-section { position: relative !important; top: auto !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
@@ -193,8 +181,9 @@
                         <input type="file" id="deliveryFile" accept=".pdf">
                     </div>
                     
-                    <!-- Animasi Kelap-Kelip (Akan muncul saat Submit) -->
-                    <div id="process-anim" class="symbolic-loading" style="display:none;">0---0---0---0 ini proses nya..</div>
+                    <div id="process-anim" class="symbolic-loading" style="display:none;">
+                        <span></span><span></span><span></span>
+                    </div>
                     
                     <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
                     <div id="ui-message"></div>
@@ -233,11 +222,14 @@
                         <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
                         <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
                         
-                        <!-- FIX BUG: Struktur HTML Dua Teks Sembunyi/Tampil untuk Filter Btn -->
-                        <button class="tab-btn filter-btn" onclick="toggleFilter(this)">
-                            <span class="btn-text-default" style="display:flex; align-items:center; gap:6px;"><i data-lucide="alert-triangle" style="width:16px;"></i> Only Anomalies</span>
-                            <span class="btn-text-active" style="display:none; align-items:center; gap:6px;"><i data-lucide="eye-off" style="width:16px;"></i> Show All Items</span>
-                        </button>
+                        <div class="filter-group">
+                            <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
+                                <i data-lucide="list" style="width:14px;"></i> Show All Items
+                            </button>
+                            <button class="filter-btn-dual" id="btn-show-anomali" onclick="setFilterMode(true)">
+                                <i data-lucide="alert-triangle" style="width:14px;"></i> Only Anomalies
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -256,7 +248,7 @@
         lucide.createIcons();
         const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
-        let pollingInterval, timerInterval, isFilter = false;
+        let pollingInterval, timerInterval;
 
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
@@ -273,22 +265,19 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-        // --- FIX BUG JAVASCRIPT: TOGGLE DISPLAY (BUKAN REPLACE INNERHTML) ---
-        function toggleFilter(el) {
-            isFilter = !isFilter;
-            const textDefault = el.querySelector('.btn-text-default');
-            const textActive = el.querySelector('.btn-text-active');
+        // --- NEW JAVASCRIPT LOGIC DUA TOMBOL FILTER ---
+        function setFilterMode(isAnomaliOnly) {
+            const btnAll = document.getElementById('btn-show-all');
+            const btnAnomali = document.getElementById('btn-show-anomali');
             
-            if(isFilter) {
-                el.classList.add('active'); 
+            if (isAnomaliOnly) {
                 document.body.classList.add('filter-anomali');
-                textDefault.style.display = 'none';
-                textActive.style.display = 'flex';
+                btnAnomali.classList.add('active');
+                btnAll.classList.remove('active');
             } else {
-                el.classList.remove('active'); 
                 document.body.classList.remove('filter-anomali');
-                textDefault.style.display = 'flex';
-                textActive.style.display = 'none';
+                btnAll.classList.add('active');
+                btnAnomali.classList.remove('active');
             }
         }
 
@@ -324,7 +313,6 @@
                 const btn = document.getElementById('submitBtn');
                 btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 
-                // Hilangkan Teks Simbolik saat selesai
                 document.getElementById('process-anim').style.display = 'none';
                 
                 const panel = document.getElementById('uploadPanel');
@@ -355,8 +343,7 @@
             btn.disabled = true; btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
             errorBox.style.display = 'none'; document.getElementById('reportPanel').style.display = 'none';
             
-            // Tampilkan animasi teks 0---0---0---0
-            document.getElementById('process-anim').style.display = 'block';
+            document.getElementById('process-anim').style.display = 'flex';
 
             const fd = new FormData();
             fd.append('job_id', id);
@@ -425,183 +412,4 @@
                 let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
                 htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
                 
-                groupedPen[g].forEach((r) => {
-                    let rawAlias = String(r.alias_sistem || "-").trim();
-                    let itemCode = rawAlias.split(" - ")[0] || "-";
-                    let systemName = rawAlias.split(" - ").slice(1).join(" - ") || "-";
-                    let hasilStr = String(r.hasil_ai || "");
-                    let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
-
-                    let certBadgeHtml = "";
-                    if(String(r.cert_terkait || "-").trim() !== "-") {
-                        certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">`;
-                        String(r.cert_terkait).split(',').forEach(c => {
-                            if(c.trim() !== "") certBadgeHtml += `<span style="background: #f8fafc; color: #475569; font-size: 9px; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: 700; width: max-content;">🏷️ ${esc(c.trim())}</span>`;
-                        });
-                        certBadgeHtml += `</div>`;
-                    }
-
-                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
-                    htmlPen += `<tr class="${rowClass}">
-                        <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
-                        <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
-                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
-                        <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
-                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
-                    </tr>`;
-
-                    if (isWarn && hasilStr.trim() !== "") {
-                        let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
-                        if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
-                        if(cleanReason !== "") {
-                            htmlPen += `<tr class="explanation-row ${rowClass}"><td style="border-right: 1px solid var(--border-color);"></td><td colspan="5"><div class="ai-note err"><b>💡 AI Reason:</b> ${esc(cleanReason)}</div></td></tr>`;
-                        }
-                    }
-                });
-            }
-            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP</td></tr>`;
-
-            let reconciliationRowsHtml = "";
-            let summaryList = parsed.summary_sertifikat || [];
-            summaryList.sort((a, b) => {
-                if(String(a.sistem).toLowerCase().includes("umum")) return -1;
-                if(String(b.sistem).toLowerCase().includes("umum")) return 1;
-                return 0;
-            });
-
-            summaryList.forEach(item => {
-                let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
-                let isFound = noCert !== "-" && !noCert.toLowerCase().includes("tidak ditemukan") && noCert.length < 250;
-
-                let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:5px;">`;
-                if (isFound) {
-                    noCert.split(',').forEach(num => {
-                        if(num.trim() !== "") certBadgeContainer += `<div style="background:#f1f5f9; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1; font-weight:700; color:#475569; font-size:10px;">🏷️ ${esc(num.trim())}</div>`;
-                    });
-                } else { certBadgeContainer += `<div style="background:#fef2f2; color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:10px;">TIDAK DITEMUKAN</div>`; }
-                certBadgeContainer += `</div>`;
-
-                let quotBulletItemsHtml = `<ul class="ref-quote-list">`;
-                let rawQuotArray = item.referensi_quotation || [];
-                if (typeof rawQuotArray === 'string') rawQuotArray = rawQuotArray.split('\n');
-
-                if (Array.isArray(rawQuotArray) && rawQuotArray.length > 0) {
-                    rawQuotArray.forEach(line => {
-                        let cleanLine = line.trim();
-                        if (cleanLine !== "" && cleanLine !== "-") quotBulletItemsHtml += `<li>${esc(cleanLine)}</li>`;
-                    });
-                } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
-                quotBulletItemsHtml += `</ul>`;
-
-                let sopChecklistHtml = `<div class="sop-check-grid">`;
-                let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
-                if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
-
-                if (Array.isArray(rawEvidenArray) && rawEvidenArray.length > 0) {
-                    rawEvidenArray.forEach(line => {
-                        let cleanLine = line.trim();
-                        if (cleanLine !== "" && cleanLine !== "-") {
-                            let textLower = cleanLine.toLowerCase();
-                            let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak sesuai") || textLower.includes("gagal") || textLower.includes("tidak ada cap") || textLower.includes("[red]");
-                            let isWarn = false;
-                            
-                            if ((textLower.includes("rn:") || textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("warning")) 
-                                && !textLower.includes("tidak ada material rn") && !textLower.includes("tidak ada item rn") && !textLower.includes("tidak ada material yg di rn")) {
-                                isWarn = true;
-                            }
-                            
-                            let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
-                            let icon = isFail ? "❌" : (isWarn ? "⚠️" : "✅");
-                            
-                            let renderedText = "";
-                            let colonIndex = cleanLine.indexOf(':');
-                            if(colonIndex !== -1) {
-                                let title = cleanLine.substring(0, colonIndex);
-                                let desc = cleanLine.substring(colonIndex + 1);
-                                renderedText = `<strong>${esc(title)}:</strong> <span class="highlight-data">${esc(desc)}</span>`;
-                            } else {
-                                renderedText = `<strong>${esc(cleanLine)}</strong>`;
-                            }
-
-                            renderedText = renderedText.replace(/\|\|/g, '<br>&nbsp;&nbsp;&nbsp;&bull; ');
-                            renderedText = renderedText.replace(/\[RED\](.*?)\[\/RED\]/g, '<span style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fca5a5;">$1</span>');
-
-                            sopChecklistHtml += `
-                            <div class="sop-item ${borderClass}">
-                                <span class="sop-icon">${icon}</span>
-                                <span class="sop-text">${renderedText}</span>
-                            </div>`;
-                        }
-                    });
-                } else { sopChecklistHtml += `<div class="sop-item pass-border"><span class="sop-text">Semua parameter tervalidasi</span></div>`; }
-                sopChecklistHtml += `</div>`;
-
-                let currentStatus = String(item.status || "PASS").toUpperCase();
-                let statusClass = "pass";
-                if (currentStatus === "FAIL") statusClass = "fail";
-                else if (currentStatus === "PARTIAL" || currentStatus === "REVIEW") statusClass = "partial";
-                let isGeneral = String(item.sistem).toLowerCase().includes("umum");
-
-                reconciliationRowsHtml += `
-                <div class="exec-card" ${isGeneral ? 'style="border-color: var(--primary); border-width: 2px;"' : ''}>
-                    <div class="exec-card-header" ${isGeneral ? 'style="background-color: var(--primary);"' : ''}>
-                        <h3 class="exec-card-title" ${isGeneral ? 'style="color: white;"' : ''}>🛡️ ${esc(item.sistem)}</h3>
-                        ${!isGeneral ? `<span class="cell-status-block ${statusClass}">${currentStatus}</span>` : `<span class="cell-status-block" style="background:#fff; color:var(--primary);">WAJIB</span>`}
-                    </div>
-                    <div class="exec-card-body">
-                        <div class="exec-col-ref">
-                            <span class="exec-col-title">Tagihan Vendor (Quotation)</span>
-                            ${quotBulletItemsHtml}
-                            <span class="exec-col-title" style="margin-top:5px;">Sertifikat Dilampirkan</span>
-                            ${certBadgeContainer}
-                        </div>
-                        <div class="exec-col-audit">
-                            <span class="exec-col-title">Checklist Audit Matrix SOP</span>
-                            ${sopChecklistHtml}
-                        </div>
-                    </div>
-                </div>`;
-            });
-            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<div style="text-align:center; padding:40px; color:#64748b; font-weight:700;">✅ DATA KOSONG ATAU BELUM TERHUBUNG</div>`;
-
-            let htmlCert = ""; let certGroups = {};
-            certRows.forEach(r => {
-                let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
-                if(!certGroups[cNo]) certGroups[cNo] = []; certGroups[cNo].push(r);
-            });
-
-            let gIdx = 1;
-            for (let cNo in certGroups) {
-                let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
-                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
-                
-                certGroups[cNo].forEach(r => {
-                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
-                    String(r.di_sertifikat).split('|').forEach(p => {
-                        let kv = p.split(':'); if(kv.length < 2) return;
-                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
-                        if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
-                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
-                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
-                        if(k.includes("sign")) d.sign=v;
-                    });
-                    
-                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
-                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-                    htmlCert += `<tr class="${rowClass}">
-                        <td align="center">${gIdx++}</td>
-                        <td><b>${esc(r.keterangan)}</b></td>
-                        <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
-                        <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
-                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
-                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ BEDA':'✅ OK'}</td>
-                    </tr>`;
-                });
-            }
-            document.getElementById("body-sertifikat").innerHTML = htmlCert;
-        }
-    </script>
-</body>
-</html>
+                groupedPen[g].forEach((r
