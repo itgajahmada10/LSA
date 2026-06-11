@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.10 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.11 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -25,20 +25,24 @@
             --bg-vendor: #fef9c3; --border-vendor: #facc15; 
             --bg-system: #e0f2fe; --border-system: #7dd3fc;
             --bg-code: #f0fdf4; --border-code: #86efac;     
+            
+            /* Variabel Tinggi Sticky Otomatis (Dihitung JS) */
+            --sticky-offset-1: 140px; 
+            --sticky-offset-2: 181px; 
         }
 
         body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
         * { box-sizing: border-box; }
         .main-container { display: flex; gap: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         
-        .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); }
+        .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); z-index: 1000; }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
-        .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; overflow: hidden; }
+        .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; }
         
         #reportPanel { padding: 0 !important; overflow: visible !important; }
         
-        /* INFO KAPAL SEKARANG TIDAK STICKY LAGI */
-        .sticky-top-section { position: relative; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); }
+        /* HEADER UTAMA BEKU (GAMBAR 4) */
+        .sticky-top-section { position: sticky; top: 0; z-index: 999; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); box-shadow: 0 10px 15px -10px rgba(78, 43, 92, 0.08); }
         .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap; }
 
         .header { text-align: center; margin-bottom: 25px; }
@@ -76,7 +80,8 @@
         #btn-show-all.active { background: var(--primary); color: white; border-color: var(--primary); }
         #btn-show-anomali.active { background: #ef4444; color: white; border-color: #ef4444; }
 
-        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; width: 100%; }
+        /* Hapus overflow:hidden di sini biar tabel sticky bisa jalan */
+        .content-card { display: none; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); width: 100%; }
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -105,25 +110,28 @@
         /* === TABLES STYLES === */
         .table-responsive { width: 100%; overflow-x: auto; } 
         table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif; background-clip: padding-box; }
-        td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
-        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; height: 41px; box-sizing: border-box; background-clip: padding-box; }
         
-        /* === FITUR BARU: STICKY HANYA UNTUK HEADER TABEL === */
+        /* HEADER TABEL BEKU (GAMBAR 2 & 3) */
         thead tr:nth-child(1) td {
             position: sticky;
-            top: 0;
+            top: var(--sticky-offset-1);
             z-index: 20;
-            outline: 1px solid var(--primary); /* Menghindari border collapse bug */
+            outline: 1px solid var(--primary); /* Fix border hilang saat sticky */
+            background-clip: padding-box;
         }
         thead tr:nth-child(2) th {
             position: sticky;
-            top: 41px; /* Mengikuti tinggi baris judul (41px) */
+            top: var(--sticky-offset-2);
             z-index: 19;
             outline: 1px solid var(--border-color);
             box-shadow: 0 4px 8px -4px rgba(78, 43, 92, 0.15);
+            background-clip: padding-box;
         }
 
+        th { background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;}
+        td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
+        .section-title td { background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px; height: 41px; box-sizing: border-box; }
+        
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .cert-badge-item { background: #fbf9fc; padding: 4px 6px; border-radius: 4px; border: 1px solid #e8dee8; font-weight: 700; color: var(--primary); font-size: 10.5px; display: inline-block; width: max-content; max-width: 100%; }
         .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
@@ -154,14 +162,14 @@
         .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes pulse-dot { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
 
-        /* === PRINT STYLES === */
+        /* === PRINT STYLES (ANTI NUMPUK) === */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .left-panel, .action-buttons, .filter-group, .header, form { display: none !important; }
             .main-container { display: block; max-width: 100%; gap: 0; }
             .right-panel { display: block; width: 100%; min-width: 0; }
-            .sticky-top-section { position: relative !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
+            .sticky-top-section { position: relative !important; top: auto !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; }
             .tabs-container { display: none !important; }
             .card-box { padding: 0; border: none; box-shadow: none; }
             .content-area { padding: 0 !important; }
@@ -170,7 +178,7 @@
             tr, td, th { page-break-inside: avoid; }
             thead { display: table-header-group; }
             
-            /* RESET STICKY SAAT PRINT BIAR TIDAK NUMPUK DI PDF */
+            /* RESET STICKY SAAT PRINT BIAR RAPI */
             thead tr:nth-child(1) td, thead tr:nth-child(2) th { 
                 position: static !important; 
                 top: auto !important; 
@@ -247,7 +255,7 @@
                         <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
                         <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
                         
-                        <div style="margin-left: auto; display: flex; gap: 8px;">
+                        <div class="filter-group">
                             <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
                                 <i data-lucide="list" style="width:14px;"></i> Show All Items
                             </button>
@@ -268,7 +276,7 @@
                                 <thead>
                                     <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
                                     <tr>
-                                        <th style="width:40px; text-align:center;">NO</th>
+                                        <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
                                         <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
                                         <th width="13%">QUOTATION (QTY)</th>
                                         <th width="15%">CERTIFICATE (QTY)</th>
@@ -286,7 +294,7 @@
                                 <thead>
                                     <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
                                     <tr>
-                                        <th style="width:40px; text-align:center;">NO</th>
+                                        <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
                                         <th width="15%">REPORT NAME</th>
                                         <th width="12%">CERT NO</th>
                                         <th width="12%">SHIP NAME</th>
@@ -316,6 +324,23 @@
         const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
         let pollingInterval, timerInterval;
 
+        // --- SISTEM KALKULATOR TINGGI STICKY OTOMATIS ---
+        function updateStickyHeights() {
+            setTimeout(() => {
+                const headerTop = document.querySelector('.sticky-top-section');
+                if (headerTop) {
+                    const topHeight = headerTop.offsetHeight;
+                    // Jarak header 1 (Tabel Judul)
+                    document.documentElement.style.setProperty('--sticky-offset-1', topHeight + 'px');
+                    
+                    // Jarak header 2 (Nama Kolom) = Tinggi header utama + Tinggi Baris Judul Tabel (41px)
+                    document.documentElement.style.setProperty('--sticky-offset-2', (topHeight + 41) + 'px');
+                }
+            }, 100);
+        }
+        window.addEventListener('resize', updateStickyHeights);
+        window.addEventListener('load', updateStickyHeights);
+
         function showMessage(msg, isError) {
             const el = document.getElementById('ui-message');
             el.innerHTML = msg; el.style.display = 'block';
@@ -329,6 +354,7 @@
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
+            updateStickyHeights(); // Recalculate sticky if tab changed
         }
 
         function setFilterMode(isAnomaliOnly) {
@@ -344,6 +370,7 @@
                 btnAll.classList.add('active');
                 btnAnomali.classList.remove('active');
             }
+            updateStickyHeights();
         }
 
         function toggleUploadForm() {
@@ -357,6 +384,7 @@
                 icon.setAttribute('data-lucide', 'sidebar-close'); text.innerText = 'Hide Upload Form';
             }
             lucide.createIcons();
+            updateStickyHeights();
         }
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -397,6 +425,7 @@
 
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
+                updateStickyHeights(); // Panggil fungsi saat laporan berhasil dibuat
             } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
@@ -495,7 +524,7 @@
 
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
                     htmlPen += `<tr class="${rowClass}">
-                        <td align="center"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
+                        <td style="width: 40px; text-align: center;"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
                         <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
                         <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
@@ -643,7 +672,7 @@
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
                     htmlCert += `<tr class="${rowClass}">
-                        <td align="center">${gIdx++}</td>
+                        <td style="width: 40px; text-align: center;">${gIdx++}</td>
                         <td><b>${esc(r.keterangan)}</b></td>
                         <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
                         <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
