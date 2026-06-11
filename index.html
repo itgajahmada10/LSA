@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.12 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.13 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -33,6 +33,8 @@
         
         .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); z-index: 1000; }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
+        
+        /* FIX STICKY: DILARANG KERAS MENGGUNAKAN overflow: hidden DI SINI! */
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; }
         
         #reportPanel { padding: 0 !important; overflow: visible !important; }
@@ -71,7 +73,6 @@
         .tab-btn:hover { color: var(--primary); background-color: rgba(78, 43, 92, 0.03); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
-        /* FIX TOMBOL FILTER ANTI NUMPUK */
         .filter-wrapper { display: flex; gap: 8px; flex-direction: row; margin-bottom: 6px; flex-shrink: 0; }
         .filter-btn-dual { background: white; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; padding: 8px 14px; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; transition: 0.2s; white-space: nowrap; }
         .filter-btn-dual:hover { background: #f1f5f9; border-color: #cbd5e1; }
@@ -105,22 +106,26 @@
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
         /* === TABLES STYLES (FIX STICKY CSS MURNI) === */
-        .table-responsive { width: 100%; overflow-x: auto; } 
+        /* FIX STICKY: DILARANG KERAS MENGGUNAKAN overflow-x: auto DI SINI! */
+        .table-responsive { width: 100%; } 
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
         
-        /* Baris 1: Judul Kategori Besar */
+        /* Baris 1: Judul Kategori Besar Mengambang (Sticky ke layar paling atas) */
         thead tr:nth-child(1) td {
-            background-color: var(--primary); color: white; font-weight: 800; padding: 12px 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
-            position: sticky; top: 0; z-index: 20;
-            border-bottom: none; /* Cegah double border */
+            background-color: var(--primary); color: white; font-weight: 800; padding: 0 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
+            position: sticky; top: 0px; z-index: 20;
+            height: 42px; /* Kunci mati tingginya biar baris 2 gak nabrak */
+            box-sizing: border-box;
+            border-bottom: none; 
         }
         
-        /* Baris 2: Nama Kolom */
+        /* Baris 2: Nama Kolom Mengambang (Menempel tepat di bawah baris 1) */
         thead tr:nth-child(2) th {
             background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;
-            position: sticky; top: 41px; z-index: 19;
+            position: sticky; top: 42px; z-index: 19;
+            box-sizing: border-box;
             box-shadow: 0 4px 8px -4px rgba(78, 43, 92, 0.15);
         }
 
@@ -248,7 +253,6 @@
                             <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
                         </div>
                         
-                        <!-- KONTENER TOMBOL FILTER BARU -->
                         <div class="filter-wrapper">
                             <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
                                 <i data-lucide="list" style="width:14px;"></i> Show All Items
@@ -268,10 +272,9 @@
                         <div class="table-responsive">
                             <table>
                                 <thead>
-                                    <!-- TABEL 1 STICKY BERBASIS CSS -->
-                                    <tr class="section-title"><td colspan="6">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
+                                    <tr class="section-title"><td colspan="6" style="display: table-cell; vertical-align: middle;">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
                                     <tr>
-                                        <!-- KOLOM NO 40PX -->
+                                        <!-- FIX: Kolom NO digembok di 40px -->
                                         <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
                                         <th width="45%">INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
                                         <th width="13%">QUOTATION (QTY)</th>
@@ -288,10 +291,9 @@
                         <div class="table-responsive">
                             <table>
                                 <thead>
-                                    <!-- TABEL 2 STICKY BERBASIS CSS -->
-                                    <tr class="section-title"><td colspan="13">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
+                                    <tr class="section-title"><td colspan="13" style="display: table-cell; vertical-align: middle;">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
                                     <tr>
-                                        <!-- KOLOM NO 40PX -->
+                                        <!-- FIX: Kolom NO digembok di 40px -->
                                         <th style="width: 40px; min-width: 40px; max-width: 40px; text-align: center;">NO</th>
                                         <th width="15%">REPORT NAME</th>
                                         <th width="12%">CERT NO</th>
