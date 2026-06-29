@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.15 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.16 Pro Enterprise Matrix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -102,7 +102,7 @@
         .sop-item.warn-border { border-left-color: #f59e0b; background: #fffbeb; }
         .sop-item.fail-border { border-left-color: #ef4444; background: #fef2f2; }
         .sop-icon { font-size: 14px; line-height: 1; margin-top: 1px; }
-        .sop-text { font-size: 11.5px; font-weight: 500; color: #334155; line-height: 1.6; }
+        .sop-text { font-size: 11.5px; font-weight: 500; color: #334155; line-height: 1.6; width: 100%; }
         .sop-text strong { color: var(--primary); font-weight: 800; }
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
@@ -147,7 +147,7 @@
         
         body.filter-anomali .row-match { display: none !important; }
 
-        /* LOADING ANIMATION & SYMBOLIC PULSE */
+        /* LOADING ANIMATION */
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         .loader-small { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -159,40 +159,23 @@
 
         /* === PRINT STYLES (PERFECT ENTERPRISE PDF) === */
         @media print {
-            /* Margin 0 membunuh Header/Footer (URL & Tanggal) bawaan browser Chrome/Edge */
             @page { size: A4 landscape; margin: 0; }
-            
-            /* Mengganti margin page dengan padding di body agar konten tidak mepet pinggir kertas */
             body { background: white; padding: 1.5cm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            
-            /* Sembunyikan elemen yang tidak perlu dicetak */
             .left-panel, .action-buttons, .filter-wrapper, .header, form { display: none !important; }
-            
             .main-container { display: block; max-width: 100%; gap: 0; margin: 0; }
             .right-panel { display: block; width: 100%; }
             .sticky-top-section { position: static !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; margin-bottom: 20px; }
             .tabs-container { display: none !important; }
             .card-box { padding: 0; border: none; box-shadow: none; }
             .content-area { padding: 0 !important; }
-            
-            /* Memaksa SEMUA Tab Tercetak sekaligus */
             .content-card { display: block !important; margin-bottom: 40px; border: none; }
-            
             table { font-size: 9px; page-break-inside: auto; width: 100%; }
-            
-            /* ANTI-KEPOTONG: Cegah teks patah sembarangan */
             td, th { page-break-inside: avoid; word-break: keep-all !important; overflow-wrap: normal !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
             thead { display: table-header-group; }
-            
-            /* RESET STICKY SAAT PRINT */
             thead tr:nth-child(1) td, thead tr:nth-child(2) th { position: static !important; top: auto !important; box-shadow: none !important; }
-            
-            /* ANTI-PUTUS: Menjaga Kartu SOP tetap utuh satu blok */
             .exec-card { page-break-inside: avoid; border: 1px solid #cbd5e1; box-shadow: none !important; margin-bottom: 15px; }
             .exec-card-body { grid-template-columns: 40% 60%; }
-            
-            /* ANTI-NUMPUK: Memaksa Badge Sertifikat berjejer rapi di mode Print */
             .cert-badge-item { display: inline-block !important; margin: 2px 4px 2px 0 !important; font-size: 9px !important; padding: 3px 5px !important; }
         }
     </style>
@@ -540,7 +523,6 @@
                     let hasilStr = String(r.hasil_ai || "");
                     let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
 
-                    // FIX BADGE: Menggunakan flex-wrap wrap agar badge menyamping
                     let certBadgeHtml = "";
                     if(String(r.cert_terkait || "-").trim() !== "-") {
                         certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">`;
@@ -583,7 +565,6 @@
                 let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
                 let isFound = noCert !== "-" && !noCert.toLowerCase().includes("tidak ditemukan") && noCert.length < 250;
 
-                // FIX BADGE TAB 1
                 let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;">`;
                 if (isFound) {
                     noCert.split(',').forEach(num => {
@@ -615,10 +596,17 @@
                             let textLower = cleanLine.toLowerCase();
                             let isFail = textLower.includes("tidak sah") || textLower.includes("anomali") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak sesuai") || textLower.includes("gagal") || textLower.includes("tidak ada cap") || textLower.includes("[red]");
                             let isWarn = false;
+                            let warningNote = "";
                             
+                            // LOGIKA BARU: Tambahan badge untuk alasan warning
                             if ((textLower.includes("rn:") || textLower.includes("rn ") || textLower.includes("(rn)") || textLower.includes("renew") || textLower.includes("mendekati") || textLower.includes("warning")) 
                                 && !textLower.includes("tidak ada material rn") && !textLower.includes("tidak ada item rn") && !textLower.includes("tidak ada material yg di rn")) {
                                 isWarn = true;
+                                if(textLower.includes("mendekati") || textLower.includes("warning")) {
+                                    warningNote = "Peringatan Jatuh Tempo / Mendekati Expired";
+                                } else {
+                                    warningNote = "Terdapat riwayat pergantian parts (RN) atau material baru";
+                                }
                             }
                             
                             let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
@@ -636,6 +624,14 @@
 
                             renderedText = renderedText.replace(/\|\|/g, '<br>&nbsp;&nbsp;&nbsp;&bull; ');
                             renderedText = renderedText.replace(/\[RED\](.*?)\[\/RED\]/g, '<span style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fca5a5;">$1</span>');
+
+                            // RENDER BADGE ALASAN WARNING / FAILED
+                            if (isWarn && warningNote !== "") {
+                                renderedText += `<div style="margin-top: 8px;"><span style="background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 4px;">💡 ALASAN WARNING: ${warningNote}</span></div>`;
+                            }
+                            if (isFail) {
+                                renderedText += `<div style="margin-top: 8px;"><span style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; border: 1px solid #fca5a5; display: inline-flex; align-items: center; gap: 4px;">🚨 ALASAN FAILED: Ditemukan ketidaksesuaian / anomali dokumen</span></div>`;
+                            }
 
                             sopChecklistHtml += `
                             <div class="sop-item ${borderClass}">
