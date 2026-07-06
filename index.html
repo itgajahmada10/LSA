@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waruna LSA Audit — V7.17 Pro Enterprise Matrix</title>
+    <title>Waruna LSA Audit — V7.18 Pro Enterprise Matrix (Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
@@ -42,15 +42,32 @@
         
         #reportPanel { padding: 0 !important; overflow: visible !important; }
         
-        .sticky-top-section { position: relative; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); }
+        /* [FIX 1] Sticky Header yang Sebenarnya */
+        .sticky-top-section { 
+            position: sticky; 
+            top: 0; 
+            z-index: 30; 
+            background-color: var(--bg-card); 
+            padding: 30px 30px 0 30px; 
+            border-radius: 16px 16px 0 0; 
+            border-bottom: 2px solid var(--border-color); 
+        }
         .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; display: flex; align-items: center; justify-content: space-between; gap: 5px; width: 100%; flex-wrap: wrap; }
         .tab-group { display: flex; align-items: center; gap: 5px; }
 
         .header { text-align: center; margin-bottom: 25px; }
         .header h2 { color: var(--primary); margin: 0 0 8px 0; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 24px;}
         label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;}
+        
+        /* [FIX 5] UI Polish untuk File Input */
         .upload-section { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #b59ebc; background: #fbf9fc; transition: 0.3s;}
-        input[type="file"] { width: 100%; padding: 8px; background-color: #fff; border-radius: 6px; border: 1px solid #ccc; font-size: 11px; cursor: pointer;}
+        .upload-section:hover { border-color: var(--primary); background: #f5eef7; }
+        input[type="file"] { width: 100%; padding: 10px; background-color: #fff; border-radius: 6px; border: 1px dashed #ccc; font-size: 11px; cursor: pointer; color: var(--text-muted); }
+        input[type="file"]::file-selector-button {
+            background-color: var(--primary); color: white; padding: 6px 12px; border: none; border-radius: 4px;
+            font-weight: 600; cursor: pointer; margin-right: 10px; font-family: 'Poppins', sans-serif;
+        }
+        
         .btn-submit { background-color: var(--primary); color: white; border: none; padding: 15px; width: 100%; font-size: 14px; font-family: 'Poppins', sans-serif; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; text-transform: uppercase; }
         .btn-submit:hover { background-color: var(--primary-hover); }
         .btn-submit:disabled { background-color: #9b8a9f; cursor: not-allowed; }
@@ -109,18 +126,22 @@
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
         /* === TABLES STYLES === */
-        .table-responsive { width: 100%; } 
+        /* [FIX 2] Responsive Table Wrapper */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 15px; } 
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
+        #tab-penawaran table { min-width: 900px; }
+        #tab-sertifikat table { min-width: 1200px; }
+
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
         
         thead tr:nth-child(1) td {
             background-color: var(--primary); color: white; font-weight: 800; padding: 0 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
-            position: sticky; top: 0px; z-index: 20; height: 42px; box-sizing: border-box; border-bottom: none; 
+            position: sticky; top: var(--sticky-offset-1, 0px); z-index: 20; height: 42px; box-sizing: border-box; border-bottom: none; 
         }
         
         thead tr:nth-child(2) th {
             background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;
-            position: sticky; top: 42px; z-index: 19; box-sizing: border-box; box-shadow: 0 4px 8px -4px rgba(78, 43, 92, 0.15);
+            position: sticky; top: var(--sticky-offset-2, 42px); z-index: 19; box-sizing: border-box; box-shadow: 0 4px 8px -4px rgba(78, 43, 92, 0.15);
         }
 
         .cert-vertical-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
@@ -165,7 +186,7 @@
             .card-box { padding: 0; border: none; box-shadow: none; }
             .content-area { padding: 0 !important; }
             .content-card { display: block !important; margin-bottom: 40px; border: none; }
-            table { font-size: 9px; page-break-inside: auto; width: 100%; }
+            table { font-size: 9px; page-break-inside: auto; width: 100%; min-width: 0 !important; }
             td, th { page-break-inside: avoid; word-break: keep-all !important; overflow-wrap: normal !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
             thead { display: table-header-group; }
@@ -397,10 +418,24 @@
         async function checkStatus(jobId) {
             try {
                 let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }});
+                if (!res.ok) return; // Handle HTTP errors gracefully
+                
                 let text = await res.text();
                 if(!text || text.trim().charAt(0) === "<") return;
                 
                 let json = JSON.parse(text);
+                
+                // [FIX 3] Handle Backend Error explicitly
+                if (json.error || json.status === "failed") {
+                    clearInterval(pollingInterval); clearInterval(timerInterval);
+                    document.getElementById('pollingCard').style.display = 'none';
+                    showMessage("AI Audit Gagal: " + (json.error || "Unknown Error"), true);
+                    const btn = document.getElementById('submitBtn');
+                    btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                    document.getElementById('process-anim').style.display = 'none';
+                    return;
+                }
+
                 let rows = Array.isArray(json) ? json : (json.data || [json]);
                 let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
                 if (json.status === "processing" || !ourRow) return; 
@@ -412,25 +447,36 @@
                 btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
                 
                 document.getElementById('process-anim').style.display = 'none';
-                
+
                 const panel = document.getElementById('uploadPanel');
                 if(!panel.classList.contains('is-hidden')) toggleUploadForm();
 
+                // [FIX 4] Dynamic Payload Loop (No hardcoded 1-10 limit)
                 let fullPayloadStr = ""; 
                 let rowKeys = Object.keys(ourRow);
-                for(let i = 1; i <= 10; i++) {
+                let i = 1;
+                while(true) {
                     let targetKey = rowKeys.find(k => k.toLowerCase().replace(/\s/g, "") === ("payload" + i));
-                    if(targetKey) fullPayloadStr += (ourRow[targetKey] || "");
+                    if (!targetKey) break;
+                    fullPayloadStr += (ourRow[targetKey] || "");
+                    i++;
                 }
                 
                 var binaryString = window.atob(fullPayloadStr);
                 var bytes = new Uint8Array(binaryString.length);
-                for (var i = 0; i < binaryString.length; i++) { bytes[i] = binaryString.charCodeAt(i); }
+                for (var j = 0; j < binaryString.length; j++) { bytes[j] = binaryString.charCodeAt(j); }
                 var decodedStr = new TextDecoder("utf-8").decode(bytes);
 
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
                 updateStickyHeights(); 
+
+                // [FIX 6] Reset Form & Auto Scroll
+                document.getElementById('auditForm').reset();
+                setTimeout(() => {
+                    document.getElementById('reportPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+
             } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
@@ -459,7 +505,19 @@
                     let s = Math.floor((Date.now() - startMs) / 1000);
                     document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
                 }, 1000);
-                pollingInterval = setInterval(() => checkStatus(id), 8000);
+                
+                // [FIX 3] Add Timeout Polling (10 Minutes)
+                pollingInterval = setInterval(() => {
+                    if (Date.now() - startMs > 600000) { // 600,000 ms = 10 mins
+                        clearInterval(pollingInterval); clearInterval(timerInterval);
+                        document.getElementById('pollingCard').style.display = 'none';
+                        showMessage("Waktu analisis habis (Timeout). Silakan coba lagi.", true);
+                        btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                        document.getElementById('process-anim').style.display = 'none';
+                        return;
+                    }
+                    checkStatus(id);
+                }, 8000);
             } catch (err) {
                 showMessage(err.message, true);
                 btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
@@ -483,9 +541,13 @@
             certRows.forEach(r => {
                 let certContent = String(r.di_sertifikat).toLowerCase();
                 if(certContent.includes("name:")) {
+                    // [FIX 1] Safe Split using indexOf instead of split(':')
                     String(r.di_sertifikat).split('|').forEach(x => {
-                        let kv = x.split(':'); if(kv.length<2) return;
-                        let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                        let colonIdx = x.indexOf(':');
+                        if (colonIdx === -1) return;
+                        let k = x.substring(0, colonIdx).trim().toLowerCase();
+                        let v = x.substring(colonIdx + 1).trim();
+                        
                         if(k.includes("name") && v !== "-" && v !== "") v_name = v.toUpperCase();
                         if(k.includes("imo") && v !== "-" && v !== "") v_imo = v;
                         if(k.includes("call") && v !== "-" && v !== "") v_call = v;
@@ -580,11 +642,6 @@
                 } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
                 quotBulletItemsHtml += `</ul>`;
 
-                /* =====================================================
-                   PATCH: sopChecklistHtml sekarang membaca checklist_sections
-                   (grouped per kategori, sudah difilter N/A) dari backend baru.
-                   Fallback ke eviden_sertifikat kalau backend belum diupdate.
-                   ===================================================== */
                 let sopChecklistHtml = `<div class="sop-check-grid">`;
 
                 function renderSopLine(cleanLine) {
@@ -624,7 +681,7 @@
                     let colonIndex = cleanLine.indexOf(':');
                     if (colonIndex !== -1) {
                         let title = cleanLine.substring(0, colonIndex);
-                        let desc = cleanLine.substring(colonIndex + 1);
+                        let desc = cleanLine.substring(colonIdx + 1);
                         renderedText = `<strong>${esc(title)}:</strong> <span class="highlight-data">${esc(desc)}</span>`;
                     } else {
                         renderedText = `<strong>${esc(cleanLine)}</strong>`;
@@ -672,7 +729,6 @@
                 }
 
                 sopChecklistHtml += `</div>`;
-                /* ===================== END PATCH ===================== */
 
                 let currentStatus = String(item.status || "PASS").toUpperCase();
                 let statusClass = "pass";
@@ -704,7 +760,13 @@
 
             let htmlCert = ""; let certGroups = {};
             certRows.forEach(r => {
-                let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
+                // [FIX 1] Safe Split for CertNo
+                let cNo = "-"; 
+                String(r.di_sertifikat).split('|').forEach(p => { 
+                    if(p.includes("CertNo:")) {
+                        cNo = p.substring(p.indexOf('CertNo:') + 7).trim(); 
+                    }
+                });
                 if(!certGroups[cNo]) certGroups[cNo] = []; certGroups[cNo].push(r);
             });
 
@@ -715,9 +777,14 @@
                 
                 certGroups[cNo].forEach(r => {
                     let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
+                    
+                    // [FIX 1] Safe Split for Certificate Table Details
                     String(r.di_sertifikat).split('|').forEach(p => {
-                        let kv = p.split(':'); if(kv.length < 2) return;
-                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+                        let colonIdx = p.indexOf(':');
+                        if (colonIdx === -1) return;
+                        let k = p.substring(0, colonIdx).trim().toLowerCase();
+                        let v = p.substring(colonIdx + 1).trim();
+                        
                         if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
                         if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
                         if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
@@ -741,11 +808,4 @@
         }
     </script>
 </body>
-</html>'''
-
-import os
-os.makedirs('output', exist_ok=True)
-with open('output/Waruna-LSA-Audit-Updated.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-
-print(len(html_content))
+</html>
