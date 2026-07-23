@@ -113,6 +113,10 @@
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
         
+        tr.section-title td {
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
         thead tr:nth-child(1) td {
             background-color: var(--primary); color: white; font-weight: 800; padding: 0 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
             position: sticky; top: 0px; z-index: 20; height: 42px; box-sizing: border-box; border-bottom: none; 
@@ -394,6 +398,13 @@
 
         function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
+        // PERBAIKAN UNICODE BASE64 DECODER
+        function decodeBase64Utf8(base64) {
+            const binString = atob(base64.replace(/\s/g, ''));
+            const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+            return new TextDecoder().decode(bytes);
+        }
+
         async function checkStatus(jobId) {
             try {
                 let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }});
@@ -423,10 +434,7 @@
                     if(targetKey) fullPayloadStr += (ourRow[targetKey] || "");
                 }
                 
-                var binaryString = window.atob(fullPayloadStr);
-                var bytes = new Uint8Array(binaryString.length);
-                for (var i = 0; i < binaryString.length; i++) { bytes[i] = binaryString.charCodeAt(i); }
-                var decodedStr = new TextDecoder("utf-8").decode(bytes);
+                var decodedStr = decodeBase64Utf8(fullPayloadStr);
 
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
@@ -455,10 +463,21 @@
                 if (!req.ok) throw new Error("Connection to N8N failed.");
                 document.getElementById('pollingCard').style.display = 'block';
                 let startMs = Date.now();
+                
                 timerInterval = setInterval(() => {
                     let s = Math.floor((Date.now() - startMs) / 1000);
                     document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
+                    
+                    // PERBAIKAN TIMEOUT SAFETY
+                    if (s > 180) { 
+                        clearInterval(pollingInterval); clearInterval(timerInterval);
+                        document.getElementById('pollingCard').style.display = 'none';
+                        showMessage("Proses analisis timeout. Silakan periksa dashboard n8n Anda.", true);
+                        btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                        document.getElementById('process-anim').style.display = 'none';
+                    }
                 }, 1000);
+                
                 pollingInterval = setInterval(() => checkStatus(id), 8000);
             } catch (err) {
                 showMessage(err.message, true);
@@ -580,11 +599,6 @@
                 } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
                 quotBulletItemsHtml += `</ul>`;
 
-                /* =====================================================
-                   PATCH: sopChecklistHtml sekarang membaca checklist_sections
-                   (grouped per kategori, sudah difilter N/A) dari backend baru.
-                   Fallback ke eviden_sertifikat kalau backend belum diupdate.
-                   ===================================================== */
                 let sopChecklistHtml = `<div class="sop-check-grid">`;
 
                 function renderSopLine(cleanLine) {
@@ -672,7 +686,6 @@
                 }
 
                 sopChecklistHtml += `</div>`;
-                /* ===================== END PATCH ===================== */
 
                 let currentStatus = String(item.status || "PASS").toUpperCase();
                 let statusClass = "pass";
@@ -741,11 +754,4 @@
         }
     </script>
 </body>
-</html>'''
-
-import os
-os.makedirs('output', exist_ok=True)
-with open('output/Waruna-LSA-Audit-Updated.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-
-print(len(html_content))
+</html>
