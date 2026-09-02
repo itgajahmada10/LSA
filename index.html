@@ -8,41 +8,41 @@
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         /* === CORE VARIABLES === */
-        :root { 
-            --primary: #4e2b5c; 
-            --primary-hover: #3b1e47; 
+        :root {
+            --primary: #4e2b5c;
+            --primary-hover: #3b1e47;
             --primary-light: #fbf9fc;
-            --bg-card: #ffffff; 
-            --border-color: #e8dee8; 
-            --text-main: #1e293b; 
+            --bg-card: #ffffff;
+            --border-color: #e8dee8;
+            --text-main: #1e293b;
             --text-muted: #64748b;
             --success: #16a34a;
             --error: #dc2626;
             --warning: #f59e0b;
-            
+
             --status-pass-bg: #f0fdf4; --status-pass-border: #bbf7d0; --status-pass-text: #166534;
             --status-partial-bg: #fff7ed; --status-partial-border: #ffedd5; --status-partial-text: #c2410c;
             --status-review-bg: #fefce8; --status-review-border: #fef08a; --status-review-text: #854d0e;
             --status-fail-bg: #fef2f2; --status-fail-border: #fecaca; --status-fail-text: #991b1b;
 
-            --bg-vendor: #fef9c3; --border-vendor: #facc15; 
+            --bg-vendor: #fef9c3; --border-vendor: #facc15;
             --bg-system: #e0f2fe; --border-system: #7dd3fc;
-            --bg-code: #f0fdf4; --border-code: #86efac;     
-            
-            --sticky-offset-1: 140px; 
-            --sticky-offset-2: 181px; 
+            --bg-code: #f0fdf4; --border-code: #86efac;
+
+            --sticky-offset-1: 140px;
+            --sticky-offset-2: 181px;
         }
 
         body { margin: 0; padding: 30px; background: linear-gradient(135deg, #fffdf2 0%, #ffe9d6 100%); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 11px; line-height: 1.4; }
         * { box-sizing: border-box; }
         .main-container { display: flex; gap: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        
+
         .left-panel { flex: 0 0 350px; max-width: 350px; position: sticky; top: 30px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); opacity: 1; visibility: visible; transform: translateX(0); z-index: 1000; }
         .left-panel.is-hidden { flex: 0 0 0px; max-width: 0px; margin-right: -25px; opacity: 0; visibility: hidden; transform: translateX(-30px); pointer-events: none; }
         .card-box { background-color: var(--bg-card); padding: 30px; border-radius: 16px; box-shadow: 0 12px 40px rgba(78, 43, 92, 0.08); border: 1px solid var(--border-color); width: 100%; }
-        
+
         #reportPanel { padding: 0 !important; overflow: visible !important; }
-        
+
         .sticky-top-section { position: relative; background-color: var(--bg-card); padding: 30px 30px 0 30px; border-radius: 16px 16px 0 0; border-bottom: 2px solid var(--border-color); }
         .tabs-container { border-bottom: none !important; margin-bottom: 0 !important; display: flex; align-items: center; justify-content: space-between; gap: 5px; width: 100%; flex-wrap: wrap; }
         .tab-group { display: flex; align-items: center; gap: 5px; }
@@ -63,7 +63,7 @@
         .info-box { display: flex; flex-direction: column; }
         .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
         .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
-        
+
         .action-buttons { display: flex; gap: 10px; }
         .btn-modern { padding: 8px 15px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; border: 1px solid var(--primary); }
         .btn-simple { background: white; color: var(--primary); }
@@ -110,17 +110,17 @@
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
         /* === TABLES STYLES === */
-        .table-responsive { width: 100%; } 
+        .table-responsive { width: 100%; }
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
-        
+
         tr.section-title td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         thead tr:nth-child(1) td {
             background-color: var(--primary); color: white; font-weight: 800; padding: 0 15px; font-size: 12px; text-transform: uppercase; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
-            position: sticky; top: 0px; z-index: 20; height: 42px; box-sizing: border-box; border-bottom: none; 
+            position: sticky; top: 0px; z-index: 20; height: 42px; box-sizing: border-box; border-bottom: none;
         }
-        
+
         thead tr:nth-child(2) th {
             background-color: #fbf9fc; color: var(--primary); padding: 12px 10px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; text-align: left; font-family: 'Poppins', sans-serif;
             position: sticky; top: 42px; z-index: 19; box-sizing: border-box; box-shadow: 0 4px 8px -4px rgba(78, 43, 92, 0.15);
@@ -143,7 +143,7 @@
         .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
         .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; }
         .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
-        
+
         body.filter-anomali .row-match { display: none !important; }
 
         /* LOADING ANIMATION */
@@ -200,11 +200,11 @@
                         <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional, Max 15MB)</label>
                         <input type="file" id="deliveryFile" accept=".pdf">
                     </div>
-                    
+
                     <div id="process-anim" class="symbolic-loading" style="display:none;">
                         <span></span><span></span><span></span>
                     </div>
-                    
+
                     <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
                     <div id="ui-message"></div>
                 </form>
@@ -220,7 +220,7 @@
             </div>
 
             <div id="reportPanel" class="card-box" style="display: none;">
-                
+
                 <div class="sticky-top-section">
                     <div class="top-info-bar">
                         <div class="ship-info">
@@ -255,7 +255,7 @@
                             <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
                             <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
                         </div>
-                        
+
                         <div class="filter-wrapper">
                             <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
                                 <i data-lucide="list" style="width:14px;"></i> Show All Items
@@ -374,13 +374,13 @@
             el.classList.add('active');
             document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            updateStickyHeights(); 
+            updateStickyHeights();
         }
 
         function setFilterMode(isAnomaliOnly) {
             const btnAll = document.getElementById('btn-show-all');
             const btnAnomali = document.getElementById('btn-show-anomali');
-            
+
             if (isAnomaliOnly) {
                 document.body.classList.add('filter-anomali');
                 btnAnomali.classList.add('active');
@@ -420,41 +420,41 @@
                 let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }});
                 let text = await res.text();
                 if(!text || text.trim().charAt(0) === "<") return;
-                
+
                 let json = JSON.parse(text);
                 let rows = Array.isArray(json) ? json : (json.data || [json]);
                 let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
-                
-                if (json.status === "processing" || !ourRow) return; 
+
+                if (json.status === "processing" || !ourRow) return;
 
                 clearInterval(pollingInterval); clearInterval(timerInterval);
                 document.getElementById('pollingCard').style.display = 'none';
                 document.getElementById('reportPanel').style.display = 'block';
                 const btn = document.getElementById('submitBtn');
                 btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
-                
+
                 document.getElementById('process-anim').style.display = 'none';
-                
+
                 const panel = document.getElementById('uploadPanel');
                 if(!panel.classList.contains('is-hidden')) toggleUploadForm();
 
-                let fullPayloadStr = ""; 
+                let fullPayloadStr = "";
                 let rowKeys = Object.keys(ourRow);
                 for(let i = 1; i <= 20; i++) { // Ditingkatkan ke 20 sesuai n8n
                     let targetKey = rowKeys.find(k => k.toLowerCase().replace(/\s/g, "") === ("payload" + i));
                     if(targetKey) fullPayloadStr += (ourRow[targetKey] || "");
                 }
-                
+
                 var decodedStr = decodeBase64Utf8(fullPayloadStr);
                 renderAuditReport(JSON.parse(decodedStr));
                 lucide.createIcons();
-                updateStickyHeights(); 
+                updateStickyHeights();
             } catch (e) { console.log("Menunggu dekripsi...", e); }
         }
 
         document.getElementById('auditForm').onsubmit = async (e) => {
             e.preventDefault();
-            
+
             // BARU: Validasi Ukuran File Anti-Timeout
             const maxSize = 15 * 1024 * 1024; // 15 MB
             const qFile = document.getElementById('quotationFile').files[0];
@@ -471,7 +471,7 @@
             const errorBox = document.getElementById('ui-message');
             btn.disabled = true; btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
             errorBox.style.display = 'none'; document.getElementById('reportPanel').style.display = 'none';
-            
+
             document.getElementById('process-anim').style.display = 'flex';
 
             const fd = new FormData();
@@ -485,13 +485,13 @@
                 if (!req.ok) throw new Error("Connection to N8N failed.");
                 document.getElementById('pollingCard').style.display = 'block';
                 let startMs = Date.now();
-                
+
                 timerInterval = setInterval(() => {
                     let s = Math.floor((Date.now() - startMs) / 1000);
                     document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
-                    
+
                     // BARU: Timeout safety dinaikkan ke 300 detik (5 menit) untuk dokumen besar
-                    if (s > 300) { 
+                    if (s > 300) {
                         clearInterval(pollingInterval); clearInterval(timerInterval);
                         document.getElementById('pollingCard').style.display = 'none';
                         showMessage("Proses analisis timeout (>5 menit). Silakan periksa dashboard n8n atau coba dengan file yang lebih kecil.", true);
@@ -499,7 +499,7 @@
                         document.getElementById('process-anim').style.display = 'none';
                     }
                 }, 1000);
-                
+
                 pollingInterval = setInterval(() => checkStatus(id), 8000);
             } catch (err) {
                 showMessage(err.message, true);
@@ -519,13 +519,15 @@
             if (parsed.status_keseluruhan) {
                 let statusText = parsed.status_keseluruhan.replace(/_/g, " ");
                 let statusColor = "#16a34a"; // Default green (ALL_MATCH)
-                
-                if (statusText.includes("DISCREPANCY") || statusText.includes("INCOMPLETE")) { 
+
+                if (statusText.includes("DISCREPANCY") || statusText.includes("INCOMPLETE")) {
                     statusColor = "#dc2626"; // Red
-                } else if (statusText.includes("UNVERIFIED")) { 
+                } else if (statusText.includes("HEADER DATA MISSING")) {
+                    statusColor = "#dc2626"; // Red juga — identitas kapal tidak ditemukan sama sekali
+                } else if (statusText.includes("UNVERIFIED")) {
                     statusColor = "#f59e0b"; // Orange
                 }
-                
+
                 statusEl.innerText = statusText;
                 statusEl.style.color = statusColor;
             }
@@ -551,20 +553,30 @@
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            let v_name="-", v_imo="-", v_call="-", v_own="-";
-            certRows.forEach(r => {
-                let certContent = String(r.di_sertifikat).toLowerCase();
-                if(certContent.includes("name:")) {
-                    String(r.di_sertifikat).split('|').forEach(x => {
-                        let kv = x.split(':'); if(kv.length<2) return;
-                        let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
-                        if(k.includes("name") && v !== "-" && v !== "") v_name = v.toUpperCase();
-                        if(k.includes("imo") && v !== "-" && v !== "") v_imo = v;
-                        if(k.includes("call") && v !== "-" && v !== "") v_call = v;
-                        if(k.includes("owner") && v !== "-" && v !== "") v_own = v.toUpperCase();
-                    });
-                }
-            });
+            // === FIX: Baca langsung dari ship_info terstruktur (bukan parsing teks bebas lagi) ===
+            let v_name = "-", v_imo = "-", v_call = "-", v_own = "-";
+
+            if (parsed.ship_info && (parsed.ship_info.name_of_ship || parsed.ship_info.imo_number)) {
+                v_name = parsed.ship_info.name_of_ship ? String(parsed.ship_info.name_of_ship).toUpperCase() : "-";
+                v_imo  = parsed.ship_info.imo_number || "-";
+                v_call = parsed.ship_info.call_sign || "-";
+                v_own  = parsed.ship_info.owner ? String(parsed.ship_info.owner).toUpperCase() : "-";
+            } else {
+                // Fallback lama untuk kompatibilitas payload job lama tanpa ship_info
+                certRows.forEach(r => {
+                    let certContent = String(r.di_sertifikat).toLowerCase();
+                    if(certContent.includes("name:")) {
+                        String(r.di_sertifikat).split('|').forEach(x => {
+                            let kv = x.split(':'); if(kv.length<2) return;
+                            let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                            if(k.includes("name") && v !== "-" && v !== "") v_name = v.toUpperCase();
+                            if(k.includes("imo") && v !== "-" && v !== "") v_imo = v;
+                            if(k.includes("call") && v !== "-" && v !== "") v_call = v;
+                            if(k.includes("owner") && v !== "-" && v !== "") v_own = v.toUpperCase();
+                        });
+                    }
+                });
+            }
             document.getElementById("val-vessel").innerText = v_name;
             document.getElementById("val-imo").innerText = v_imo;
             document.getElementById("val-call").innerText = v_call;
@@ -582,7 +594,7 @@
                 });
                 let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
                 htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
-                
+
                 groupedPen[g].forEach((r) => {
                     let rawAlias = String(r.alias_sistem || "-").trim();
                     let itemCode = rawAlias.split(" - ")[0] || "-";
@@ -778,7 +790,7 @@
             for (let cNo in certGroups) {
                 let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
                 htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
-                
+
                 certGroups[cNo].forEach(r => {
                     let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
                     String(r.di_sertifikat).split('|').forEach(p => {
@@ -789,7 +801,7 @@
                         if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
                         if(k.includes("sign")) d.sign=v;
                     });
-                    
+
                     let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
                     let rowClass = isWarn ? 'row-anomali' : 'row-match';
 
