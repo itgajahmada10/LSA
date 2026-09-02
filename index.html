@@ -131,4 +131,680 @@
         .cell-status-block { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Poppins', sans-serif; border: 1px solid transparent; width: 90px; }
         .cell-status-block.pass { background-color: var(--status-pass-bg); border-color: var(--status-pass-border); color: var(--status-pass-text); }
         .cell-status-block.partial { background-color: var(--status-partial-bg); border-color: var(--status-partial-border); color: var(--status-partial-text); }
-        .cell-status-block.review { background-color: var(--status-review-bg); border-color: var
+        .cell-status-block.review { background-color: var(--status-review-bg); border-color: var(--status-review-border); color: var(--status-review-text); }
+        .cell-status-block.fail { background-color: var(--status-fail-bg); border-color: var(--status-fail-border); color: var(--status-fail-text); }
+        .ok-cell { background-color: #f0fdf4; color: var(--success); font-weight: 800; text-align: center; vertical-align: middle; }
+        .err-cell { background-color: #fef2f2; color: var(--error); font-weight: 800; text-align: center; vertical-align: middle; }
+        .group-header td { background-color: #f1f5f9; font-weight: 800; color: #334155; font-size: 11px; padding: 8px; }
+        .box-vendor { background: var(--bg-vendor); border-left: 3px solid var(--border-vendor); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 700; color: #713f12; font-size: 10px; }
+        .box-system { background: var(--bg-system); border-left: 3px solid var(--border-system); padding: 3px 5px; border-radius: 2px; margin-bottom: 3px; font-weight: 600; color: #0369a1; font-size: 10px; }
+        .box-code { background: var(--bg-code); border-left: 3px solid var(--border-code); padding: 3px 5px; border-radius: 2px; font-weight: 700; color: #166534; font-size: 10px; font-family: monospace; }
+        .doc-val { background: #fdfdfd; padding: 4px; border-radius: 2px; border: 1px solid #f1f5f9; font-weight: 600; font-size: 11px; }
+        .explanation-row td { background-color: #f8fafc; border-top: none; padding: 6px 10px; }
+        .ai-note { padding: 6px 10px; border-radius: 4px; font-size: 10px; line-height: 1.4; }
+        .ai-note.err { background: #fef2f2; border-left: 3px solid var(--error); color: var(--error); }
+        
+        body.filter-anomali .row-match { display: none !important; }
+
+        /* LOADING ANIMATION */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        .loader-small { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .symbolic-loading { margin-bottom: 15px; font-size: 11px; color: #701a75; font-weight: 700; text-align: center; display: flex; justify-content: center; gap: 8px;}
+        .symbolic-loading span { display: inline-block; width: 6px; height: 6px; background-color: #701a75; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+        .symbolic-loading span:nth-child(2) { animation-delay: 0.2s; }
+        .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse-dot { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
+
+        /* === PRINT STYLES === */
+        @media print {
+            @page { size: A4 landscape; margin: 0; }
+            body { background: white; padding: 1.5cm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .left-panel, .action-buttons, .filter-wrapper, .header, form { display: none !important; }
+            .main-container { display: block; max-width: 100%; gap: 0; margin: 0; }
+            .right-panel { display: block; width: 100%; }
+            .sticky-top-section { position: static !important; padding: 0 !important; border:none; box-shadow:none; border-radius: 0; margin-bottom: 20px; }
+            .tabs-container { display: none !important; }
+            .card-box { padding: 0; border: none; box-shadow: none; }
+            .content-area { padding: 0 !important; }
+            .content-card { display: block !important; margin-bottom: 40px; border: none; }
+            table { font-size: 9px; page-break-inside: auto; width: 100%; }
+            td, th { page-break-inside: avoid; word-break: keep-all !important; overflow-wrap: normal !important; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            thead { display: table-header-group; }
+            thead tr:nth-child(1) td, thead tr:nth-child(2) th { position: static !important; top: auto !important; box-shadow: none !important; }
+            .exec-card { page-break-inside: avoid; border: 1px solid #cbd5e1; box-shadow: none !important; margin-bottom: 15px; }
+            .exec-card-body { grid-template-columns: 40% 60%; }
+            .cert-badge-item { display: inline-block !important; margin: 2px 4px 2px 0 !important; font-size: 9px !important; padding: 3px 5px !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-panel" id="uploadPanel">
+            <div class="card-box">
+                <div class="header">
+                    <h2><i data-lucide="shield-check"></i> Verification</h2>
+                    <p style="color: #666; font-size: 12px; font-weight:500;">AI LSA System</p>
+                </div>
+                <form id="auditForm">
+                    <div class="upload-section">
+                        <label><i data-lucide="file-text" style="width:14px; vertical-align:-2px;"></i> 1. Quotation Document (Max 15MB)</label>
+                        <input type="file" id="quotationFile" accept=".pdf" required>
+                    </div>
+                    <div class="upload-section">
+                        <label><i data-lucide="file-badge" style="width:14px; vertical-align:-2px;"></i> 2. Certificate Report (Max 15MB)</label>
+                        <input type="file" id="certFile" accept=".pdf" required>
+                    </div>
+                    <div class="upload-section">
+                        <label><i data-lucide="package-check" style="width:14px; vertical-align:-2px;"></i> 3. Delivery Order (Optional, Max 15MB)</label>
+                        <input type="file" id="deliveryFile" accept=".pdf">
+                    </div>
+                    
+                    <div id="process-anim" class="symbolic-loading" style="display:none;">
+                        <span></span><span></span><span></span>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn" class="btn-submit"><i data-lucide="zap"></i> RUN AI VERIFICATION</button>
+                    <div id="ui-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div id="pollingCard" class="card-box" style="display: none; text-align: center; padding: 60px 20px;">
+                <div class="loader"></div>
+                <h2>Analyzing...</h2>
+                <div id="loading-txt" style="color: #666; font-size: 13px; font-weight: 600; margin-bottom: 10px;">(Waiting time: <b>0</b> seconds)</div>
+                <p style="color: #666; font-size: 11px;">Performing Triangulation Data via N8N Architecture</p>
+            </div>
+
+            <div id="reportPanel" class="card-box" style="display: none;">
+                
+                <div class="sticky-top-section">
+                    <div class="top-info-bar">
+                        <div class="ship-info">
+                            <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
+                            <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
+                            <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
+                            <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
+                        </div>
+                        <!-- BARU: Overall Status Badge -->
+                        <div class="info-box" style="text-align: right; border-left: 2px solid #e8dee8; padding-left: 20px;">
+                            <span class="info-label">OVERALL STATUS</span>
+                            <span class="info-val" id="val-overall-status" style="font-size: 16px;">-</span>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button onclick="toggleUploadForm()" class="btn-modern btn-toggle-view" id="toggleFormBtn">
+                                <i data-lucide="sidebar-close" id="toggleIcon" style="width:16px;"></i> <span id="toggleText">Hide Upload Form</span>
+                            </button>
+                            <button onclick="window.print()" class="btn-modern btn-full"><i data-lucide="printer" style="width:16px;"></i> Print Report</button>
+                        </div>
+                    </div>
+
+                    <!-- BARU: Missing Document Alert -->
+                    <div id="missing-doc-alert" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px; margin: 20px 30px 0 30px; color: #991b1b; font-weight: 600; font-size: 12px; align-items: center; gap: 10px;">
+                        <i data-lucide="alert-octagon" style="width: 18px; flex-shrink: 0;"></i>
+                        <span id="missing-doc-text"></span>
+                    </div>
+
+                    <div class="tabs-container" style="padding: 0 30px;">
+                        <div class="tab-group">
+                            <button class="tab-btn active" onclick="switchTab('tab-summary', this)"><i data-lucide="pie-chart" style="width:16px;"></i> Executive Summary</button>
+                            <button class="tab-btn" onclick="switchTab('tab-penawaran', this)"><i data-lucide="list-checks" style="width:16px;"></i> Quotation Compliance</button>
+                            <button class="tab-btn" onclick="switchTab('tab-sertifikat', this)"><i data-lucide="award" style="width:16px;"></i> Certificate Registry</button>
+                        </div>
+                        
+                        <div class="filter-wrapper">
+                            <button class="filter-btn-dual active" id="btn-show-all" onclick="setFilterMode(false)">
+                                <i data-lucide="list" style="width:14px;"></i> Show All Items
+                            </button>
+                            <button class="filter-btn-dual" id="btn-show-anomali" onclick="setFilterMode(true)">
+                                <i data-lucide="alert-triangle" style="width:14px;"></i> Only Anomalies
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <main class="content-area" style="padding: 25px 30px 30px 30px;">
+                    <div id="tab-summary" class="content-card active" style="background: transparent; border: none; box-shadow: none;">
+                        <div id="body-reconciliation-summary" class="exec-summary-grid"></div>
+                    </div>
+                    <div id="tab-penawaran" class="content-card">
+                        <div class="table-responsive">
+                            <table>
+                                <colgroup>
+                                    <col style="width: 40px;">
+                                    <col style="width: 42%;">
+                                    <col style="width: 13%;">
+                                    <col style="width: 15%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 20%;">
+                                </colgroup>
+                                <thead>
+                                    <tr class="section-title"><td colspan="6" style="display: table-cell; vertical-align: middle;">QUOTATION COMPLIANCE CHECK & RECONCILIATION</td></tr>
+                                    <tr>
+                                        <th style="text-align: center;">NO</th>
+                                        <th>INSPECTION POINT (VENDOR | SYSTEM | CODE)</th>
+                                        <th>QUOTATION (QTY)</th>
+                                        <th>CERTIFICATE (QTY)</th>
+                                        <th style="text-align:center;">DO (QTY)</th>
+                                        <th style="text-align:center;">AUDIT STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-penawaran"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="tab-sertifikat" class="content-card">
+                        <div class="table-responsive">
+                            <table>
+                                <colgroup>
+                                    <col style="width: 40px;">
+                                    <col style="width: 15%;">
+                                    <col style="width: 12%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 8%;">
+                                    <col style="width: 6%;">
+                                    <col style="width: 5%;">
+                                    <col style="width: 5%;">
+                                    <col style="width: 6%;">
+                                    <col style="width: 8%;">
+                                    <col style="width: 8%;">
+                                    <col style="width: 7%;">
+                                </colgroup>
+                                <thead>
+                                    <tr class="section-title"><td colspan="13" style="display: table-cell; vertical-align: middle;">CERTIFICATE LIST & SHIP VALIDATION</td></tr>
+                                    <tr>
+                                        <th style="text-align: center;">NO</th>
+                                        <th>REPORT NAME</th>
+                                        <th>CERT NO</th>
+                                        <th>SHIP NAME</th>
+                                        <th>OWNER</th>
+                                        <th style="text-align:center;">IMO NO</th>
+                                        <th style="text-align:center;">CLASS</th>
+                                        <th style="text-align:center;">GT</th>
+                                        <th>FLAG</th>
+                                        <th style="text-align:center;">CALL</th>
+                                        <th>SERVICING DATE</th>
+                                        <th>SIGN DATE</th>
+                                        <th style="text-align:center;">STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-sertifikat"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const WEBHOOK_URL = "https://n8.waruna-group.co.id/webhook/audit-dokumen";
+        const STATUS_URL = "https://n8.waruna-group.co.id/webhook/check-status-audit";
+        let pollingInterval, timerInterval;
+
+        function updateStickyHeights() {
+            setTimeout(() => {
+                const headerTop = document.querySelector('.sticky-top-section');
+                if (headerTop) {
+                    const topHeight = headerTop.offsetHeight;
+                    document.documentElement.style.setProperty('--sticky-offset-1', topHeight + 'px');
+                    document.documentElement.style.setProperty('--sticky-offset-2', (topHeight + 41) + 'px');
+                }
+            }, 100);
+        }
+        window.addEventListener('resize', updateStickyHeights);
+        window.addEventListener('load', updateStickyHeights);
+
+        function showMessage(msg, isError) {
+            const el = document.getElementById('ui-message');
+            el.innerHTML = msg; el.style.display = 'block';
+            el.style.backgroundColor = isError ? '#fdedec' : '#e9f7ef';
+            el.style.color = isError ? '#c0392b' : '#1e8449';
+            el.style.border = `1px solid ${isError ? '#fadbd8' : '#d5f5e3'}`;
+        }
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-btn:not(.filter-btn)').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.content-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            updateStickyHeights(); 
+        }
+
+        function setFilterMode(isAnomaliOnly) {
+            const btnAll = document.getElementById('btn-show-all');
+            const btnAnomali = document.getElementById('btn-show-anomali');
+            
+            if (isAnomaliOnly) {
+                document.body.classList.add('filter-anomali');
+                btnAnomali.classList.add('active');
+                btnAll.classList.remove('active');
+            } else {
+                document.body.classList.remove('filter-anomali');
+                btnAll.classList.add('active');
+                btnAnomali.classList.remove('active');
+            }
+            updateStickyHeights();
+        }
+
+        function toggleUploadForm() {
+            const panel = document.getElementById('uploadPanel');
+            const icon = document.getElementById('toggleIcon');
+            const text = document.getElementById('toggleText');
+            panel.classList.toggle('is-hidden');
+            if (panel.classList.contains('is-hidden')) {
+                icon.setAttribute('data-lucide', 'sidebar-open'); text.innerText = 'Show Upload Form';
+            } else {
+                icon.setAttribute('data-lucide', 'sidebar-close'); text.innerText = 'Hide Upload Form';
+            }
+            lucide.createIcons();
+            updateStickyHeights();
+        }
+
+        function esc(s){ return String(s||"-").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+        function decodeBase64Utf8(base64) {
+            const binString = atob(base64.replace(/\s/g, ''));
+            const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+            return new TextDecoder().decode(bytes);
+        }
+
+        async function checkStatus(jobId) {
+            try {
+                let res = await fetch(`${STATUS_URL}?job_id=${jobId}&_t=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }});
+                let text = await res.text();
+                if(!text || text.trim().charAt(0) === "<") return;
+                
+                let json = JSON.parse(text);
+                let rows = Array.isArray(json) ? json : (json.data || [json]);
+                let ourRow = rows.find(r => r["Job ID"] === jobId || r["job_id"] === jobId);
+                
+                if (json.status === "processing" || !ourRow) return; 
+
+                clearInterval(pollingInterval); clearInterval(timerInterval);
+                document.getElementById('pollingCard').style.display = 'none';
+                document.getElementById('reportPanel').style.display = 'block';
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                
+                document.getElementById('process-anim').style.display = 'none';
+                
+                const panel = document.getElementById('uploadPanel');
+                if(!panel.classList.contains('is-hidden')) toggleUploadForm();
+
+                let fullPayloadStr = ""; 
+                let rowKeys = Object.keys(ourRow);
+                for(let i = 1; i <= 20; i++) { // Ditingkatkan ke 20 sesuai n8n
+                    let targetKey = rowKeys.find(k => k.toLowerCase().replace(/\s/g, "") === ("payload" + i));
+                    if(targetKey) fullPayloadStr += (ourRow[targetKey] || "");
+                }
+                
+                var decodedStr = decodeBase64Utf8(fullPayloadStr);
+                renderAuditReport(JSON.parse(decodedStr));
+                lucide.createIcons();
+                updateStickyHeights(); 
+            } catch (e) { console.log("Menunggu dekripsi...", e); }
+        }
+
+        document.getElementById('auditForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            // BARU: Validasi Ukuran File Anti-Timeout
+            const maxSize = 15 * 1024 * 1024; // 15 MB
+            const qFile = document.getElementById('quotationFile').files[0];
+            const cFile = document.getElementById('certFile').files[0];
+            const dFile = document.getElementById('deliveryFile').files[0];
+
+            if ((qFile && qFile.size > maxSize) || (cFile && cFile.size > maxSize) || (dFile && dFile.size > maxSize)) {
+                showMessage("Ukuran file terlalu besar (>15MB). Ini dapat menyebabkan timeout pada proses upload atau AI. Mohon kompres PDF terlebih dahulu.", true);
+                return;
+            }
+
+            const id = `JOB-${Date.now()}`;
+            const btn = document.getElementById('submitBtn');
+            const errorBox = document.getElementById('ui-message');
+            btn.disabled = true; btn.innerHTML = `<div class="loader-small"></div> PROCESSING...`;
+            errorBox.style.display = 'none'; document.getElementById('reportPanel').style.display = 'none';
+            
+            document.getElementById('process-anim').style.display = 'flex';
+
+            const fd = new FormData();
+            fd.append('job_id', id);
+            if (qFile) fd.append('penawaran', qFile);
+            if (cFile) fd.append('sertifikat', cFile);
+            if (dFile) fd.append('surat_jalan', dFile);
+
+            try {
+                const req = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+                if (!req.ok) throw new Error("Connection to N8N failed.");
+                document.getElementById('pollingCard').style.display = 'block';
+                let startMs = Date.now();
+                
+                timerInterval = setInterval(() => {
+                    let s = Math.floor((Date.now() - startMs) / 1000);
+                    document.getElementById('loading-txt').innerHTML = `(Waiting time: <b>${s}</b> seconds)`;
+                    
+                    // BARU: Timeout safety dinaikkan ke 300 detik (5 menit) untuk dokumen besar
+                    if (s > 300) { 
+                        clearInterval(pollingInterval); clearInterval(timerInterval);
+                        document.getElementById('pollingCard').style.display = 'none';
+                        showMessage("Proses analisis timeout (>5 menit). Silakan periksa dashboard n8n atau coba dengan file yang lebih kecil.", true);
+                        btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                        document.getElementById('process-anim').style.display = 'none';
+                    }
+                }, 1000);
+                
+                pollingInterval = setInterval(() => checkStatus(id), 8000);
+            } catch (err) {
+                showMessage(err.message, true);
+                btn.disabled = false; btn.innerHTML = `<i data-lucide="zap"></i> RUN AI VERIFICATION`;
+                document.getElementById('process-anim').style.display = 'none';
+                lucide.createIcons();
+            }
+        };
+
+        function renderAuditReport(parsed) {
+            if (!parsed || !parsed.tabel_audit) {
+                showMessage("Format data JSON tidak dikenali oleh sistem.", true); return;
+            }
+
+            // BARU 1: Render Overall Status
+            const statusEl = document.getElementById("val-overall-status");
+            if (parsed.status_keseluruhan) {
+                let statusText = parsed.status_keseluruhan.replace(/_/g, " ");
+                let statusColor = "#16a34a"; // Default green (ALL_MATCH)
+                
+                if (statusText.includes("DISCREPANCY") || statusText.includes("INCOMPLETE")) { 
+                    statusColor = "#dc2626"; // Red
+                } else if (statusText.includes("UNVERIFIED")) { 
+                    statusColor = "#f59e0b"; // Orange
+                }
+                
+                statusEl.innerText = statusText;
+                statusEl.style.color = statusColor;
+            }
+
+            // BARU 2: Render Missing Document Alert
+            const alertBox = document.getElementById("missing-doc-alert");
+            const alertText = document.getElementById("missing-doc-text");
+            if (parsed.document_checks && Array.isArray(parsed.document_checks)) {
+                const missingDocs = parsed.document_checks.filter(d => String(d.status).toUpperCase() === "MISSING");
+                if (missingDocs.length > 0) {
+                    alertText.innerText = `PERINGATAN: Dokumen wajib berikut tidak ditemukan atau tidak valid: ${missingDocs.map(d => d.check).join(", ")}. Harap verifikasi dengan vendor.`;
+                    alertBox.style.display = "flex";
+                } else {
+                    alertBox.style.display = "none";
+                }
+            } else {
+                alertBox.style.display = "none";
+            }
+
+            let certRows = [], penRows = [];
+            parsed.tabel_audit.forEach(r => {
+                let k = String(r.kategori || "").toUpperCase();
+                if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
+            });
+
+            let v_name="-", v_imo="-", v_call="-", v_own="-";
+            certRows.forEach(r => {
+                let certContent = String(r.di_sertifikat).toLowerCase();
+                if(certContent.includes("name:")) {
+                    String(r.di_sertifikat).split('|').forEach(x => {
+                        let kv = x.split(':'); if(kv.length<2) return;
+                        let k = kv[0].trim().toLowerCase(), v = kv[1].trim();
+                        if(k.includes("name") && v !== "-" && v !== "") v_name = v.toUpperCase();
+                        if(k.includes("imo") && v !== "-" && v !== "") v_imo = v;
+                        if(k.includes("call") && v !== "-" && v !== "") v_call = v;
+                        if(k.includes("owner") && v !== "-" && v !== "") v_own = v.toUpperCase();
+                    });
+                }
+            });
+            document.getElementById("val-vessel").innerText = v_name;
+            document.getElementById("val-imo").innerText = v_imo;
+            document.getElementById("val-call").innerText = v_call;
+            document.getElementById("val-owner").innerText = v_own;
+
+            let htmlPen = ""; let groupedPen = {};
+            penRows.forEach(r => {
+                let g = r.grup_penawaran && r.grup_penawaran !== "-" ? r.grup_penawaran : "Item Lainnya";
+                if(!groupedPen[g]) groupedPen[g] = []; groupedPen[g].push(r);
+            });
+
+            for(let g in groupedPen) {
+                let groupHasWarn = groupedPen[g].some(r => {
+                    let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
+                });
+                let headerClass = groupHasWarn ? 'row-anomali' : 'row-match';
+                htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
+                
+                groupedPen[g].forEach((r) => {
+                    let rawAlias = String(r.alias_sistem || "-").trim();
+                    let itemCode = rawAlias.split(" - ")[0] || "-";
+                    let systemName = rawAlias.split(" - ").slice(1).join(" - ") || "-";
+                    let hasilStr = String(r.hasil_ai || "");
+                    let isWarn = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
+
+                    let certBadgeHtml = "";
+                    if(String(r.cert_terkait || "-").trim() !== "-") {
+                        certBadgeHtml = `<div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">`;
+                        String(r.cert_terkait).split(',').forEach(c => {
+                            if(c.trim() !== "") certBadgeHtml += `<span class="cert-badge-item">🏷️ ${esc(c.trim())}</span>`;
+                        });
+                        certBadgeHtml += `</div>`;
+                    }
+
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
+                    htmlPen += `<tr class="${rowClass}">
+                        <td style="text-align: center;"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
+                        <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
+                        <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
+                        <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
+                        <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
+                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ ANOMALI':'✅ MATCH'}</td>
+                    </tr>`;
+
+                    if (isWarn && hasilStr.trim() !== "") {
+                        let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI/gi, '').trim();
+                        if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
+                        if(cleanReason !== "") {
+                            htmlPen += `<tr class="explanation-row ${rowClass}"><td style="border-right: 1px solid var(--border-color);"></td><td colspan="5"><div class="ai-note err"><b>💡 AI Reason:</b> ${esc(cleanReason)}</div></td></tr>`;
+                        }
+                    }
+                });
+            }
+            document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP</td></tr>`;
+
+            let reconciliationRowsHtml = "";
+            let summaryList = parsed.summary_sertifikat || [];
+            summaryList.sort((a, b) => {
+                if(String(a.sistem).toLowerCase().includes("umum")) return -1;
+                if(String(b.sistem).toLowerCase().includes("umum")) return 1;
+                return 0;
+            });
+
+            summaryList.forEach(item => {
+                let noCert = String(item.no_sertifikat || item.certificate_no || "-").trim();
+                let isFound = noCert !== "-" && !noCert.toLowerCase().includes("tidak ditemukan") && noCert.length < 250;
+
+                let certBadgeContainer = `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:5px;">`;
+                if (isFound) {
+                    noCert.split(',').forEach(num => {
+                        if(num.trim() !== "") certBadgeContainer += `<span class="cert-badge-item">🏷️ ${esc(num.trim())}</span>`;
+                    });
+                } else { certBadgeContainer += `<div style="background:#fef2f2; color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:10px;">TIDAK DITEMUKAN</div>`; }
+                certBadgeContainer += `</div>`;
+
+                let quotBulletItemsHtml = `<ul class="ref-quote-list">`;
+                let rawQuotArray = item.referensi_quotation || [];
+                if (typeof rawQuotArray === 'string') rawQuotArray = rawQuotArray.split('\n');
+
+                if (Array.isArray(rawQuotArray) && rawQuotArray.length > 0) {
+                    rawQuotArray.forEach(line => {
+                        let cleanLine = line.trim();
+                        if (cleanLine !== "" && cleanLine !== "-") quotBulletItemsHtml += `<li>${esc(cleanLine)}</li>`;
+                    });
+                } else { quotBulletItemsHtml += `<li><i>Data General</i></li>`; }
+                quotBulletItemsHtml += `</ul>`;
+
+                let sopChecklistHtml = `<div class="sop-check-grid">`;
+
+                function renderSopLine(cleanLine) {
+                    let isFail = false;
+                    let isWarn = false;
+                    let badgeReason = "";
+
+                    let bedaRegex = /\[BEDA:\s*(.*?)\]/i;
+                    let matchBeda = cleanLine.match(bedaRegex);
+
+                    if (matchBeda) {
+                        isWarn = true;
+                        badgeReason = matchBeda[1].trim();
+                        cleanLine = cleanLine.replace(matchBeda[0], "");
+                    }
+
+                    if (cleanLine.toLowerCase().includes("[red]")) {
+                        isFail = true;
+                        if (!badgeReason) badgeReason = "Terdapat perbedaan kuantitas (ditandai merah) antara Quotation dan Sertifikat.";
+                    }
+
+                    let textLower = cleanLine.toLowerCase();
+                    if (textLower.includes("tidak sah") || textLower.includes("tidak dilampirkan") || textLower.includes("tidak ditemukan") || textLower.includes("tidak ada cap")) {
+                        isFail = true;
+                        if (!badgeReason) badgeReason = "Dokumen tidak lengkap atau tidak valid.";
+                    }
+
+                    if (textLower.includes("mendekati") || textLower.includes("warning batas")) {
+                        isWarn = true;
+                        if (!badgeReason) badgeReason = "Peringatan Jatuh Tempo / Mendekati Expired Date";
+                    }
+
+                    let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
+                    let icon = isFail ? "❌" : (isWarn ? "⚠️" : "✅");
+
+                    let renderedText = "";
+                    let colonIndex = cleanLine.indexOf(':');
+                    if (colonIndex !== -1) {
+                        let title = cleanLine.substring(0, colonIndex);
+                        let desc = cleanLine.substring(colonIndex + 1);
+                        renderedText = `<strong>${esc(title)}:</strong> <span class="highlight-data">${esc(desc)}</span>`;
+                    } else {
+                        renderedText = `<strong>${esc(cleanLine)}</strong>`;
+                    }
+
+                    renderedText = renderedText.replace(/\|\|/g, '<br>&nbsp;&nbsp;&nbsp;&bull; ');
+                    renderedText = renderedText.replace(/\[RED\](.*?)\[\/RED\]/gi, '<span style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fca5a5;">$1</span>');
+
+                    if (badgeReason !== "") {
+                        let badgeColor = isFail ? "background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;" : "background: #fef3c7; color: #b45309; border: 1px solid #fde68a;";
+                        let badgeIcon = isFail ? "🚨" : "💡";
+                        renderedText += `<div style="margin-top: 8px;"><span style="${badgeColor} padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">${badgeIcon} KETERANGAN: ${esc(badgeReason)}</span></div>`;
+                    }
+
+                    return `<div class="sop-item ${borderClass}">
+                        <span class="sop-icon">${icon}</span>
+                        <span class="sop-text">${renderedText}</span>
+                    </div>`;
+                }
+
+                if (Array.isArray(item.checklist_sections) && item.checklist_sections.length > 0) {
+                    item.checklist_sections.forEach(section => {
+                        sopChecklistHtml += `<div class="exec-col-title" style="margin-top:10px; font-size:9.5px;">${esc(section.nomor)}. ${esc(section.judul)}</div>`;
+                        section.items.forEach(line => {
+                            let cleanLine = String(line).trim();
+                            if (cleanLine !== "" && cleanLine !== "-") {
+                                sopChecklistHtml += renderSopLine(cleanLine);
+                            }
+                        });
+                    });
+                } else {
+                    let rawEvidenArray = item.eviden_sertifikat || item.temuan_rn || [];
+                    if (typeof rawEvidenArray === 'string') rawEvidenArray = rawEvidenArray.split('\n');
+
+                    if (Array.isArray(rawEvidenArray) && rawEvidenArray.length > 0) {
+                        rawEvidenArray.forEach(line => {
+                            let cleanLine = line.trim();
+                            if (cleanLine !== "" && cleanLine !== "-") {
+                                sopChecklistHtml += renderSopLine(cleanLine);
+                            }
+                        });
+                    } else {
+                        sopChecklistHtml += `<div class="sop-item pass-border"><span class="sop-text">Semua parameter tervalidasi</span></div>`;
+                    }
+                }
+
+                sopChecklistHtml += `</div>`;
+
+                let currentStatus = String(item.status || "PASS").toUpperCase();
+                let statusClass = "pass";
+                if (currentStatus === "FAIL") statusClass = "fail";
+                else if (currentStatus === "PARTIAL" || currentStatus === "REVIEW") statusClass = "partial";
+                let isGeneral = String(item.sistem).toLowerCase().includes("umum");
+
+                reconciliationRowsHtml += `
+                <div class="exec-card" ${isGeneral ? 'style="border-color: var(--primary); border-width: 2px;"' : ''}>
+                    <div class="exec-card-header" ${isGeneral ? 'style="background-color: var(--primary);"' : ''}>
+                        <h3 class="exec-card-title" ${isGeneral ? 'style="color: white;"' : ''}>🛡️ ${esc(item.sistem)}</h3>
+                        ${!isGeneral ? `<span class="cell-status-block ${statusClass}">${currentStatus}</span>` : `<span class="cell-status-block" style="background:#fff; color:var(--primary);">WAJIB</span>`}
+                    </div>
+                    <div class="exec-card-body">
+                        <div class="exec-col-ref">
+                            <span class="exec-col-title">Tagihan Vendor (Quotation)</span>
+                            ${quotBulletItemsHtml}
+                            <span class="exec-col-title" style="margin-top:5px;">Sertifikat Dilampirkan</span>
+                            ${certBadgeContainer}
+                        </div>
+                        <div class="exec-col-audit">
+                            <span class="exec-col-title">Checklist Audit Matrix SOP</span>
+                            ${sopChecklistHtml}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<div style="text-align:center; padding:40px; color:#64748b; font-weight:700;">✅ DATA KOSONG ATAU BELUM TERHUBUNG</div>`;
+
+            let htmlCert = ""; let certGroups = {};
+            certRows.forEach(r => {
+                let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
+                if(!certGroups[cNo]) certGroups[cNo] = []; certGroups[cNo].push(r);
+            });
+
+            let gIdx = 1;
+            for (let cNo in certGroups) {
+                let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
+                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
+                
+                certGroups[cNo].forEach(r => {
+                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
+                    String(r.di_sertifikat).split('|').forEach(p => {
+                        let kv = p.split(':'); if(kv.length < 2) return;
+                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
+                        if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
+                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
+                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
+                        if(k.includes("sign")) d.sign=v;
+                    });
+                    
+                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
+                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
+
+                    htmlCert += `<tr class="${rowClass}">
+                        <td style="text-align: center;">${gIdx++}</td>
+                        <td><b>${esc(r.keterangan)}</b></td>
+                        <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
+                        <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
+                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
+                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ BEDA':'✅ OK'}</td>
+                    </tr>`;
+                });
+            }
+            document.getElementById("body-sertifikat").innerHTML = htmlCert;
+        }
+    </script>
+</body>
+</html>
