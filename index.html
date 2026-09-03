@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        /* === CORE VARIABLES === */
         :root {
             --primary: #4e2b5c;
             --primary-hover: #3b1e47;
@@ -63,6 +62,7 @@
         .info-box { display: flex; flex-direction: column; }
         .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
         .info-val { font-weight: 800; font-size: 14px; color: var(--primary); }
+        .info-val-small { font-weight: 700; font-size: 11px; color: var(--text-muted); }
 
         .action-buttons { display: flex; gap: 10px; }
         .btn-modern { padding: 8px 15px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: 'Poppins', sans-serif; border: 1px solid var(--primary); }
@@ -87,12 +87,17 @@
         .content-card.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MATRIX CARDS */
+        .compliance-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; font-family: 'Poppins', sans-serif; margin-left: 8px; }
+        .compliance-badge.high { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .compliance-badge.mid { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .compliance-badge.low { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
         .exec-summary-grid { display: flex; flex-direction: column; gap: 20px; width: 100%; }
         .exec-card { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px -10px rgba(78, 43, 92, 0.08); transition: transform 0.2s; }
         .exec-card:hover { transform: translateY(-2px); box-shadow: 0 12px 25px -10px rgba(78, 43, 92, 0.12); border-color: #d8c8df; }
         .exec-card-header { padding: 15px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fbf9fc; }
         .exec-card-title { margin: 0; font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px;}
+        .exec-card-title small { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: none; }
         .exec-card-body { display: grid; grid-template-columns: 35% 65%; }
         .exec-col-ref { padding: 20px 25px; border-right: 1px dashed var(--border-color); background: #ffffff; }
         .exec-col-title { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; display: inline-block; }
@@ -109,7 +114,6 @@
         .sop-text strong { color: var(--primary); font-weight: 800; }
         .sop-text .highlight-data { color: #0f172a; font-weight: 600; }
 
-        /* === TABLES STYLES === */
         .table-responsive { width: 100%; }
         table { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; }
         th, td { border: 1px solid var(--border-color); padding: 11px 10px; font-size: 11px; vertical-align: top; word-wrap: break-word; background-clip: padding-box; }
@@ -148,7 +152,6 @@
 
         body.filter-anomali .row-match { display: none !important; }
 
-        /* LOADING ANIMATION */
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         .loader-small { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -158,7 +161,10 @@
         .symbolic-loading span:nth-child(3) { animation-delay: 0.4s; }
         @keyframes pulse-dot { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
 
-        /* === PRINT STYLES === */
+        .vessel-mismatch-tag { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        .vessel-mismatch-tag.ok { background: #f0fdf4; color: #166534; }
+        .vessel-mismatch-tag.bad { background: #fef2f2; color: #991b1b; }
+
         @media print {
             @page { size: A4 landscape; margin: 0; }
             body { background: white; padding: 1.5cm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -230,6 +236,7 @@
                             <div class="info-box"><span class="info-label">IMO Number</span><span class="info-val" id="val-imo">-</span></div>
                             <div class="info-box"><span class="info-label">Call Sign</span><span class="info-val" id="val-call">-</span></div>
                             <div class="info-box"><span class="info-label">Owner</span><span class="info-val" id="val-owner">-</span></div>
+                            <div class="info-box"><span class="info-label">Class / GT</span><span class="info-val-small" id="val-class-gt">-</span></div>
                         </div>
                         <div class="info-box" style="text-align: right; border-left: 2px solid #e8dee8; padding-left: 20px;">
                             <span class="info-label">OVERALL STATUS</span>
@@ -247,6 +254,11 @@
                     <div id="missing-doc-alert" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px 20px; margin: 20px 30px 0 30px; color: #991b1b; font-weight: 600; font-size: 12px; align-items: center; gap: 10px;">
                         <i data-lucide="alert-octagon" style="width: 18px; flex-shrink: 0;"></i>
                         <span id="missing-doc-text"></span>
+                    </div>
+
+                    <div id="vessel-mismatch-alert" style="display: none; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 8px; padding: 15px 20px; margin: 15px 30px 0 30px; color: #c2410c; font-weight: 600; font-size: 12px; align-items: center; gap: 10px;">
+                        <i data-lucide="alert-triangle" style="width: 18px; flex-shrink: 0;"></i>
+                        <span id="vessel-mismatch-text"></span>
                     </div>
 
                     <div class="tabs-container" style="padding: 0 30px;">
@@ -512,12 +524,13 @@
                 showMessage("Format data JSON tidak dikenali oleh sistem.", true); return;
             }
 
+            /* ===== OVERALL STATUS + COMPLIANCE SCORE ===== */
             const statusEl = document.getElementById("val-overall-status");
             if (parsed.status_keseluruhan) {
                 let statusText = parsed.status_keseluruhan.replace(/_/g, " ");
                 let statusColor = "#16a34a";
 
-                if (statusText.includes("DISCREPANCY") || statusText.includes("INCOMPLETE")) {
+                if (statusText.includes("DISCREPANCY") || statusText.includes("INCOMPLETE") || statusText.includes("PROCESSING FAILED")) {
                     statusColor = "#dc2626";
                 } else if (statusText.includes("HEADER DATA MISSING")) {
                     statusColor = "#dc2626";
@@ -525,10 +538,17 @@
                     statusColor = "#f59e0b";
                 }
 
-                statusEl.innerText = statusText;
-                statusEl.style.color = statusColor;
+                let scoreHtml = "";
+                if (parsed.compliance_score !== undefined && parsed.compliance_detail) {
+                    let d = parsed.compliance_detail;
+                    let badgeClass = parsed.compliance_score >= 90 ? "high" : (parsed.compliance_score >= 70 ? "mid" : "low");
+                    scoreHtml = `<span class="compliance-badge ${badgeClass}">${d.matched}/${d.total} • ${parsed.compliance_score}%</span>`;
+                }
+
+                statusEl.innerHTML = `<span style="color:${statusColor};">${statusText}</span>${scoreHtml}`;
             }
 
+            /* ===== MISSING DOCUMENT ALERT ===== */
             const alertBox = document.getElementById("missing-doc-alert");
             const alertText = document.getElementById("missing-doc-text");
             if (parsed.document_checks && Array.isArray(parsed.document_checks)) {
@@ -543,19 +563,49 @@
                 alertBox.style.display = "none";
             }
 
+            /* ===== VESSEL MISMATCH ALERT (dari ship_validation) ===== */
+            const mismatchBox = document.getElementById("vessel-mismatch-alert");
+            const mismatchText = document.getElementById("vessel-mismatch-text");
+            const validation = parsed.ship_validation || {};
+            const checks = validation.checks || {};
+
+            if (validation.master_found === false) {
+                mismatchText.innerText = "Kapal ini TIDAK ditemukan di Master Data Kapal. Identitas kapal hanya mengandalkan hasil ekstraksi sertifikat — mohon verifikasi manual.";
+                mismatchBox.style.display = "flex";
+            } else if (validation.master_found === true) {
+                let mismatches = [];
+                if (checks.vessel_name && checks.vessel_name.match === false) mismatches.push("Nama Kapal");
+                if (checks.imo_number && checks.imo_number.match === false) mismatches.push("IMO Number");
+                if (checks.call_sign && checks.call_sign.match === false) mismatches.push("Call Sign");
+                if (checks.owner && checks.owner.match === false) mismatches.push("Owner");
+
+                if (mismatches.length > 0) {
+                    mismatchText.innerText = `PERINGATAN: Data berikut TIDAK COCOK antara Master Kapal dan Sertifikat: ${mismatches.join(", ")}. Mohon periksa apakah dokumen tertukar dengan kapal lain.`;
+                    mismatchBox.style.display = "flex";
+                } else {
+                    mismatchBox.style.display = "none";
+                }
+            } else {
+                mismatchBox.style.display = "none";
+            }
+
             let certRows = [], penRows = [];
             parsed.tabel_audit.forEach(r => {
                 let k = String(r.kategori || "").toUpperCase();
                 if (k.includes("SERTIFIKAT") || k.includes("HEADER")) certRows.push(r); else penRows.push(r);
             });
 
-            let v_name = "-", v_imo = "-", v_call = "-", v_own = "-";
+            /* ===== SHIP INFO HEADER ===== */
+            let v_name = "-", v_imo = "-", v_call = "-", v_own = "-", v_classgt = "-";
 
             if (parsed.ship_info && (parsed.ship_info.name_of_ship || parsed.ship_info.imo_number)) {
                 v_name = parsed.ship_info.name_of_ship ? String(parsed.ship_info.name_of_ship).toUpperCase() : "-";
                 v_imo  = parsed.ship_info.imo_number || "-";
                 v_call = parsed.ship_info.call_sign || "-";
                 v_own  = parsed.ship_info.owner ? String(parsed.ship_info.owner).toUpperCase() : "-";
+                let cls = parsed.ship_info.class || "-";
+                let gt = parsed.ship_info.gross_tonnage || "-";
+                v_classgt = (cls !== "-" || gt !== "-") ? `${cls} / ${gt} GT` : "-";
             } else {
                 certRows.forEach(r => {
                     let certContent = String(r.di_sertifikat).toLowerCase();
@@ -575,30 +625,43 @@
             document.getElementById("val-imo").innerText = v_imo;
             document.getElementById("val-call").innerText = v_call;
             document.getElementById("val-owner").innerText = v_own;
+            document.getElementById("val-class-gt").innerText = v_classgt;
 
+            /* ===== TAB: QUOTATION COMPLIANCE ===== */
             let htmlPen = ""; let groupedPen = {};
             penRows.forEach(r => {
                 let g = r.grup_penawaran && r.grup_penawaran !== "-" ? r.grup_penawaran : "Item Lainnya";
                 if(!groupedPen[g]) groupedPen[g] = []; groupedPen[g].push(r);
             });
 
+            function classifyStatus(hasilStr) {
+                let s = String(hasilStr || "");
+                if (s.includes('⚠️') || s.toLowerCase().includes('anomali') || s.toLowerCase().includes('beda')) return 'ANOMALY';
+                if (s.includes('🔍') || s.toLowerCase().includes('review')) return 'REVIEW';
+                if (s.includes('❓') || s.toLowerCase().includes('tidak terverifikasi')) return 'UNVERIFIED';
+                return 'MATCH';
+            }
+
+            const STATUS_STYLE = {
+                MATCH:      { rowClass: 'row-match',   cellClass: 'ok-cell',     label: '✅ MATCH',    noteClass: null,     noteLabel: null },
+                ANOMALY:    { rowClass: 'row-anomali', cellClass: 'err-cell',    label: '⚠️ ANOMALI',  noteClass: 'err',    noteLabel: '💡 AI Reason' },
+                REVIEW:     { rowClass: 'row-review',  cellClass: 'review-cell', label: '🔍 REVIEW',   noteClass: 'review', noteLabel: '🔍 Perlu Ditinjau' },
+                UNVERIFIED: { rowClass: 'row-review',  cellClass: 'review-cell', label: '❓ REVIEW',   noteClass: 'review', noteLabel: '🔍 Perlu Ditinjau' }
+            };
+
             for(let g in groupedPen) {
-                let groupHasAnomaly = groupedPen[g].some(r => {
-                    let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda');
-                });
-                let groupHasUnverified = groupedPen[g].some(r => {
-                    let h = String(r.hasil_ai || ""); return h.includes('❓') || h.toLowerCase().includes('tidak terverifikasi');
-                });
-                let headerClass = groupHasAnomaly ? 'row-anomali' : (groupHasUnverified ? 'row-review' : 'row-match');
-                htmlPen += `<tr class="group-header ${headerClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
+                let groupStatuses = groupedPen[g].map(r => classifyStatus(r.hasil_ai));
+                let groupHeaderClass = groupStatuses.includes('ANOMALY') ? 'row-anomali' : (groupStatuses.some(s => s === 'REVIEW' || s === 'UNVERIFIED') ? 'row-review' : 'row-match');
+
+                htmlPen += `<tr class="group-header ${groupHeaderClass}"><td colspan="6" style="background:#e2e8f0; color:#1e293b; font-size:12px;">📁 <b>${esc(g)}</b></td></tr>`;
 
                 groupedPen[g].forEach((r) => {
                     let rawAlias = String(r.alias_sistem || "-").trim();
                     let itemCode = rawAlias.split(" - ")[0] || "-";
                     let systemName = rawAlias.split(" - ").slice(1).join(" - ") || "-";
                     let hasilStr = String(r.hasil_ai || "");
-                    let isAnomaly = hasilStr.includes('⚠️') || hasilStr.toLowerCase().includes('anomali') || hasilStr.toLowerCase().includes('beda');
-                    let isUnverified = !isAnomaly && (hasilStr.includes('❓') || hasilStr.toLowerCase().includes('tidak terverifikasi'));
+                    let statusKey = classifyStatus(hasilStr);
+                    let style = STATUS_STYLE[statusKey];
 
                     let certBadgeHtml = "";
                     if(String(r.cert_terkait || "-").trim() !== "-") {
@@ -609,32 +672,27 @@
                         certBadgeHtml += `</div>`;
                     }
 
-                    let rowClass = isAnomaly ? 'row-anomali' : (isUnverified ? 'row-review' : 'row-match');
-                    let statusCellClass = isAnomaly ? 'err-cell' : (isUnverified ? 'review-cell' : 'ok-cell');
-                    let statusCellText = isAnomaly ? '⚠️ ANOMALI' : (isUnverified ? '❓ REVIEW' : '✅ MATCH');
-
-                    htmlPen += `<tr class="${rowClass}">
+                    htmlPen += `<tr class="${style.rowClass}">
                         <td style="text-align: center;"><b>${esc(r.no_urut_penawaran || "-")}</b></td>
                         <td><div class="box-vendor">${esc(r.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td>
                         <td><div class="doc-val">${esc(r.di_penawaran)}</div></td>
                         <td><div class="doc-val">${esc(String(r.di_sertifikat || "-").trim())}</div>${certBadgeHtml}</td>
                         <td align="center"><div class="doc-val" style="text-align:center;">${esc(r.di_do)}</div></td>
-                        <td class="${statusCellClass}">${statusCellText}</td>
+                        <td class="${style.cellClass}">${style.label}</td>
                     </tr>`;
 
-                    if ((isAnomaly || isUnverified) && hasilStr.trim() !== "") {
-                        let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI|❓ TIDAK TERVERIFIKASI/gi, '').trim();
+                    if (statusKey !== 'MATCH' && hasilStr.trim() !== "") {
+                        let cleanReason = hasilStr.replace(/✅ MATCH|⚠️ ANOMALI|❓ TIDAK TERVERIFIKASI|🔍 REVIEW/gi, '').trim();
                         if(cleanReason.startsWith(':') || cleanReason.startsWith('-') || cleanReason.startsWith('.')) cleanReason = cleanReason.substring(1).trim();
                         if(cleanReason !== "") {
-                            let noteClass = isAnomaly ? 'err' : 'review';
-                            let noteLabel = isAnomaly ? '💡 AI Reason' : '🔍 Perlu Ditinjau';
-                            htmlPen += `<tr class="explanation-row ${rowClass}"><td style="border-right: 1px solid var(--border-color);"></td><td colspan="5"><div class="ai-note ${noteClass}"><b>${noteLabel}:</b> ${esc(cleanReason)}</div></td></tr>`;
+                            htmlPen += `<tr class="explanation-row ${style.rowClass}"><td style="border-right: 1px solid var(--border-color);"></td><td colspan="5"><div class="ai-note ${style.noteClass}"><b>${style.noteLabel}:</b> ${esc(cleanReason)}</div></td></tr>`;
                         }
                     }
                 });
             }
             document.getElementById("body-penawaran").innerHTML = htmlPen || `<tr><td colspan="6" align="center" style="padding:30px; color:var(--success); font-weight:700;">✅ SEMUA PARAMETER COCOK PATUH SOP</td></tr>`;
 
+            /* ===== TAB: EXECUTIVE SUMMARY ===== */
             let reconciliationRowsHtml = "";
             let summaryList = parsed.summary_sertifikat || [];
             summaryList.sort((a, b) => {
@@ -694,9 +752,9 @@
                         if (!badgeReason) badgeReason = "Dokumen tidak lengkap atau tidak valid.";
                     }
 
-                    if (textLower.includes("mendekati") || textLower.includes("warning batas")) {
+                    if (textLower.includes("perlu review") || textLower.includes("mendekati") || textLower.includes("warning batas")) {
                         isWarn = true;
-                        if (!badgeReason) badgeReason = "Peringatan Jatuh Tempo / Mendekati Expired Date";
+                        if (!badgeReason) badgeReason = "Perlu ditinjau manual.";
                     }
 
                     let borderClass = isFail ? "fail-border" : (isWarn ? "warn-border" : "pass-border");
@@ -761,10 +819,15 @@
                 else if (currentStatus === "PARTIAL" || currentStatus === "REVIEW") statusClass = "review";
                 let isGeneral = String(item.sistem).toLowerCase().includes("umum");
 
+                let itemCountBadge = "";
+                if (item.total_item !== undefined) {
+                    itemCountBadge = `<small>${item.item_match || 0}/${item.total_item} item cocok</small>`;
+                }
+
                 reconciliationRowsHtml += `
                 <div class="exec-card" ${isGeneral ? 'style="border-color: var(--primary); border-width: 2px;"' : ''}>
                     <div class="exec-card-header" ${isGeneral ? 'style="background-color: var(--primary);"' : ''}>
-                        <h3 class="exec-card-title" ${isGeneral ? 'style="color: white;"' : ''}>🛡️ ${esc(item.sistem)}</h3>
+                        <h3 class="exec-card-title" ${isGeneral ? 'style="color: white;"' : ''}>🛡️ ${esc(item.sistem)} ${itemCountBadge}</h3>
                         ${!isGeneral ? `<span class="cell-status-block ${statusClass}">${currentStatus}</span>` : `<span class="cell-status-block" style="background:#fff; color:var(--primary);">WAJIB</span>`}
                     </div>
                     <div class="exec-card-body">
@@ -783,38 +846,28 @@
             });
             document.getElementById("body-reconciliation-summary").innerHTML = reconciliationRowsHtml || `<div style="text-align:center; padding:40px; color:#64748b; font-weight:700;">✅ DATA KOSONG ATAU BELUM TERHUBUNG</div>`;
 
-            let htmlCert = ""; let certGroups = {};
-            certRows.forEach(r => {
-                let cNo = "-"; String(r.di_sertifikat).split('|').forEach(p => { if(p.includes("CertNo:")) cNo = p.split(':')[1].trim(); });
-                if(!certGroups[cNo]) certGroups[cNo] = []; certGroups[cNo].push(r);
-            });
+            /* ===== TAB: CERTIFICATE REGISTRY (dari certificate_registry terstruktur) ===== */
+            let htmlCert = "";
+            let certList = Array.isArray(parsed.certificate_registry) ? parsed.certificate_registry : [];
 
-            let gIdx = 1;
-            for (let cNo in certGroups) {
-                let groupWarn = certGroups[cNo].some(r => { let h = String(r.hasil_ai).toLowerCase(); return h.includes('⚠️') || h.includes('anomali') || h.includes('beda'); });
-                htmlCert += `<tr class="group-header ${groupWarn?'row-anomali':'row-match'}"><td colspan="13">🛡️ NOMOR SERTIFIKAT: ${esc(cNo)}</td></tr>`;
-
-                certGroups[cNo].forEach(r => {
-                    let d = { cert: "-", ship: "-", owner: "-", imo: "-", cls: "-", gt: "-", nat: "-", call: "-", date: "-", sign: "-" };
-                    String(r.di_sertifikat).split('|').forEach(p => {
-                        let kv = p.split(':'); if(kv.length < 2) return;
-                        let k = kv[0].trim().toLowerCase(); let v = kv[1].trim();
-                        if(k.includes("name")) d.ship=v; if(k.includes("owner")) d.owner=v;
-                        if(k.includes("imo")) d.imo=v; if(k.includes("class")) d.cls=v; if(k.includes("gt")) d.gt=v;
-                        if(k.includes("nat")) d.nat=v; if(k.includes("call")) d.call=v; if(k.includes("date")) d.date=v;
-                        if(k.includes("sign")) d.sign=v;
-                    });
-
-                    let isWarn = String(r.hasil_ai).includes('⚠️') || String(r.hasil_ai).toLowerCase().includes('beda');
-                    let rowClass = isWarn ? 'row-anomali' : 'row-match';
-
-                    htmlCert += `<tr class="${rowClass}">
-                        <td style="text-align: center;">${gIdx++}</td>
-                        <td><b>${esc(r.keterangan)}</b></td>
-                        <td>${esc(cNo)}</td><td>${esc(d.ship)}</td><td>${esc(d.owner)}</td><td align="center"><b>${esc(d.imo)}</b></td>
-                        <td align="center">${esc(d.cls)}</td><td align="center">${esc(d.gt)}</td><td>${esc(d.nat)}</td><td align="center">${esc(d.call)}</td>
-                        <td>${esc(d.date)}</td><td>${esc(d.sign)}</td>
-                        <td class="${isWarn?'err-cell':'ok-cell'}">${isWarn?'⚠️ BEDA':'✅ OK'}</td>
+            if (certList.length === 0) {
+                htmlCert = `<tr><td colspan="13" align="center" style="padding:30px; color:#94a3b8; font-weight:700;">Tidak ada data sertifikat</td></tr>`;
+            } else {
+                certList.forEach((c, idx) => {
+                    htmlCert += `<tr class="row-match">
+                        <td style="text-align: center;">${idx + 1}</td>
+                        <td><b>${esc(c.report_name)}</b>${c.component_summary && c.component_summary !== '-' ? `<div style="margin-top:4px; font-size:10px; color:#64748b;">${esc(c.component_summary)}</div>` : ''}</td>
+                        <td>${esc(c.cert_no)}</td>
+                        <td>${esc(c.ship_name)}</td>
+                        <td>${esc(c.owner)}</td>
+                        <td align="center"><b>${esc(c.imo_no)}</b></td>
+                        <td align="center">${esc(c.class)}</td>
+                        <td align="center">${esc(c.gt)}</td>
+                        <td>${esc(c.flag)}</td>
+                        <td align="center">${esc(c.call_sign)}</td>
+                        <td>${esc(c.servicing_date)}</td>
+                        <td>${esc(c.sign_date)}</td>
+                        <td class="ok-cell">✅ ${esc(c.status)}</td>
                     </tr>`;
                 });
             }
