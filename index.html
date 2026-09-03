@@ -527,19 +527,24 @@
             }
         }
 
-        document.getElementById('auditForm').onsubmit = async event => {
-            event.preventDefault();
-            const maxSize = 15 * 1024 * 1024;
-            const qFile = document.getElementById('quotationFile').files[0];
-            const cFile = document.getElementById('certFile').files[0];
-            const dFile = document.getElementById('deliveryFile').files[0];
+     document.getElementById('auditForm').onsubmit = async event => {
+    event.preventDefault();
 
-            if ([qFile, cFile, dFile].some(file => file && file.size > maxSize)) {
-                showMessage('Ukuran file terlalu besar. Maksimum 15MB per PDF.', true);
-                return;
-            }
+    const maxSize = 50 * 1024 * 1024; // 50 MB per file
 
-            const jobId = `JOB-${Date.now()}`;
+    const qFile = document.getElementById('quotationFile').files[0];
+    const cFile = document.getElementById('certFile').files[0];
+    const dFile = document.getElementById('deliveryFile').files[0];
+
+    if ([qFile, cFile, dFile].some(file => file && file.size > maxSize)) {
+        showMessage(
+            'Ukuran file maksimal 50 MB per PDF. Mohon kompres dokumen yang lebih besar.',
+            true
+        );
+        return;
+    }
+
+    const jobId = `JOB-${Date.now()}`;
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerHTML = '<div class="loader-small"></div> PROCESSING...';
@@ -561,13 +566,13 @@
                 timerInterval = setInterval(() => {
                     const seconds = Math.floor((Date.now() - start) / 1000);
                     document.getElementById('loading-txt').innerHTML = `Waiting time: <b>${seconds}</b> seconds`;
-                    if (seconds > 300) {
+                    if (seconds > 600) {
                         clearInterval(pollingInterval); clearInterval(timerInterval);
                         document.getElementById('pollingCard').style.display = 'none';
                         btn.disabled = false;
                         btn.innerHTML = '<i data-lucide="zap" style="width:16px;"></i> RUN AI VERIFICATION';
                         document.getElementById('process-anim').style.display = 'none';
-                        showMessage('Proses melebihi 5 menit. Periksa execution n8n.', true);
+                        showMessage('Proses melebihi 10 menit. Periksa execution n8n.', true);
                         lucide.createIcons();
                     }
                 }, 1000);
