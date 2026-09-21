@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -247,7 +247,7 @@
 
                     <div id="attention-summary">
                         <div class="attention-card">
-                            <div class="attention-head"><i data-lucide="list-todo" style="width:16px;"></i> <span id="attention-count-text">Perlu Ditindaklanjuti</span></div>
+                            <div class="attention-head"><i data-lucide="list-todo" style="width:16px;"></i> <span id="attention-count-text">Needs Attention</span></div>
                             <div class="attention-list" id="attention-list"></div>
                         </div>
                     </div>
@@ -363,14 +363,14 @@
 
         function statusStyle(status) {
             const s = String(status || '').toUpperCase();
-            if (s.includes('ANOMALY') || s.includes('FAIL') || s.includes('DISCREPANCY')) return { key: 'ANOMALY', label: '⚠️ ANOMALI', className: 'err-cell', row: 'row-anomali' };
+            if (s.includes('ANOMALY') || s.includes('FAIL') || s.includes('DISCREPANCY')) return { key: 'ANOMALY', label: '⚠️ ANOMALY', className: 'err-cell', row: 'row-anomali' };
             if (s.includes('REVIEW') || s.includes('UNVERIFIED')) return { key: 'REVIEW', label: '🔍 REVIEW', className: 'review-cell', row: 'row-review' };
             return { key: 'MATCH', label: '✅ MATCH', className: 'ok-cell', row: 'row-match' };
         }
 
         function expiryBadge(status, days) {
-            if (status === 'EXPIRED') return `<span class="expiry-badge expired">🔴 EXPIRED${days !== null && days !== undefined ? ` (${Math.abs(days)}d lalu)` : ''}</span>`;
-            if (status === 'EXPIRING_SOON') return `<span class="expiry-badge soon">🟡 ${days}d LAGI</span>`;
+            if (status === 'EXPIRED') return `<span class="expiry-badge expired">🔴 EXPIRED${days !== null && days !== undefined ? ` (${Math.abs(days)}d ago)` : ''}</span>`;
+            if (status === 'EXPIRING_SOON') return `<span class="expiry-badge soon">🟡 ${days}d LEFT</span>`;
             if (status === 'VALID') return `<span class="expiry-badge valid">🟢 VALID</span>`;
             return `<span class="expiry-badge unknown">-</span>`;
         }
@@ -406,7 +406,7 @@
                 renderAuditReport(parsed);
                 lucide.createIcons();
             } catch (error) {
-                console.log('Menunggu data audit...', error);
+                console.log('Waiting for audit data...', error);
             }
         }
 
@@ -420,7 +420,7 @@
     const dFile = document.getElementById('deliveryFile').files[0];
 
     if ([qFile, cFile, dFile].some(file => file && file.size > maxSize)) {
-        showMessage('Ukuran file maksimal 50 MB per PDF. Mohon kompres dokumen yang lebih besar.', true);
+        showMessage('Maximum file size is 50 MB per PDF. Please compress larger documents.', true);
         return;
     }
 
@@ -452,7 +452,7 @@
                         btn.disabled = false;
                         btn.innerHTML = '<i data-lucide="zap" style="width:16px;"></i> RUN AI VERIFICATION';
                         document.getElementById('process-anim').style.display = 'none';
-                        showMessage('Proses melebihi 10 menit. Periksa execution n8n.', true);
+                        showMessage('Process exceeded 10 minutes. Please check the n8n execution.', true);
                         lucide.createIcons();
                     }
                 }, 1000);
@@ -468,7 +468,7 @@
 
         function renderAuditReport(parsed) {
             if (!parsed || !Array.isArray(parsed.tabel_audit)) {
-                showMessage('Format payload audit tidak dikenali.', true);
+                showMessage('Unrecognized audit payload format.', true);
                 return;
             }
 
@@ -488,7 +488,7 @@
             const missing = (parsed.document_checks || []).filter(x => String(x.status || '').toUpperCase() === 'MISSING');
             const missingAlert = document.getElementById('missing-doc-alert');
             if (missing.length) {
-                document.getElementById('missing-doc-text').innerText = `Dokumen wajib belum lengkap: ${missing.map(x => x.check || x.field || 'Dokumen').join(', ')}`;
+                document.getElementById('missing-doc-text').innerText = `Required documents incomplete: ${missing.map(x => x.check || x.field || 'Document').join(', ')}`;
                 missingAlert.style.display = 'flex';
             } else missingAlert.style.display = 'none';
 
@@ -497,15 +497,15 @@
             const mismatchLines = [];
             Object.entries(checks).forEach(([field, check]) => {
                 if (check && check.match === false) {
-                    mismatchLines.push(`<div class="mismatch-line">• <b>${esc(field.replace(/_/g, ' '))}</b> — Master: <b>${esc(check.master || '-')}</b> vs Sertifikat: <b>${esc(check.certificate || '-')}</b></div>`);
+                    mismatchLines.push(`<div class="mismatch-line">• <b>${esc(field.replace(/_/g, ' '))}</b> — Master: <b>${esc(check.master || '-')}</b> vs Certificate: <b>${esc(check.certificate || '-')}</b></div>`);
                 }
             });
             const mismatchAlert = document.getElementById('vessel-mismatch-alert');
             if (validation.master_found === false) {
-                document.getElementById('vessel-mismatch-text').innerHTML = 'Kapal tidak ditemukan pada Master Data Kapal. Mohon lakukan verifikasi manual.';
+                document.getElementById('vessel-mismatch-text').innerHTML = 'Vessel not found in Master Vessel Data. Please verify manually.';
                 mismatchAlert.style.display = 'flex';
             } else if (mismatchLines.length) {
-                document.getElementById('vessel-mismatch-text').innerHTML = `<div>Perbedaan data Master Kapal vs Sertifikat:</div>${mismatchLines.join('')}`;
+                document.getElementById('vessel-mismatch-text').innerHTML = `<div>Mismatch between Master Vessel Data and Certificate:</div>${mismatchLines.join('')}`;
                 mismatchAlert.style.display = 'flex';
             } else mismatchAlert.style.display = 'none';
 
@@ -520,7 +520,7 @@
             if (!items.length) { wrap.style.display = 'none'; return; }
 
             wrap.style.display = 'block';
-            document.getElementById('attention-count-text').innerText = `Perlu Ditindaklanjuti (${items.length})`;
+            document.getElementById('attention-count-text').innerText = `Needs Attention (${items.length})`;
 
             const html = items.map(item => {
                 const type = String(item.type || 'REVIEW').toUpperCase();
@@ -529,7 +529,7 @@
                 return `<div class="attention-item ${cls}">
                     <i data-lucide="${icon}" style="width:14px; flex:0 0 auto; margin-top:1px;"></i>
                     <div><b>${esc(item.title)}</b>${esc(item.message)}</div>
-                    <span class="attention-badge ${cls}">${cls === 'anomaly' ? 'Anomali' : 'Review'}</span>
+                    <span class="attention-badge ${cls}">${cls === 'anomaly' ? 'Anomaly' : 'Review'}</span>
                 </div>`;
             }).join('');
 
@@ -539,7 +539,7 @@
         function renderQuotationTable(parsed) {
             const rows = parsed.tabel_audit.filter(row => String(row.kategori || '').toUpperCase() === 'PENAWARAN');
             const groups = {};
-            rows.forEach(row => { const key = row.grup_penawaran || 'Item Lainnya'; (groups[key] ||= []).push(row); });
+            rows.forEach(row => { const key = row.grup_penawaran || 'Other Items'; (groups[key] ||= []).push(row); });
             let html = '';
             Object.entries(groups).forEach(([groupName, items]) => {
                 const groupHasFail = items.some(item => statusStyle(item.status || item.hasil_ai).key === 'ANOMALY');
@@ -552,13 +552,13 @@
                     const split = alias.split(' - ');
                     const itemCode = split.shift() || '-';
                     const systemName = split.join(' - ') || '-';
-                    const certs = String(row.cert_terkait || '').split(',').map(x => x.trim()).filter(x => x && x !== '-' && x !== 'TIDAK DITEMUKAN');
+                    const certs = String(row.cert_terkait || '').split(',').map(x => x.trim()).filter(x => x && x !== '-' && x.toUpperCase() !== 'NOT FOUND');
                     const badges = certs.length ? `<div class="cert-badge-wrap">${certs.map(c => `<span class="cert-badge-item">🏷️ ${esc(c)}</span>`).join('')}</div>` : '';
                     html += `<tr class="${s.row}"><td style="text-align:center;"><b>${esc(row.no_urut_penawaran || '-')}</b></td><td><div class="box-vendor">${esc(row.keterangan)}</div><div class="box-system">${esc(systemName)}</div><div class="box-code">${esc(itemCode)}</div></td><td><div class="doc-val">${esc(row.di_penawaran)}</div></td><td><div class="doc-val">${esc(row.di_sertifikat)}</div>${badges}</td><td><div class="doc-val" style="text-align:center;">${esc(row.di_do)}</div></td><td class="status-cell ${s.className}">${s.label}</td></tr>`;
-                    if (s.key !== 'MATCH' && row.reason) html += `<tr class="explanation-row ${s.row}"><td></td><td colspan="5"><div class="ai-note ${s.key === 'ANOMALY' ? 'err' : 'review'}"><b>${s.key === 'ANOMALY' ? '💡 AI Reason' : '🔍 Perlu Ditinjau'}:</b> ${esc(row.reason)}</div></td></tr>`;
+                    if (s.key !== 'MATCH' && row.reason) html += `<tr class="explanation-row ${s.row}"><td></td><td colspan="5"><div class="ai-note ${s.key === 'ANOMALY' ? 'err' : 'review'}"><b>${s.key === 'ANOMALY' ? '💡 AI Reason' : '🔍 Needs Review'}:</b> ${esc(row.reason)}</div></td></tr>`;
                 });
             });
-            document.getElementById('body-penawaran').innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">Tidak ada item quotation.</td></tr>';
+            document.getElementById('body-penawaran').innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding:30px; color:#64748b;">No quotation items found.</td></tr>';
         }
 
         function renderCertificateRegistry(parsed) {
@@ -582,7 +582,7 @@
                     <td class="status-cell ok-cell">✅ ${esc(cert.status || 'OK')}</td>
                 </tr>`;
             }).join('');
-            document.getElementById('body-sertifikat').innerHTML = html || '<tr><td colspan="12" style="text-align:center; padding:30px; color:#64748b;">Tidak ada certificate registry.</td></tr>';
+            document.getElementById('body-sertifikat').innerHTML = html || '<tr><td colspan="12" style="text-align:center; padding:30px; color:#64748b;">No certificate registry data.</td></tr>';
         }
     </script>
 </body>
