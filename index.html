@@ -8,100 +8,42 @@
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         :root {
-            --primary: #4e2b5c;
-            --primary-dark: #32193d;
-            --primary-soft: #f7f1f8;
-            --primary-line: #e5d5e9;
-            --ink: #172033;
-            --muted: #64748b;
-            --surface: #ffffff;
-            --surface-2: #fbfcfe;
-            --line: #e5e7eb;
-            --success: #16a34a;
-            --success-soft: #f0fdf4;
-            --success-line: #bbf7d0;
-            --warning: #d97706;
-            --warning-soft: #fffbeb;
-            --warning-line: #fde68a;
-            --danger: #dc2626;
-            --danger-soft: #fef2f2;
-            --danger-line: #fecaca;
-            --info: #2563eb;
-            --info-soft: #eff6ff;
-            --info-line: #bfdbfe;
+            --primary: #4e2b5c; --primary-dark: #32193d; --primary-soft: #f7f1f8; --primary-line: #e5d5e9;
+            --ink: #172033; --muted: #64748b; --surface: #ffffff; --surface-2: #fbfcfe; --line: #e5e7eb;
+            --success: #16a34a; --success-soft: #f0fdf4; --success-line: #bbf7d0;
+            --warning: #d97706; --warning-soft: #fffbeb; --warning-line: #fde68a;
+            --danger: #dc2626; --danger-soft: #fef2f2; --danger-line: #fecaca;
+            --info: #2563eb; --info-soft: #eff6ff; --info-line: #bfdbfe;
         }
 
         * { box-sizing: border-box; }
         body {
-            margin: 0;
-            padding: 24px;
-            min-height: 100vh;
-            color: var(--ink);
-            background:
-                radial-gradient(circle at 10% 0%, rgba(252, 211, 77, .20), transparent 30%),
+            margin: 0; padding: 24px; min-height: 100vh; color: var(--ink);
+            background: radial-gradient(circle at 10% 0%, rgba(252, 211, 77, .20), transparent 30%),
                 radial-gradient(circle at 90% 0%, rgba(168, 85, 247, .12), transparent 28%),
                 linear-gradient(135deg, #fffcf6 0%, #fff2e5 50%, #f9f2fb 100%);
-            font-family: Inter, sans-serif;
-            font-size: 12px;
+            font-family: Inter, sans-serif; font-size: 12px;
         }
 
         .app-shell { max-width: 1640px; margin: 0 auto; }
         .main-container { display: flex; gap: 22px; align-items: flex-start; }
 
-        .left-panel {
-            flex: 0 0 340px;
-            position: sticky;
-            top: 22px;
-            transition: all .28s ease;
-            z-index: 10;
-        }
-        .left-panel.is-hidden {
-            flex-basis: 0;
-            width: 0;
-            opacity: 0;
-            overflow: hidden;
-            transform: translateX(-25px);
-            pointer-events: none;
-            margin-right: -22px;
-        }
+        .left-panel { flex: 0 0 340px; position: sticky; top: 22px; transition: all .28s ease; z-index: 10; }
+        .left-panel.is-hidden { flex-basis: 0; width: 0; opacity: 0; overflow: hidden; transform: translateX(-25px); pointer-events: none; margin-right: -22px; }
         .right-panel { flex: 1; min-width: 0; }
 
-        .card {
-            background: rgba(255,255,255,.92);
-            border: 1px solid rgba(229, 231, 235, .96);
-            box-shadow: 0 16px 42px rgba(70, 46, 82, .08);
-            border-radius: 18px;
-        }
+        .card { background: rgba(255,255,255,.92); border: 1px solid rgba(229, 231, 235, .96); box-shadow: 0 16px 42px rgba(70, 46, 82, .08); border-radius: 18px; }
         .upload-card { padding: 24px; }
         .brand { text-align: center; padding: 5px 0 22px; }
-        .brand-logo {
-            width: 46px; height: 46px; margin: 0 auto 10px;
-            border-radius: 14px;
-            display: grid; place-items: center;
-            background: linear-gradient(145deg, var(--primary), #875397);
-            color: #fff;
-            box-shadow: 0 8px 18px rgba(78, 43, 92, .25);
-        }
+        .brand-logo { width: 46px; height: 46px; margin: 0 auto 10px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg, var(--primary), #875397); color: #fff; box-shadow: 0 8px 18px rgba(78, 43, 92, .25); }
         .brand h1 { margin: 0; color: var(--primary); font: 800 21px Poppins, sans-serif; letter-spacing: -.3px; }
         .brand p { margin: 5px 0 0; color: var(--muted); font-weight: 600; }
 
-        .upload-section {
-            margin-bottom: 12px;
-            padding: 13px;
-            border-radius: 12px;
-            border: 1px dashed #c9aece;
-            background: #fcfaff;
-        }
+        .upload-section { margin-bottom: 12px; padding: 13px; border-radius: 12px; border: 1px dashed #c9aece; background: #fcfaff; }
         label { display: block; margin-bottom: 7px; color: #4a2b54; font: 700 10px Poppins, sans-serif; letter-spacing: .4px; text-transform: uppercase; }
         input[type=file] { width: 100%; border: 1px solid #d9dbe3; border-radius: 8px; background: #fff; padding: 8px; font-size: 11px; }
         button { font: inherit; }
-        .btn-submit {
-            width: 100%; border: 0; border-radius: 11px; padding: 14px;
-            background: linear-gradient(135deg, var(--primary), #71427e);
-            color: #fff; cursor: pointer; font: 700 12px Poppins, sans-serif;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 8px 18px rgba(78, 43, 92, .22);
-        }
+        .btn-submit { width: 100%; border: 0; border-radius: 11px; padding: 14px; background: linear-gradient(135deg, var(--primary), #71427e); color: #fff; cursor: pointer; font: 700 12px Poppins, sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 18px rgba(78, 43, 92, .22); }
         .btn-submit:hover { filter: brightness(1.08); transform: translateY(-1px); }
         .btn-submit:disabled { opacity: .62; cursor: wait; transform: none; }
         #ui-message { display: none; margin-top: 12px; padding: 10px; border-radius: 9px; font-weight: 700; text-align: center; }
@@ -137,9 +79,25 @@
         .btn-full { background: var(--primary); color: #fff; }
         .btn-modern:hover { filter: brightness(.97); }
 
-        .alert { display: none; margin-top: 14px; padding: 11px 13px; border-radius: 10px; font-weight: 650; align-items: center; gap: 8px; }
+        .alert { display: none; margin-top: 14px; padding: 11px 13px; border-radius: 10px; font-weight: 650; gap: 8px; }
+        .alert-body { display: flex; align-items: flex-start; gap: 8px; }
         #missing-doc-alert { background: var(--danger-soft); border: 1px solid var(--danger-line); color: #991b1b; }
         #vessel-mismatch-alert { background: var(--warning-soft); border: 1px solid var(--warning-line); color: #9a5a02; }
+        .mismatch-line { margin-top: 4px; font-size: 10.5px; font-weight: 600; }
+        .mismatch-line b { font-weight: 800; }
+
+        #attention-summary { display: none; margin: 16px 22px 0; }
+        .attention-card { border-radius: 14px; border: 1px solid var(--line); background: #fff; overflow: hidden; }
+        .attention-head { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #faf7fb; border-bottom: 1px solid var(--line); font: 800 12px Poppins, sans-serif; color: var(--primary-dark); }
+        .attention-list { padding: 4px 0; max-height: 220px; overflow-y: auto; }
+        .attention-item { display: flex; gap: 10px; align-items: flex-start; padding: 9px 16px; border-bottom: 1px dashed var(--line); font-size: 10.5px; }
+        .attention-item:last-child { border-bottom: none; }
+        .attention-item.anomaly i { color: var(--danger); }
+        .attention-item.review i { color: var(--warning); }
+        .attention-item b { display: block; color: var(--ink); font-weight: 800; margin-bottom: 2px; }
+        .attention-badge { font: 700 8px Poppins, sans-serif; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; white-space: nowrap; margin-left: auto; }
+        .attention-badge.anomaly { background: var(--danger-soft); color: #991b1b; }
+        .attention-badge.review { background: var(--warning-soft); color: #9a5a02; }
 
         .tabs-container { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
         .tab-group, .filter-wrapper { display: flex; gap: 2px; }
@@ -155,34 +113,14 @@
         .content-card.active { display: block; animation: fade .25s ease; }
         @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ===== TABLES ===== */
-        .table-shell {
-            overflow-x: auto;
-            overflow-y: auto;
-            max-height: 68vh;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            background: #fff;
-        }
+        .table-shell { overflow-x: auto; overflow-y: auto; max-height: 68vh; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
         table { width: 100%; min-width: 980px; border-collapse: collapse; table-layout: fixed; }
         th, td { border-bottom: 1px solid var(--line); padding: 10px 9px; font-size: 10.5px; vertical-align: top; overflow-wrap: anywhere; }
         th { color: #52325e; background: #faf7fb; font: 800 9px Poppins, sans-serif; text-transform: uppercase; letter-spacing: .3px; text-align: left; }
 
-        /* Freeze header: header tetap terlihat saat body tabel discroll */
         thead { position: sticky; top: 0; z-index: 4; }
-        thead tr.section-title td {
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            background: linear-gradient(90deg, var(--primary), #6c3d78);
-        }
-        thead tr:not(.section-title) th {
-            position: sticky;
-            top: 40px;
-            z-index: 4;
-            background: #faf7fb;
-        }
-
+        thead tr.section-title td { position: sticky; top: 0; z-index: 5; background: linear-gradient(90deg, var(--primary), #6c3d78); }
+        thead tr:not(.section-title) th { position: sticky; top: 40px; z-index: 4; background: #faf7fb; }
         thead .section-title td { color: #fff; font: 800 11px Poppins, sans-serif; letter-spacing: .35px; padding: 12px 14px; }
         .group-header td { background: #f1f5f9; color: #334155; font: 800 11px Poppins, sans-serif; }
         .box-vendor { padding: 4px 6px; border-left: 3px solid #facc15; border-radius: 4px; background: #fefce8; color: #713f12; font-weight: 700; margin-bottom: 4px; }
@@ -201,9 +139,13 @@
         .ai-note.err { border-left: 3px solid var(--danger); background: var(--danger-soft); color: #991b1b; }
         body.filter-anomali .row-match { display: none; }
 
-        @media (max-width: 1180px) {
-            .left-panel { flex-basis: 300px; }
-        }
+        .expiry-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 999px; font: 800 9px Poppins, sans-serif; white-space: nowrap; }
+        .expiry-badge.valid { background: var(--success-soft); color: #166534; border: 1px solid var(--success-line); }
+        .expiry-badge.soon { background: var(--warning-soft); color: #9a5a02; border: 1px solid var(--warning-line); }
+        .expiry-badge.expired { background: var(--danger-soft); color: #991b1b; border: 1px solid var(--danger-line); }
+        .expiry-badge.unknown { background: #f1f5f9; color: #64748b; border: 1px solid var(--line); }
+
+        @media (max-width: 1180px) { .left-panel { flex-basis: 300px; } }
         @media (max-width: 860px) {
             body { padding: 12px; }
             .main-container { display: block; }
@@ -228,6 +170,8 @@
             thead, thead tr.section-title td, thead tr:not(.section-title) th { position: static; }
             table { min-width: 0; font-size: 8px; }
             th, td { padding: 5px; }
+            #attention-summary { margin: 12px 0 0; }
+            .attention-list { max-height: none; overflow: visible; }
         }
     </style>
 </head>
@@ -286,8 +230,8 @@
                             </div>
                         </div>
 
-                        <div id="missing-doc-alert" class="alert"><i data-lucide="alert-octagon" style="width:17px;"></i><span id="missing-doc-text"></span></div>
-                        <div id="vessel-mismatch-alert" class="alert"><i data-lucide="alert-triangle" style="width:17px;"></i><span id="vessel-mismatch-text"></span></div>
+                        <div id="missing-doc-alert" class="alert"><div class="alert-body"><i data-lucide="alert-octagon" style="width:17px;"></i><span id="missing-doc-text"></span></div></div>
+                        <div id="vessel-mismatch-alert" class="alert"><div class="alert-body"><i data-lucide="alert-triangle" style="width:17px;"></i><div id="vessel-mismatch-text"></div></div></div>
 
                         <div class="tabs-container">
                             <div class="tab-group">
@@ -301,17 +245,20 @@
                         </div>
                     </header>
 
+                    <div id="attention-summary">
+                        <div class="attention-card">
+                            <div class="attention-head"><i data-lucide="list-todo" style="width:16px;"></i> <span id="attention-count-text">Perlu Ditindaklanjuti</span></div>
+                            <div class="attention-list" id="attention-list"></div>
+                        </div>
+                    </div>
+
                     <div class="content-area">
                         <section id="tab-penawaran" class="content-card active">
                             <div class="table-shell">
                                 <table>
                                     <colgroup>
-                                        <col style="width:42px;">
-                                        <col style="width:43%;">
-                                        <col style="width:13%;">
-                                        <col style="width:15%;">
-                                        <col style="width:10%;">
-                                        <col style="width:18%;">
+                                        <col style="width:42px;"><col style="width:43%;"><col style="width:13%;">
+                                        <col style="width:15%;"><col style="width:10%;"><col style="width:18%;">
                                     </colgroup>
                                     <thead>
                                         <tr class="section-title"><td colspan="6">Quotation Compliance Check &amp; Reconciliation</td></tr>
@@ -333,20 +280,13 @@
                             <div class="table-shell">
                                 <table>
                                     <colgroup>
-                                        <col style="width:42px;">
-                                        <col style="width:18%;">
-                                        <col style="width:14%;">
-                                        <col style="width:12%;">
-                                        <col style="width:11%;">
-                                        <col style="width:8%;">
-                                        <col style="width:7%;">
-                                        <col style="width:6%;">
-                                        <col style="width:8%;">
-                                        <col style="width:9%;">
-                                        <col style="width:7%;">
+                                        <col style="width:42px;"><col style="width:16%;"><col style="width:12%;">
+                                        <col style="width:11%;"><col style="width:10%;"><col style="width:7%;">
+                                        <col style="width:6%;"><col style="width:5%;"><col style="width:7%;">
+                                        <col style="width:8%;"><col style="width:10%;"><col style="width:6%;">
                                     </colgroup>
                                     <thead>
-                                        <tr class="section-title"><td colspan="11">Certificate List &amp; Ship Validation</td></tr>
+                                        <tr class="section-title"><td colspan="12">Certificate List &amp; Ship Validation</td></tr>
                                         <tr>
                                             <th style="text-align:center;">No</th>
                                             <th>Report Name</th>
@@ -358,6 +298,7 @@
                                             <th style="text-align:center;">GT</th>
                                             <th style="text-align:center;">Call Sign</th>
                                             <th>Service Date</th>
+                                            <th>Next Inspection</th>
                                             <th style="text-align:center;">Status</th>
                                         </tr>
                                     </thead>
@@ -380,11 +321,7 @@
         let timerInterval = null;
 
         function esc(value) {
-            return String(value ?? '-')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+            return String(value ?? '-').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function decodeBase64Utf8(base64) {
@@ -431,6 +368,13 @@
             return { key: 'MATCH', label: '✅ MATCH', className: 'ok-cell', row: 'row-match' };
         }
 
+        function expiryBadge(status, days) {
+            if (status === 'EXPIRED') return `<span class="expiry-badge expired">🔴 EXPIRED${days !== null && days !== undefined ? ` (${Math.abs(days)}d lalu)` : ''}</span>`;
+            if (status === 'EXPIRING_SOON') return `<span class="expiry-badge soon">🟡 ${days}d LAGI</span>`;
+            if (status === 'VALID') return `<span class="expiry-badge valid">🟢 VALID</span>`;
+            return `<span class="expiry-badge unknown">-</span>`;
+        }
+
         async function checkStatus(jobId) {
             try {
                 const res = await fetch(`${STATUS_URL}?job_id=${encodeURIComponent(jobId)}&_t=${Date.now()}`, {
@@ -469,17 +413,14 @@
      document.getElementById('auditForm').onsubmit = async event => {
     event.preventDefault();
 
-    const maxSize = 50 * 1024 * 1024; // 50 MB per file
+    const maxSize = 50 * 1024 * 1024;
 
     const qFile = document.getElementById('quotationFile').files[0];
     const cFile = document.getElementById('certFile').files[0];
     const dFile = document.getElementById('deliveryFile').files[0];
 
     if ([qFile, cFile, dFile].some(file => file && file.size > maxSize)) {
-        showMessage(
-            'Ukuran file maksimal 50 MB per PDF. Mohon kompres dokumen yang lebih besar.',
-            true
-        );
+        showMessage('Ukuran file maksimal 50 MB per PDF. Mohon kompres dokumen yang lebih besar.', true);
         return;
     }
 
@@ -553,19 +494,46 @@
 
             const validation = parsed.ship_validation || {};
             const checks = validation.checks || {};
-            const mismatch = [];
-            ['vessel_name', 'imo_number', 'call_sign', 'owner'].forEach(key => { if (checks[key] && checks[key].match === false) mismatch.push(key.replace('_', ' ')); });
+            const mismatchLines = [];
+            Object.entries(checks).forEach(([field, check]) => {
+                if (check && check.match === false) {
+                    mismatchLines.push(`<div class="mismatch-line">• <b>${esc(field.replace(/_/g, ' '))}</b> — Master: <b>${esc(check.master || '-')}</b> vs Sertifikat: <b>${esc(check.certificate || '-')}</b></div>`);
+                }
+            });
             const mismatchAlert = document.getElementById('vessel-mismatch-alert');
             if (validation.master_found === false) {
-                document.getElementById('vessel-mismatch-text').innerText = 'Kapal tidak ditemukan pada Master Data Kapal. Mohon lakukan verifikasi manual.';
+                document.getElementById('vessel-mismatch-text').innerHTML = 'Kapal tidak ditemukan pada Master Data Kapal. Mohon lakukan verifikasi manual.';
                 mismatchAlert.style.display = 'flex';
-            } else if (mismatch.length) {
-                document.getElementById('vessel-mismatch-text').innerText = `Perbedaan data Master Kapal vs Sertifikat: ${mismatch.join(', ')}.`;
+            } else if (mismatchLines.length) {
+                document.getElementById('vessel-mismatch-text').innerHTML = `<div>Perbedaan data Master Kapal vs Sertifikat:</div>${mismatchLines.join('')}`;
                 mismatchAlert.style.display = 'flex';
             } else mismatchAlert.style.display = 'none';
 
+            renderAttentionSummary(parsed);
             renderQuotationTable(parsed);
             renderCertificateRegistry(parsed);
+        }
+
+        function renderAttentionSummary(parsed) {
+            const items = Array.isArray(parsed.attention_items) ? parsed.attention_items : [];
+            const wrap = document.getElementById('attention-summary');
+            if (!items.length) { wrap.style.display = 'none'; return; }
+
+            wrap.style.display = 'block';
+            document.getElementById('attention-count-text').innerText = `Perlu Ditindaklanjuti (${items.length})`;
+
+            const html = items.map(item => {
+                const type = String(item.type || 'REVIEW').toUpperCase();
+                const cls = type === 'ANOMALY' ? 'anomaly' : 'review';
+                const icon = type === 'ANOMALY' ? 'circle-x' : 'circle-alert';
+                return `<div class="attention-item ${cls}">
+                    <i data-lucide="${icon}" style="width:14px; flex:0 0 auto; margin-top:1px;"></i>
+                    <div><b>${esc(item.title)}</b>${esc(item.message)}</div>
+                    <span class="attention-badge ${cls}">${cls === 'anomaly' ? 'Anomali' : 'Review'}</span>
+                </div>`;
+            }).join('');
+
+            document.getElementById('attention-list').innerHTML = html;
         }
 
         function renderQuotationTable(parsed) {
@@ -596,9 +564,7 @@
         function renderCertificateRegistry(parsed) {
             const list = Array.isArray(parsed.certificate_registry) ? parsed.certificate_registry : [];
             const html = list.map((cert, i) => {
-                const certNumbers = Array.isArray(cert.cert_numbers)
-                    ? cert.cert_numbers
-                    : (cert.cert_no ? [cert.cert_no] : ['-']);
+                const certNumbers = Array.isArray(cert.cert_numbers) ? cert.cert_numbers : (cert.cert_no ? [cert.cert_no] : ['-']);
                 const certBubbles = `<div class="cert-badge-wrap">${certNumbers.map(c => `<span class="cert-badge-item">🏷️ ${esc(c)}</span>`).join('')}</div>`;
 
                 return `<tr class="row-match">
@@ -612,10 +578,11 @@
                     <td style="text-align:center;">${esc(cert.gt)}</td>
                     <td style="text-align:center;">${esc(cert.call_sign)}</td>
                     <td>${esc(cert.service_date)}</td>
+                    <td>${esc(cert.next_inspection_date)}<br>${expiryBadge(cert.expiry_status, cert.expiry_days)}</td>
                     <td class="status-cell ok-cell">✅ ${esc(cert.status || 'OK')}</td>
                 </tr>`;
             }).join('');
-            document.getElementById('body-sertifikat').innerHTML = html || '<tr><td colspan="11" style="text-align:center; padding:30px; color:#64748b;">Tidak ada certificate registry.</td></tr>';
+            document.getElementById('body-sertifikat').innerHTML = html || '<tr><td colspan="12" style="text-align:center; padding:30px; color:#64748b;">Tidak ada certificate registry.</td></tr>';
         }
     </script>
 </body>
