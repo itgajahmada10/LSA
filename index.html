@@ -119,7 +119,7 @@
         #reportPanel { display: none; overflow: hidden; }
         .report-header { padding: 20px 22px 0; background: linear-gradient(180deg, #fff 0%, #fcfafe 100%); border-bottom: 1px solid var(--line); }
         .top-info-bar { display: flex; align-items: stretch; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-        .ship-info { display: flex; gap: 12px 18px; align-items: center; }
+        .ship-info { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
         .info-box { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
         .info-label { color: var(--muted); font: 700 9px Poppins, sans-serif; text-transform: uppercase; letter-spacing: .35px; }
         .info-val { color: var(--primary-dark); font: 800 15px Poppins, sans-serif; overflow-wrap: anywhere; }
@@ -274,6 +274,7 @@
                         <div class="top-info-bar">
                             <div class="ship-info">
                                 <div class="info-box"><span class="info-label">Vessel Name</span><span class="info-val" id="val-vessel">-</span></div>
+                                <div class="info-box"><span class="info-label">Vendor</span><span class="info-val" id="val-vendor">-</span></div>
                             </div>
                             <div class="overall-box info-box">
                                 <span class="info-label">Overall Status</span>
@@ -532,6 +533,7 @@
 
             const ship = parsed.ship_info || {};
             document.getElementById('val-vessel').innerText = ship.name_of_ship || '-';
+            document.getElementById('val-vendor').innerText = ship.vendor_name || '-';
 
             const overall = String(parsed.status_keseluruhan || 'UNVERIFIED').replace(/_/g, ' ');
             const score = Number(parsed.compliance_score || 0);
